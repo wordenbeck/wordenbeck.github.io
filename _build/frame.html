@@ -1,0 +1,7 @@
+<!doctype html><html><body style="margin:0;overflow:hidden"><iframe id="f" style="border:0;width:100vw;height:100vh;display:block"></iframe>
+<script>
+// Hilfsseite für Screenshots: lädt eine Seite und klickt danach Elemente an. frame.html?src=../mahlzeit/&click=.seg button:nth-child(2)
+const q=new URLSearchParams(location.search), f=document.getElementById('f');
+f.src=q.get('src');
+f.onload=()=>setTimeout(()=>{const el=f.contentDocument.querySelector(q.get('click')); el&&el.click();},800);
+</script></body></html>

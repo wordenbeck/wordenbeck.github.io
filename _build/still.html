@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;overflow:hidden;background:#fff}iframe{border:0;display:block}.taps{display:none}</style>
+</head>
+<body>
+<!-- Hilfsseite für Standbilder: spielt ein Demo-Kapitel ab, headless Chrome fotografiert nach x ms.
+     Aufruf: still.html?p=kalo&c=1  (Fenstergröße = Demo-Größe) -->
+<iframe id="f"></iframe>
+<div class="taps" id="t"></div>
+<script src="../content.js"></script>
+<script src="../demo-player.js"></script>
+<script src="../demo-scripts.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const p = CONTENT.projects.find(x => x.id === q.get('p'));
+  const f = document.getElementById('f');
+  f.width = p.demo.width; f.height = p.demo.height;
+  f.dataset.src = '../' + p.demo.src;
+  const player = new DemoPlayer({ frame: f, taps: document.getElementById('t'), script: DEMO_SCRIPTS[p.id], onChapter: () => {} });
+  player.start(+q.get('c') || 0);
+</script>
+</body>
+</html>

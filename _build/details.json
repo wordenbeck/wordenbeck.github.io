@@ -1,0 +1,204 @@
+{
+"kalo": {
+ "de": {
+  "highlights": [
+   ["Mahlzeiten per Chat", "Einfach aufschreiben, was man gegessen hat. Kalo erkennt Zutaten, Mengen und Kalorien."],
+   ["Rückmeldung mit Charakter", "Jede Mahlzeit bekommt einen Kommentar im Ruhrpott-Ton. Ehrlich, aber nie belehrend."],
+   ["Alles auf einen Blick", "Kalorien, Makros, Wasser und Sport in einem Dashboard."],
+   ["Passend zum eigenen Ziel", "Abnehmen, halten oder aufbauen, nach Kalorien, High Protein oder SanaMana."],
+   ["Wochenrückblick", "Jeden Sonntag ein Fazit der Woche mit Vorschlägen für die nächste."]
+  ],
+  "tech": [
+   ["Aufbau", "React mit TypeScript und Vite, gedacht als App fürs iPhone. Supabase übernimmt Login, Datenbank und acht Serverfunktionen."],
+   ["Mahlzeit-Analyse", "Eine Serverfunktion schickt die Eingabe an das Sprachmodell Llama 3.3 (über Groq). Ein ausführlicher Prompt mit Beispielen sorgt dafür, dass immer strukturierte Daten zurückkommen: Lebensmittel, Mengen, Kalorien, Makros, Kommentar und bei Unklarheit eine Rückfrage."],
+   ["Persönlichkeit per Prompt", "Der Ruhrpott-Ton ist im Prompt mit Pflicht-Vokabular, Tonregeln und Negativbeispielen festgelegt. Wie deutlich Kalo wird, hängt davon ab, wie gut die Mahlzeit zum gewählten Konzept passt."],
+   ["Kontext", "Mit jeder Anfrage gehen Tagesbudget, bereits Gegessenes, Uhrzeit, Ernährungskonzept und Ziel mit. So passt die Antwort zur Situation."],
+   ["Weitere KI-Funktionen", "Wochenrückblick, Rezeptvorschläge, Wochenplan und Einkaufsliste laufen jeweils als eigene Serverfunktion."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["Log meals by chat", "Just write down what you ate. Kalo recognises ingredients, amounts and calories."],
+   ["Feedback with character", "Every meal gets a comment in Ruhr Valley dialect. Honest, never preachy."],
+   ["Everything at a glance", "Calories, macros, water and exercise in one dashboard."],
+   ["Built around your goal", "Lose, maintain or build, by calories, high protein or SanaMana."],
+   ["Weekly review", "Every Sunday a summary of the week with suggestions for the next one."]
+  ],
+  "tech": [
+   ["Setup", "React with TypeScript and Vite, designed as an iPhone app. Supabase handles login, database and eight server functions."],
+   ["Meal analysis", "A server function sends the input to the Llama 3.3 language model (via Groq). A detailed prompt with examples makes sure it always returns structured data: foods, amounts, calories, macros, a comment and, if unclear, a follow-up question."],
+   ["Personality by prompt", "The Ruhr Valley tone is defined in the prompt with required vocabulary, tone rules and counter-examples. How outspoken Kalo gets depends on how well the meal fits the chosen diet."],
+   ["Context", "Every request includes the daily budget, what has already been eaten, the time, the diet concept and the goal, so the answer fits the situation."],
+   ["More AI features", "Weekly review, recipe suggestions, meal plan and shopping list each run as their own server function."]
+  ]
+ }
+},
+"mahlzeit": {
+ "de": {
+  "highlights": [
+   ["Rezepte aus Instagram", "Link einfügen oder direkt aus Instagram teilen. Daraus wird ein sauberes Rezept."],
+   ["Woche planen", "Rezepte mit einem Tipp auf die Wochentage legen."],
+   ["Einkaufsliste von allein", "Alle Zutaten der Woche zusammengerechnet, Portionen anpassbar, Export nach Bring."],
+   ["Kochmodus", "Schritt für Schritt, mit Timern, die aus dem Rezepttext erkannt werden."],
+   ["Für den ganzen Haushalt", "Mehrere Geräte, ein gemeinsamer Plan. Änderungen erscheinen sofort überall."]
+  ],
+  "tech": [
+   ["Aufbau", "React mit TypeScript und Vite, als App installierbar (PWA), gehostet auf Vercel."],
+   ["Daten und Sync", "Supabase mit anonymem Login, ganz ohne Registrierung. Ein Haushalt ist ein gemeinsamer Bereich mit Beitrittscode; die Datenbank trennt die Haushalte sauber voneinander und synchronisiert Änderungen live zwischen den Geräten."],
+   ["Rezept-Import", "Eine Serverfunktion liest Text und Vorschaubild des Reels aus und schickt sie mit einem Parser-Prompt an Gemini. Zurück kommt ein strukturiertes Rezept: Zutaten mit Menge, Einheit und Hinweis, Schritte, Zeit und Schwierigkeit. Ist das Modell überlastet, versucht sie es bis zu dreimal; lässt sich der Text nicht lesen, kann man ihn selbst einfügen."],
+   ["Teilen aus Instagram", "Als installierte App meldet sich Mahlzeit beim Handy als Teilen-Ziel an. Ein Reel lässt sich so direkt aus Instagram an Mahlzeit schicken."],
+   ["Einkaufsliste", "Gleiche Zutaten werden über alle Rezepte nach Name und Einheit zusammengezählt und auf die gewählten Portionen umgerechnet. Gewürze ohne Mengenangabe stehen gesammelt am Ende."],
+   ["Export nach Bring", "Eine kleine Serverfunktion stellt die Liste im Rezept-Format bereit, das die Bring-App über einen Link einliest."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["Recipes from Instagram", "Paste a link or share straight from Instagram. It becomes a clean recipe."],
+   ["Plan the week", "Put recipes on weekdays with a single tap."],
+   ["Shopping list on autopilot", "All ingredients of the week added up, portions adjustable, export to Bring."],
+   ["Cooking mode", "Step by step, with timers detected from the recipe text."],
+   ["For the whole household", "Several devices, one shared plan. Changes show up everywhere instantly."]
+  ],
+  "tech": [
+   ["Setup", "React with TypeScript and Vite, installable as an app (PWA), hosted on Vercel."],
+   ["Data and sync", "Supabase with anonymous login, no sign-up needed. A household is a shared space with a join code; the database keeps households cleanly separated and syncs changes live between devices."],
+   ["Recipe import", "A server function reads the reel's text and thumbnail and sends them with a parser prompt to Gemini. Back comes a structured recipe: ingredients with amount, unit and note, steps, time and difficulty. If the model is overloaded it retries up to three times; if the text can't be read, you can paste it yourself."],
+   ["Share from Instagram", "Once installed, Mahlzeit registers as a share target on the phone, so a reel can be sent straight from Instagram."],
+   ["Shopping list", "Identical ingredients are added up across all recipes by name and unit and scaled to the chosen portions. Spices without an amount are listed together at the end."],
+   ["Export to Bring", "A small server function provides the list in a recipe format that the Bring app imports via a link."]
+  ]
+ }
+},
+"human": {
+ "de": {
+  "highlights": [
+   ["Slot-Machine", "Zieht eine von zehn DevOps-Rollen, dazu drei KI-Fähigkeiten und drei menschliche Stärken."],
+   ["Diskussions-Timer", "5, 10 oder 15 Minuten, auf Knopfdruck verlängerbar."],
+   ["KI-Perspektive", "Ein Zukunftsszenario und eine Reflexionsfrage zur gezogenen Rolle."],
+   ["Gemacht für den Beamer", "Große Schrift, Arcade-Look, Bedienung mit Leertaste und Enter."],
+   ["Komplett offline", "Keine Installation, kein Konto, keine laufenden Kosten."]
+  ],
+  "tech": [
+   ["Aufbau", "Eine einzige HTML-Datei mit CSS und JavaScript, ohne Framework und ohne Build-Schritt. Sie läuft in jedem Browser, auch ohne Internet."],
+   ["Inhalte", "20 handgeschriebene Sets, zwei pro Rolle, jeweils mit KI-Fähigkeiten, menschlichen Stärken, Szenario und Reflexionsfrage. Ein gemischter Stapel sorgt dafür, dass sich nichts wiederholt, bis alle Sets einmal dran waren."],
+   ["Sound ohne Audiodateien", "Die Chiptune-Musik entsteht live im Browser mit der Web Audio API, aus Melodie-, Akkord- und Bassfolgen."],
+   ["Inszenierung", "Die Walzen drehen im Takt der Musik. Die Reflexionsfrage erscheint nach einem Countdown wie mit der Schreibmaschine getippt, damit die Gruppe erst selbst nachdenkt."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["Slot machine", "Draws one of ten DevOps roles, plus three AI capabilities and three human strengths."],
+   ["Discussion timer", "5, 10 or 15 minutes, extendable at the push of a button."],
+   ["AI perspective", "A future scenario and a reflection question for the drawn role."],
+   ["Made for the projector", "Large type, arcade look, controlled with space bar and enter."],
+   ["Fully offline", "No installation, no account, no running costs."]
+  ],
+  "tech": [
+   ["Setup", "A single HTML file with CSS and JavaScript, no framework and no build step. It runs in any browser, even without internet."],
+   ["Content", "20 hand-written sets, two per role, each with AI capabilities, human strengths, a scenario and a reflection question. A shuffled deck makes sure nothing repeats until every set has come up once."],
+   ["Sound without audio files", "The chiptune music is generated live in the browser with the Web Audio API, from melody, chord and bass sequences."],
+   ["Staging", "The reels spin in time with the music. The reflection question appears after a countdown, typed out like on a typewriter, so the group thinks for itself first."]
+  ]
+ }
+},
+"vuca": {
+ "de": {
+  "highlights": [
+   ["Immer aktuell", "Neue Folgen erscheinen automatisch auf der Seite."],
+   ["Auf allen Plattformen", "Jede Folge mit Links zu Spotify, Apple Podcasts, Deezer und Amazon Music."],
+   ["Archiv mit Suche", "Alle Folgen durchsuchbar und nach Wert, Staffel und Jahr filterbar."],
+   ["Transkripte", "Auf Knopfdruck erstellt und vor der Veröffentlichung geprüft."],
+   ["Kurzlinks", "vucablaster.de/62 führt direkt zur Folge."]
+  ],
+  "tech": [
+   ["Statische Seite", "Ein Python-Skript baut alle Seiten aus dem RSS-Feed des Podcast-Hosters, den Schnittstellen von Apple und Deezer und gepflegten Inhaltsdateien. Gehostet auf GitHub Pages mit eigener Domain."],
+   ["Automatik", "Ein GitHub-Workflow läuft stündlich. Erscheint eine neue Folge, entsteht ihre Seite und ein Ticket mit Checkliste für den Host."],
+   ["Plattform-Links", "Spotify und Amazon bieten keinen einfachen Zugang ohne Entwicklerkonto. Deshalb öffnet ein automatisierter Browser (Playwright) ihre öffentlichen Podcast-Seiten und ordnet die Folgen über die Nummer im Titel zu."],
+   ["Transkripte", "Das Spracherkennungsmodell Whisper läuft direkt auf den GitHub-Servern, mit Pausenerkennung und einem Filter gegen Wiederholungsschleifen. Sichtbar werden nur freigegebene Transkripte."],
+   ["Pflege ohne Code", "Inhalte liegen in einfachen Dateien, damit die Hosts sie selbst ändern können."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["Always up to date", "New episodes appear on the site automatically."],
+   ["On every platform", "Each episode links to Spotify, Apple Podcasts, Deezer and Amazon Music."],
+   ["Searchable archive", "Every episode searchable and filterable by value, season and year."],
+   ["Transcripts", "Created at the push of a button and reviewed before publishing."],
+   ["Short links", "vucablaster.de/62 goes straight to the episode."]
+  ],
+  "tech": [
+   ["Static site", "A Python script builds every page from the podcast host's RSS feed, the Apple and Deezer APIs and maintained content files. Hosted on GitHub Pages with a custom domain."],
+   ["Automation", "A GitHub workflow runs every hour. When a new episode comes out, its page is created along with a ticket and checklist for the host."],
+   ["Platform links", "Spotify and Amazon offer no simple access without a developer account. So an automated browser (Playwright) opens their public podcast pages and matches episodes by the number in the title."],
+   ["Transcripts", "The speech recognition model Whisper runs directly on GitHub's servers, with pause detection and a filter against repetition loops. Only approved transcripts are shown."],
+   ["Maintenance without code", "Content lives in simple files so the hosts can change it themselves."]
+  ]
+ }
+},
+"punkte": {
+ "de": {
+  "highlights": [
+   ["Zwei Spiele, eigene Regeln", "Flip 7: Wer zuerst das Ziel erreicht, gewinnt. Uno: Die niedrigste Summe gewinnt."],
+   ["Schnell eintragen", "Punkte tippen, die Summen laufen mit, die nächste Runde legt sich selbst an."],
+   ["Siegerehrung", "Krone, Rangliste und Konfetti."],
+   ["Verlauf und Fakten", "König der Woche, Ewiger Zweiter, beste Siegquote und mehr."],
+   ["Ohne Konto", "Läuft komplett auf dem Handy, auch offline."]
+  ],
+  "tech": [
+   ["Aufbau", "Eine einzige HTML-Datei als installierbare App (PWA) mit Service Worker. Sie funktioniert auch ohne Internet."],
+   ["Speicher", "Das laufende Spiel und der Verlauf liegen nur auf dem Gerät (localStorage). Keine Datenbank, kein Server."],
+   ["Regeln je Spiel", "Flip 7 mit Punktziel zwischen 100 und 250. Uno mit Rundenziel (4, 8, 12 oder offen) und umgekehrter Wertung."],
+   ["Fakten aus dem Verlauf", "Die App errechnet Serien, Siegquoten, das Lieblingsspiel, den Dauergast und den Ewigen Zweiten und wählt bei jedem Besuch einige davon aus."],
+   ["Details", "Die Farben wechseln mit dem Spiel, Zahlen zählen animiert hoch, und auf dem Handy gibt es kurzes Vibrationsfeedback."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["Two games, their own rules", "Flip 7: first to the target wins. Uno: the lowest total wins."],
+   ["Quick entry", "Type the points, totals update, the next round sets itself up."],
+   ["Winner ceremony", "Crown, leaderboard and confetti."],
+   ["History and facts", "King of the week, eternal runner-up, best win rate and more."],
+   ["No account", "Runs entirely on the phone, even offline."]
+  ],
+  "tech": [
+   ["Setup", "A single HTML file as an installable app (PWA) with a service worker. It works without internet."],
+   ["Storage", "The current game and the history live only on the device (localStorage). No database, no server."],
+   ["Rules per game", "Flip 7 with a points target between 100 and 250. Uno with a round target (4, 8, 12 or open) and reversed scoring."],
+   ["Facts from the history", "The app works out streaks, win rates, the favourite game, the regular guest and the eternal runner-up, and picks a few on every visit."],
+   ["Details", "Colours change with the game, numbers count up with an animation, and phones give short vibration feedback."]
+  ]
+ }
+},
+"zirkus": {
+ "de": {
+  "highlights": [
+   ["Das Projekt erklärt", "Was die Kinder erwartet und was das Zirkusprojekt fördert."],
+   ["Bilder der Kinder", "Eine Galerie mit den Bildern, die die Kinder gemalt haben."],
+   ["Spenden leicht gemacht", "Per Überweisung oder GiroCode zum Scannen mit der Banking-App."],
+   ["Spendenchronik", "Der Fortschritt zum Ziel, jede Spende als Zeitleiste oder Feed."]
+  ],
+  "tech": [
+   ["Aufbau", "Eine React-Seite, die vorab in fertige Dateien übersetzt wird. Ausgeliefert als statische Seite über Vercel."],
+   ["Pflege", "Texte, Spendenziel und alle Spenden stehen in einer Datei. Neue Spenden trage ich als Liste ein, Summe und Chronik rechnen sich daraus."],
+   ["Bewegung mit Rücksicht", "Der Spendenring zählt hoch, sobald er ins Bild kommt. Wer am Gerät reduzierte Bewegung eingestellt hat, sieht direkt den Endwert."],
+   ["Zeitleiste", "Die Größe der Punkte zeigt die Höhe der Spende."],
+   ["Kein Zahlungsanbieter", "GiroCode reicht für Überweisungen und kostet die Schule keine Gebühren."]
+  ]
+ },
+ "en": {
+  "highlights": [
+   ["The project explained", "What the children can look forward to and what the circus project supports."],
+   ["Children's drawings", "A gallery with the pictures the children painted."],
+   ["Easy to donate", "By bank transfer or GiroCode, scanned with a banking app."],
+   ["Donation timeline", "Progress towards the goal, every donation as a timeline or feed."]
+  ],
+  "tech": [
+   ["Setup", "A React site that is compiled ahead of time into plain files and served as a static site via Vercel."],
+   ["Maintenance", "Texts, the donation goal and all donations live in one file. I add new donations as a list; the total and timeline are calculated from it."],
+   ["Motion with care", "The donation ring counts up once it scrolls into view. Anyone who has reduced motion enabled sees the final value straight away."],
+   ["Timeline", "The size of each dot shows the size of the donation."],
+   ["No payment provider", "GiroCode is enough for bank transfers and costs the school no fees."]
+  ]
+ }
+}
+}

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thomas Wordenbeck</title>
+<meta name="description" content="Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=20261020144242">
+</head>
+<body data-page="project" data-project="vuca" data-root="../">
+<header class="top"><div class="wrap top-in">
+  <a class="who" href="../" data-k="name"></a>
+  <nav>
+    <div class="menu">
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><span data-k="nav.work"></span><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="menu-panel" id="menu-panel" hidden></div>
+    </div>
+    <a class="nav-link" href="../warum/" data-k="nav.why"></a>
+    <a class="nav-link" href="../ueber-mich/" data-k="nav.about"></a>
+    <button class="theme-btn" id="theme-btn" type="button"></button>
+    <div class="lang"><button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button></div>
+  </nav>
+</div></header>
+<main class="wrap p-layout">
+  <div class="p-top"><a class="back-btn" id="back-btn" href="../#projekte"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span data-k="nav.backBtn"></span></a></div>
+  <section class="stage" id="stage">
+    <div class="stage-bar">
+      <div class="chapters" id="chapters"></div>
+      <button class="playpause" id="playpause" type="button"></button>
+    </div>
+    <p class="caption" id="caption" aria-live="polite"></p>
+    <div class="device-slot"><div id="device"></div></div>
+  </section>
+  <aside class="p-info">
+    <div class="p-head" id="p-head"></div>
+    <div class="p-tabs">
+      <div class="seg" id="p-tabs" role="tablist"></div>
+      <div class="p-panel" id="p-panel" role="tabpanel"></div>
+    </div>
+    <nav class="switcher" aria-label="Projekte">
+      <h2 data-k="labels.more"></h2>
+      <div id="switcher"></div>
+    </nav>
+  </aside>
+</main>
+<script src="../content.js?v=20261020144242"></script>
+<script src="../demo-player.js?v=20261020144242"></script>
+<script src="../demo-scripts.js?v=20261020144242"></script>
+<script src="../site.js?v=20261020144242"></script>
+</body>
+</html>

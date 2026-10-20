@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalo — Klickbarer Prototyp</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  /* ── Kalo Design Tokens (aus src/index.css) ── */
+  :root {
+    --bg-page:        #f9fafb;
+    --bg-card:        #ffffff;
+    --bg-muted:       #f3f4f6;
+    --bg-green:       #f0fdf4;
+    --bg-green-light: #dcfce7;
+    --text-1: #111827;
+    --text-2: #374151;
+    --text-3: #6b7280;
+    --text-4: #9ca3af;
+    --border: #e5e7eb;
+    --green:          #16a34a;
+    --green-hover:    #15803d;
+    --water-track:      #e0f2fe;
+    --water-ring:       #0ea5e9;
+    --water-btn-bg:     #f0f9ff;
+    --water-btn-border: #e0f2fe;
+    --water-btn-text:   #0369a1;
+    --orange: #f97316;
+    --shadow-card:    0 1px 4px rgba(0,0,0,0.06);
+    --shadow-card-lg: 0 4px 24px rgba(0,0,0,0.08);
+    --auth-gradient: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  }
+
+  html, body { font-family: system-ui, -apple-system, sans-serif; background: #e5e7eb; color: var(--text-1); -webkit-font-smoothing: antialiased; }
+
+  /* ── Overview / Grid ── */
+  .overview { padding: 32px 24px 80px; }
+  .overview-header {
+    max-width: 1240px; margin: 0 auto 32px;
+    display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .overview-title { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .overview-sub { color: var(--text-3); font-size: 15px; }
+  .overview-hint { color: var(--text-3); font-size: 13px; background: white; padding: 8px 14px; border-radius: 10px; }
+  .grid {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+  }
+  .group-title { grid-column: 1 / -1; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-3); margin: 20px 0 -4px; }
+  .thumb {
+    background: white; border-radius: 20px; overflow: hidden; cursor: pointer; border: 1px solid var(--border);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .thumb:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.08); }
+  .thumb-preview {
+    height: 200px; background: var(--auth-gradient); display: flex; align-items: center; justify-content: center;
+  }
+  .thumb-preview-inner {
+    width: 140px; height: 250px; background: var(--bg-page); border-radius: 22px; border: 6px solid #111;
+    overflow: hidden; position: relative; transform: scale(0.8);
+  }
+  .thumb-info { padding: 14px 18px; border-top: 1px solid var(--border); }
+  .thumb-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .thumb-desc { font-size: 12px; color: var(--text-3); }
+
+  /* ── Detail View mit iPhone-Frame ── */
+  .detail { display: none; min-height: 100vh; background: #1a1d24; padding: 40px 20px; }
+  .detail.active { display: flex; align-items: flex-start; justify-content: center; gap: 40px; flex-wrap: wrap; }
+  .detail-nav { max-width: 260px; color: white; }
+  .detail-back {
+    background: #2a2e36; color: white; border: none; padding: 10px 18px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 24px;
+  }
+  .detail-back:hover { background: #363a44; }
+  .detail-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .detail-desc { font-size: 13px; color: #a0a5b1; line-height: 1.5; margin-bottom: 24px; }
+  .detail-flow-title { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #a0a5b1; margin-bottom: 8px; }
+  .detail-flow-list { display: flex; flex-direction: column; gap: 6px; }
+  .detail-flow-list a {
+    color: var(--green); font-size: 13px; text-decoration: none; padding: 8px 10px; border-radius: 8px;
+    background: rgba(22,163,74,0.12); cursor: pointer;
+  }
+  .detail-flow-list a:hover { background: rgba(22,163,74,0.22); }
+
+  /* ── iPhone Frame ── */
+  .iphone {
+    width: 390px; height: 844px; background: #111; border-radius: 55px;
+    padding: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.4); position: relative; flex-shrink: 0;
+  }
+  .iphone-notch {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 32px; background: #111; border-radius: 0 0 20px 20px; z-index: 20;
+  }
+  .iphone-screen {
+    width: 100%; height: 100%; background: var(--bg-page); border-radius: 44px; overflow: hidden;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .status-bar {
+    padding: 14px 28px 6px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 14px; font-weight: 600; color: var(--text-1); flex-shrink: 0;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+
+  /* ── Shared: .page + Container ── */
+  .kalo-app { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .kalo-app::-webkit-scrollbar { display: none; }
+  .page, .dashboard {
+    max-width: 480px; margin: 0 auto;
+    padding: 20px 16px 100px;
+    background: var(--bg-page);
+    min-height: 100%;
+  }
+
+  /* ── Page Header (Meals-Style) ── */
+  .page-header {
+    display: flex; align-items: center; margin-bottom: 20px;
+  }
+  .back-btn {
+    background: var(--bg-muted); border: none; border-radius: 10px; padding: 8px 12px; cursor: pointer;
+    color: var(--text-2); display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+  }
+  .page-title {
+    flex: 1; text-align: center; font-size: 18px; font-weight: 700; color: var(--text-1); margin: 0;
+  }
+  .page-header-spacer { width: 36px; }
+
+  /* ── Icon Buttons ── */
+  .icon-btn {
+    background: var(--bg-muted); border: none; border-radius: 10px; padding: 8px 10px; cursor: pointer;
+    color: var(--text-3); display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+  }
+
+  /* ── Dashboard Header ── */
+  .dash-header {
+    position: relative; text-align: center; margin-bottom: 20px; padding: 0 132px 0 40px;
+  }
+  .dash-date { font-size: 13px; color: var(--text-4); margin: 0 0 4px; }
+  .dash-greeting { font-size: 20px; font-weight: 700; color: var(--text-1); margin: 0 0 2px; }
+  .dash-header-actions { position: absolute; right: 0; top: 0; display: flex; gap: 6px; }
+
+  /* ── Card ── */
+  .dash-card {
+    background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 12px;
+    box-shadow: var(--shadow-card);
+  }
+  .card-title-row {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+  }
+  .card-title-left { display: flex; align-items: center; gap: 6px; }
+  .card-title {
+    font-size: 12px; font-weight: 600; color: var(--text-4);
+    text-transform: uppercase; letter-spacing: 0.06em; margin: 0;
+  }
+  .card-nav-btn {
+    background: var(--bg-muted); border: none; border-radius: 8px; padding: 6px 8px;
+    color: var(--text-3); cursor: pointer; display: flex; align-items: center;
+  }
+
+  /* ── Donut ── */
+  .donut-layout { display: flex; align-items: center; gap: 20px; }
+  .donut-box { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none;
+  }
+  .donut-remaining { display: block; font-size: 24px; font-weight: 700; line-height: 1; color: var(--green); }
+  .donut-label { display: block; font-size: 11px; color: var(--text-4); margin-top: 3px; }
+  .calorie-stats-col { flex: 1; display: flex; flex-direction: column; padding-left: 8px; }
+  .calorie-stat-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0;
+  }
+  .calorie-divider-h { height: 1px; background: var(--border); }
+  .calorie-num { display: block; font-size: 16px; font-weight: 700; color: var(--text-1); line-height: 1; }
+  .calorie-lbl { display: block; font-size: 11px; color: var(--text-4); margin-top: 2px; }
+  .calorie-add-chip {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--bg-green); color: var(--green);
+    padding: 8px 11px; border-radius: 12px; flex-shrink: 0; font-size: 12px;
+  }
+
+  /* ── Macro Rings ── */
+  .macro-rings-row { display: flex; justify-content: space-around; gap: 8px; }
+  .macro-ring-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .macro-ring-svg { position: relative; width: 68px; height: 68px; }
+  .macro-ring-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .macro-ring-val { font-size: 12px; font-weight: 700; line-height: 1; }
+  .macro-ring-goal { font-size: 11px; color: var(--text-3); font-weight: 500; }
+  .macro-ring-label { font-size: 11px; color: var(--text-4); display: flex; align-items: center; gap: 3px; }
+
+  /* ── Water ── */
+  .water-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .water-header .card-title { margin: 0; }
+  .water-content { display: flex; align-items: center; gap: 14px; }
+  .water-ring-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+  .water-ring-box { position: relative; width: 90px; height: 90px; }
+  .water-ring-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .water-text-col { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-left: 12px; }
+  .water-text-row { display: flex; flex-direction: column; gap: 1px; }
+  .water-text-label { font-size: 11px; color: var(--text-4); }
+  .water-text-value { font-size: 20px; font-weight: 700; color: var(--text-1); line-height: 1; }
+  .water-btns-col { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; min-width: 80px; }
+  .water-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 8px; background: var(--water-btn-bg);
+    border: 1.5px solid var(--water-btn-border); border-radius: 12px; cursor: pointer;
+    width: 100%;
+  }
+  .water-btn-icon-row { display: flex; align-items: center; gap: 3px; color: var(--water-btn-text); font-size: 13px; }
+  .water-btn-name { font-size: 12px; font-weight: 600; color: var(--water-btn-text); line-height: 1; }
+  .water-btn-ml { font-size: 10px; color: var(--water-btn-text); opacity: 0.7; }
+
+  /* ── Log entries ── */
+  .log-list { display: flex; flex-direction: column; gap: 6px; }
+  .log-entry {
+    display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  }
+  .log-icon {
+    width: 28px; height: 28px; border-radius: 8px; background: var(--bg-muted);
+    display: flex; align-items: center; justify-content: center; color: var(--text-4);
+  }
+  .log-label { flex: 1; font-size: 13px; color: var(--text-2); }
+  .log-kcal { font-size: 13px; color: var(--green); font-weight: 600; }
+
+  /* ── Bottom Nav (BottomNav.css 1:1) ── */
+  .bn-root {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 50;
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 8px 8px 20px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  }
+  .bn-item {
+    flex: 1; background: none; border: 0; display: flex; flex-direction: column; align-items: center;
+    gap: 3px; padding: 6px 2px; font-size: 10px; color: var(--text-3); cursor: pointer;
+    position: relative;
+  }
+  .bn-item--active { color: #3b82f6; }
+  .bn-item--active::after {
+    content: ''; position: absolute; top: -8px; left: 50%; width: 28px; height: 2px;
+    background: #3b82f6; border-radius: 2px; transform: translateX(-50%);
+  }
+  .bn-fab-wrap {
+    flex: 1; background: none; border: 0; display: flex; flex-direction: column; align-items: center;
+    gap: 3px; cursor: pointer; padding: 0;
+  }
+  .bn-fab {
+    width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: -22px; box-shadow: 0 6px 18px rgba(34, 197, 94, 0.5);
+  }
+  .bn-fab-label { color: var(--green); font-size: 10px; font-weight: 600; }
+
+  /* ── Rezepte Tiles ── */
+  .rz-intro { font-size: 14px; color: var(--text-3); margin: 0 0 18px; padding: 0 4px; }
+  .rz-tiles { display: flex; flex-direction: column; gap: 12px; }
+  .rz-tile {
+    display: flex; align-items: center; gap: 14px; padding: 18px 16px;
+    background: var(--bg-card); border: 0; border-radius: 18px;
+    box-shadow: var(--shadow-card); cursor: pointer; text-align: left;
+    width: 100%;
+  }
+  .rz-tile-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .rz-tile-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .rz-tile-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+  .rz-tile-sub { font-size: 12px; color: var(--text-4); }
+  .rz-tile-arrow { color: var(--text-4); }
+
+  /* ── Auth (Login/Register) ── */
+  .auth-container {
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    background: var(--auth-gradient); padding: 24px;
+  }
+  .auth-card {
+    background: var(--bg-card); border-radius: 24px; padding: 40px 32px;
+    width: 100%; max-width: 400px; box-shadow: var(--shadow-card-lg);
+  }
+  .auth-logo { font-size: 48px; text-align: center; margin-bottom: 8px; }
+  .auth-title { font-size: 32px; font-weight: 700; text-align: center; color: var(--green); margin: 0 0 4px; }
+  .auth-subtitle { font-size: 16px; color: var(--text-3); text-align: center; margin: 0 0 32px; }
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+  .input-group label { font-size: 14px; font-weight: 500; color: var(--text-2); }
+  .input-group input {
+    padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 12px;
+    font-size: 16px; outline: none; background: var(--bg-card); color: var(--text-1);
+    -webkit-appearance: none; font-family: inherit;
+  }
+  .input-group input:focus { border-color: var(--green); }
+  .auth-button {
+    margin-top: 8px; padding: 14px; background: var(--green); color: white;
+    border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .auth-switch { font-size: 13px; text-align: center; color: var(--text-3); margin-top: 16px; }
+  .auth-switch a { color: var(--green); text-decoration: none; font-weight: 600; }
+  .auth-version { text-align: center; font-size: 11px; color: var(--text-4); margin-top: 20px; }
+
+  /* ── Onboarding ── */
+  .onboarding-container {
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 24px;
+  }
+  .onboarding-card {
+    background: white; border-radius: 24px; padding: 32px 28px;
+    width: 100%; max-width: 440px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .progress-bar { height: 6px; background: #e5e7eb; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: #16a34a; border-radius: 99px; }
+  .progress-label { font-size: 13px; color: #9ca3af; margin: 0 0 24px; }
+  .step-emoji { font-size: 40px; margin-bottom: 8px; }
+  .step h2 { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 6px; }
+  .step-sub { font-size: 14px; color: #6b7280; margin: 0 0 24px; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .option-btn {
+    padding: 10px 8px; border: 1.5px solid #e5e7eb; border-radius: 12px;
+    background: white; font-size: 13px; cursor: pointer; color: #374151; font-family: inherit;
+  }
+  .option-btn.active { border-color: #16a34a; background: #f0fdf4; color: #16a34a; font-weight: 600; }
+  .option-list { display: flex; flex-direction: column; gap: 8px; }
+  .option-list-btn {
+    padding: 14px 16px; border: 1.5px solid #e5e7eb; border-radius: 12px;
+    background: white; text-align: left; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .option-list-btn.active { border-color: #16a34a; background: #f0fdf4; }
+  .option-list-emoji { font-size: 22px; }
+  .option-list-label { font-size: 15px; font-weight: 500; color: #111827; }
+  .ob-primary {
+    margin-top: 20px; padding: 14px; background: var(--green); color: white; border: none;
+    border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;
+    font-family: inherit;
+  }
+  .ob-primary:disabled { background: #86efac; }
+
+  /* ── Meals ── */
+  .meal-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .meal-type-card {
+    position: relative; background: var(--bg-card); border: none; border-radius: 18px;
+    padding: 16px; cursor: pointer; box-shadow: var(--shadow-card); text-align: left;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .meal-type-top { display: flex; justify-content: space-between; align-items: center; }
+  .meal-type-icon {
+    width: 36px; height: 36px; background: var(--bg-green); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .meal-type-plus {
+    width: 28px; height: 28px; background: var(--green); color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .meal-type-label { font-size: 15px; font-weight: 600; color: var(--text-1); }
+  .meal-type-badge {
+    position: absolute; top: 10px; right: 10px; background: var(--bg-green-light);
+    color: var(--green); font-size: 11px; font-weight: 700; border-radius: 99px; padding: 2px 7px;
+  }
+
+  .chat-card {
+    background: var(--bg-card); border-radius: 20px; padding: 16px;
+    box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px;
+  }
+  .meal-type-tabs { display: flex; gap: 6px; }
+  .meal-tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 7px 4px; border: 1.5px solid var(--border); border-radius: 10px;
+    background: transparent; font-size: 11px; font-weight: 500; color: var(--text-3);
+    cursor: pointer; font-family: inherit;
+  }
+  .meal-tab.active {
+    border-color: var(--green); background: var(--bg-green); color: var(--green); font-weight: 600;
+  }
+  .chat-msg {
+    background: var(--bg-muted); border-radius: 14px; padding: 10px 12px; font-size: 13px; color: var(--text-2); line-height: 1.4;
+  }
+  .chat-msg.user { background: var(--bg-green); color: var(--text-1); align-self: flex-end; max-width: 82%; }
+  .chat-msg.bot { max-width: 90%; }
+  .chat-input-row {
+    display: flex; gap: 8px; align-items: center; padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .chat-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; font-size: 14px; outline: none; background: var(--bg-page);
+    color: var(--text-1); font-family: inherit;
+  }
+  .chat-send {
+    width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--green);
+    color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Sport ── */
+  .sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .sport-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 8px; border: 1.5px solid var(--border); border-radius: 14px;
+    background: var(--bg-card); cursor: pointer; font-family: inherit;
+  }
+  .sport-btn.active {
+    border-color: var(--green); background: var(--bg-green); transform: scale(1.02);
+  }
+  .sport-icon {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--bg-muted);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .sport-btn.active .sport-icon { background: var(--bg-green-light); }
+  .sport-name { font-size: 11px; font-weight: 500; color: var(--text-2); }
+  .sport-btn.active .sport-name { color: var(--green); font-weight: 600; }
+
+  /* ── Kochbuch ── */
+  .kb-add-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px 16px; margin-bottom: 16px;
+    background: var(--green); color: white; border: none; border-radius: 14px;
+    font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .kb-card {
+    display: flex; align-items: stretch; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    margin-bottom: 10px; cursor: pointer;
+  }
+  .kb-thumb {
+    width: 76px; flex-shrink: 0; background: linear-gradient(135deg, #ffcc80, #f97316);
+    display: flex; align-items: center; justify-content: center; font-size: 32px;
+  }
+  .kb-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .kb-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+  .kb-desc { font-size: 12px; color: var(--text-3); }
+  .kb-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--text-4); margin-top: 4px; }
+  .kb-source-link { color: #3b82f6; text-decoration: none; }
+
+  /* ── Wochenplan ── */
+  .wp-day {
+    background: var(--bg-card); border-radius: 16px; padding: 14px; margin-bottom: 10px;
+    box-shadow: var(--shadow-card);
+  }
+  .wp-day.today { border: 2px solid var(--green); }
+  .wp-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .wp-day-name { font-size: 15px; font-weight: 700; color: var(--text-1); }
+  .wp-day-date { font-size: 12px; color: var(--text-4); }
+  .wp-slot { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: 13px; }
+  .wp-slot:first-of-type { border-top: 0; }
+  .wp-slot-time { color: var(--text-4); min-width: 56px; font-size: 12px; }
+  .wp-slot-name { flex: 1; color: var(--text-2); }
+  .wp-slot-empty { color: var(--text-4); font-style: italic; }
+
+  /* ── Verlauf ── */
+  .day-entry {
+    background: var(--bg-card); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: var(--shadow-card);
+  }
+  .day-entry-name { font-size: 14px; font-weight: 600; color: var(--text-1); }
+  .day-entry-date { font-size: 11px; color: var(--text-4); margin-top: 2px; }
+  .day-entry-stats { text-align: right; }
+  .day-entry-kcal { font-size: 14px; font-weight: 700; color: var(--text-1); }
+  .day-entry-goal { font-size: 11px; margin-top: 2px; }
+  .day-entry-goal.ok { color: var(--green); }
+  .day-entry-goal.over { color: #ef4444; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 12px; font-weight: 600; color: var(--text-4);
+    text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; padding: 0 4px;
+  }
+
+  /* ── Profile ── */
+  .profile-hero { text-align: center; padding: 12px 0 20px; }
+  .profile-avatar {
+    width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 12px;
+    background: var(--green); color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700;
+  }
+  .profile-name { font-size: 20px; font-weight: 700; }
+  .profile-email { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; background: var(--bg-card); margin-bottom: 6px;
+    border-radius: 12px; font-size: 14px; cursor: pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .settings-row-left { display: flex; align-items: center; gap: 12px; }
+  .settings-row-icon {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--bg-muted);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .settings-row-arrow { color: var(--text-4); font-size: 18px; }
+
+  /* ── Kochbuch Detail ── */
+  .kb-detail-image { height: 220px; background: linear-gradient(135deg, #ffcc80, #f97316); display: flex; align-items: center; justify-content: center; font-size: 80px; position: relative; }
+  .kb-back-overlay {
+    position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+    border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; color: var(--text-1);
+    display: flex; align-items: center;
+  }
+  .kb-detail-body { padding: 20px; }
+  .kb-detail-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: var(--text-1); }
+  .kb-detail-source { font-size: 13px; color: #3b82f6; margin-bottom: 14px; text-decoration: none; }
+  .kb-detail-meta { display: flex; gap: 14px; color: var(--text-3); font-size: 12px; margin-bottom: 16px; }
+  .kb-macros-card {
+    background: var(--bg-card); border-radius: 14px; padding: 12px 16px;
+    display: flex; justify-content: space-around; margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+  }
+  .kb-macros-item { text-align: center; }
+  .kb-macros-value { font-size: 18px; font-weight: 700; color: var(--text-1); }
+  .kb-macros-label { font-size: 10px; color: var(--text-4); }
+  .kb-section { margin-bottom: 22px; }
+  .kb-section-title {
+    font-size: 12px; font-weight: 600; color: var(--text-4);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+  }
+  .kb-ingredient { font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-2); }
+  .kb-ingredient:last-child { border-bottom: none; }
+  .kb-step { font-size: 14px; line-height: 1.5; padding: 8px 0; display: flex; gap: 10px; color: var(--text-2); }
+  .kb-step-num { font-weight: 700; color: var(--green); flex-shrink: 0; }
+
+  /* Import Dialog */
+  .import-form-input {
+    width: 100%; padding: 12px 14px 12px 40px; border: 1.5px solid var(--border);
+    border-radius: 12px; font-size: 14px; outline: none; background: var(--bg-card);
+    color: var(--text-1); font-family: inherit;
+  }
+  .import-input-wrap { position: relative; margin-bottom: 12px; }
+  .import-input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-4); }
+  .import-btn {
+    padding: 12px; background: var(--green); color: white; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit;
+  }
+
+  /* Weekly Review */
+  .wr-hero { text-align: center; padding: 8px 0 20px; }
+  .wr-hero-emoji { font-size: 42px; margin-bottom: 8px; }
+  .wr-hero-title { font-size: 20px; font-weight: 700; }
+  .wr-hero-sub { font-size: 12px; color: var(--text-4); margin-top: 2px; }
+  .stat-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; }
+  .stat-row + .stat-row { border-top: 1px solid var(--border); }
+  .stat-row .lbl { color: var(--text-3); }
+  .stat-row .val { font-weight: 600; color: var(--text-1); }
+
+  /* Search input */
+  .search-wrap { position: relative; margin-bottom: 12px; }
+  .search-input {
+    width: 100%; padding: 10px 14px 10px 38px; border: 1.5px solid var(--border);
+    border-radius: 12px; font-size: 14px; background: var(--bg-card); color: var(--text-1);
+    outline: none; font-family: inherit;
+  }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-4); }
+
+  /* Favoriten */
+  .fav-item {
+    background: var(--bg-card); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-card);
+  }
+  .fav-item-body { flex: 1; }
+  .fav-item-name { font-size: 14px; font-weight: 600; color: var(--text-1); }
+  .fav-item-meta { font-size: 11px; color: var(--text-4); margin-top: 2px; }
+  .fav-add-btn {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--green); color: white;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Einkauf */
+  .ek-item {
+    background: var(--bg-card); border-radius: 12px; padding: 12px 16px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-card);
+  }
+  .ek-check {
+    width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ek-check.done { background: var(--green); border-color: var(--green); color: white; }
+  .ek-name { flex: 1; font-size: 14px; color: var(--text-2); }
+  .ek-name.done { text-decoration: line-through; color: var(--text-4); }
+
+  /* SVG utils */
+  .ring-track { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-progress { fill: none; stroke-width: 10; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+  .macro-ring-track { fill: none; stroke: var(--border); stroke-width: 6; }
+  .macro-ring-progress { fill: none; stroke-width: 6; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+  .water-ring-track { fill: none; stroke: var(--water-track); stroke-width: 8; }
+  .water-ring-progress { fill: none; stroke: var(--water-ring); stroke-width: 8; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+</style>
+</head>
+<body>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="overview" id="overview">
+  <div class="overview-header">
+    <div>
+      <h1 class="overview-title">Kalo — Klickbarer Prototyp</h1>
+      <p class="overview-sub">Gebaut aus den echten CSS-Files & Komponenten. Klick auf einen Screen.</p>
+    </div>
+    <div class="overview-hint">💡 Öffne im Browser (Doppelklick auf index.html)</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="detail" id="detail-container"></div>
+
+<script>
+// ==================================================================
+// Icon helpers — approximated (lucide-react is used in real app)
+// ==================================================================
+const Icon = {
+  flame: () => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`,
+  bar: () => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  droplets: () => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>`,
+  trophy: () => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+  calendar: () => `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  history: () => `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>`,
+  user: () => `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>`,
+  moon: () => `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  logout: () => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  home: () => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  chef: () => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>`,
+  plus: () => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  footprints: () => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/></svg>`,
+  cart: () => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
+  back: () => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+  utensils: () => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+  send: () => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+  link: () => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+  search: () => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  plusSm: () => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  beef: () => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12.5" cy="8.5" r="2.5"/><path d="M12.5 2a6.5 6.5 0 0 0-6.22 4.6c-1.1 3.13-.78 3.9-3.18 6.08A3 3 0 0 0 5 18c4 0 6.5-3 8-4"/><path d="M18.5 13a6.5 6.5 0 0 1-4.6 6.22c-3.13 1.1-3.9.78-6.08 3.18A3 3 0 0 1 3 20.5c0-4 3-6.5 4-8"/></svg>`,
+  wheat: () => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22 16 8"/><path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94z"/><path d="M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94z"/><path d="M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94z"/><path d="M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z"/><path d="M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/><path d="M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/><path d="M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/></svg>`,
+  drop: () => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+  glass: () => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.8L5.4 6.6a1 1 0 0 1 1-1.2h11.2a1 1 0 0 1 1 1.2l-1.4 13.6a2 2 0 0 1-2 1.8Z"/></svg>`,
+  ext: () => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`
+};
+
+// ==================================================================
+// Donut ring for calories
+// ==================================================================
+function donutRing(consumed, goal) {
+  const pct = Math.min(1, consumed / goal);
+  const R = 60;
+  const C = 2 * Math.PI * R;
+  const offset = C * (1 - pct);
+  return `
+    <svg width="140" height="140" viewBox="0 0 140 140">
+      <circle cx="70" cy="70" r="${R}" class="ring-track"/>
+      <circle cx="70" cy="70" r="${R}" class="ring-progress"
+        stroke="var(--green)" stroke-dasharray="${C}" stroke-dashoffset="${offset}"/>
+    </svg>
+  `;
+}
+
+function macroRing(current, goal, color, iconSvg, label) {
+  const pct = Math.min(1, current / goal);
+  const R = 28;
+  const C = 2 * Math.PI * R;
+  const offset = C * (1 - pct);
+  return `
+    <div class="macro-ring-item">
+      <div class="macro-ring-svg">
+        <svg width="68" height="68" viewBox="0 0 68 68">
+          <circle cx="34" cy="34" r="${R}" class="macro-ring-track"/>
+          <circle cx="34" cy="34" r="${R}" class="macro-ring-progress"
+            stroke="${color}" stroke-dasharray="${C}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="macro-ring-center">
+          <span class="macro-ring-val" style="color:${color}">${current}</span>
+        </div>
+      </div>
+      <span class="macro-ring-goal">${current}/${goal}g</span>
+      <span class="macro-ring-label" style="color: ${color};">${iconSvg}${label}</span>
+    </div>
+  `;
+}
+
+function waterRing(currentMl, goalMl) {
+  const pct = Math.min(1, currentMl / goalMl);
+  const R = 36;
+  const C = 2 * Math.PI * R;
+  const offset = C * (1 - pct);
+  return `
+    <svg width="90" height="90" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="${R}" class="water-ring-track"/>
+      <circle cx="45" cy="45" r="${R}" class="water-ring-progress"
+        stroke-dasharray="${C}" stroke-dashoffset="${offset}"/>
+    </svg>
+  `;
+}
+
+// ==================================================================
+// Bottom Nav Renderer
+// ==================================================================
+function nav(active) {
+  const items = [
+    {id: 'dashboard', label: 'Home', icon: Icon.home(), key: 'home'},
+    {id: 'rezepte', label: 'Rezepte', icon: Icon.chef(), key: 'rezepte'},
+    {id: '_fab', label: 'Mahlzeit', icon: Icon.plus(), key: 'fab'},
+    {id: 'sport', label: 'Sport', icon: Icon.footprints(), key: 'sport'},
+    {id: 'einkaufsliste', label: 'Einkauf', icon: Icon.cart(), key: 'einkauf'}
+  ];
+  return `<nav class="bn-root">
+    ${items.map(it => {
+      if (it.key === 'fab') return `
+        <button class="bn-fab-wrap" onclick="show('meals')">
+          <span class="bn-fab">${it.icon}</span>
+          <span class="bn-fab-label">${it.label}</span>
+        </button>`;
+      return `<button class="bn-item ${active === it.key ? 'bn-item--active' : ''}" onclick="show('${it.id}')">
+        ${it.icon}<span>${it.label}</span>
+      </button>`;
+    }).join('')}
+  </nav>`;
+}
+
+// ==================================================================
+// Screens
+// ==================================================================
+const screens = {
+
+  // ─── LOGIN ───
+  login: {
+    title: 'Login', desc: 'Erster Bildschirm — grüne Kalo-Marke, sanfter Farbverlauf.',
+    flows: [{name: 'Login → Dashboard', to: 'dashboard'}, {name: 'Zur Registrierung', to: 'register'}, {name: 'Onboarding-Flow', to: 'ob-1'}],
+    time: '9:41',
+    body: `
+      <div class="auth-container">
+        <div class="auth-card">
+          <div class="auth-logo">🥗</div>
+          <h1 class="auth-title">Kalo</h1>
+          <p class="auth-subtitle">Willkommen zurück</p>
+          <form class="auth-form" onsubmit="event.preventDefault(); show('dashboard')">
+            <div class="input-group">
+              <label>Email</label>
+              <input type="email" placeholder="deine@email.com" value="thomas@example.de">
+            </div>
+            <div class="input-group">
+              <label>Passwort</label>
+              <input type="password" placeholder="••••••••" value="••••••••">
+            </div>
+            <button type="submit" class="auth-button">Einloggen</button>
+          </form>
+          <p class="auth-switch">Noch kein Account? <a onclick="show('register')">Registrieren</a></p>
+          <p class="auth-version">v0.4.2</p>
+        </div>
+      </div>
+    `
+  },
+
+  register: {
+    title: 'Registrierung', desc: 'Selber Auth-Style wie Login.',
+    flows: [{name: 'Weiter zu Onboarding', to: 'ob-1'}, {name: 'Zurück zu Login', to: 'login'}],
+    time: '9:41',
+    body: `
+      <div class="auth-container">
+        <div class="auth-card">
+          <div class="auth-logo">🥗</div>
+          <h1 class="auth-title">Kalo</h1>
+          <p class="auth-subtitle">Willkommen an Bord</p>
+          <form class="auth-form" onsubmit="event.preventDefault(); show('ob-1')">
+            <div class="input-group">
+              <label>Email</label>
+              <input type="email" placeholder="deine@email.com">
+            </div>
+            <div class="input-group">
+              <label>Passwort</label>
+              <input type="password" placeholder="••••••••">
+            </div>
+            <button type="submit" class="auth-button">Konto erstellen</button>
+          </form>
+          <p class="auth-switch">Schon ein Konto? <a onclick="show('login')">Einloggen</a></p>
+        </div>
+      </div>
+    `
+  },
+
+  // ─── ONBOARDING ───
+  'ob-1': {
+    title: 'Onboarding 1/4 — Ziel', desc: 'Grüner Fortschritts-Balken, große Optionen.',
+    flows: [{name: 'Weiter → Schritt 2', to: 'ob-2'}],
+    time: '9:41',
+    body: `
+      <div class="onboarding-container">
+        <div class="onboarding-card">
+          <div class="progress-bar"><div class="progress-fill" style="width: 25%;"></div></div>
+          <p class="progress-label">Schritt 1 / 4</p>
+          <div class="step">
+            <div class="step-emoji">🎯</div>
+            <h2>Was ist dein Ziel?</h2>
+            <p class="step-sub">Ich passe die App an dein Vorhaben an.</p>
+            <div class="option-list">
+              <button class="option-list-btn"><span class="option-list-emoji">📉</span><span class="option-list-label">Gewicht reduzieren</span></button>
+              <button class="option-list-btn active"><span class="option-list-emoji">⚖️</span><span class="option-list-label">Gewicht halten</span></button>
+              <button class="option-list-btn"><span class="option-list-emoji">💪</span><span class="option-list-label">Muskeln aufbauen</span></button>
+            </div>
+            <button class="ob-primary" onclick="show('ob-2')">Weiter</button>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  'ob-2': {
+    title: 'Onboarding 2/4 — Grunddaten', desc: 'Input-Row Layout, aktives Input hat grünen Rand.',
+    flows: [{name: 'Weiter → Schritt 3', to: 'ob-3'}, {name: 'Zurück', to: 'ob-1'}],
+    time: '9:41',
+    body: `
+      <div class="onboarding-container">
+        <div class="onboarding-card">
+          <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+          <p class="progress-label">Schritt 2 / 4</p>
+          <div class="step">
+            <div class="step-emoji">👋</div>
+            <h2>Sag mir etwas über dich</h2>
+            <p class="step-sub">Basis für dein Kalorien-Budget.</p>
+            <div class="input-group" style="margin-bottom: 12px;"><label>Name</label><input value="Thomas"></div>
+            <div class="input-row" style="margin-bottom: 12px;">
+              <div class="input-group"><label>Alter</label><input value="35"></div>
+              <div class="input-group"><label>Größe (cm)</label><input value="182"></div>
+            </div>
+            <div class="input-group"><label>Gewicht (kg)</label><input value="82"></div>
+            <button class="ob-primary" onclick="show('ob-3')">Weiter</button>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  'ob-3': {
+    title: 'Onboarding 3/4 — Konzept', desc: 'Ernährungskonzept auswählen.',
+    flows: [{name: 'Weiter → Schritt 4', to: 'ob-4'}, {name: 'Zurück', to: 'ob-2'}],
+    time: '9:41',
+    body: `
+      <div class="onboarding-container">
+        <div class="onboarding-card">
+          <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+          <p class="progress-label">Schritt 3 / 4</p>
+          <div class="step">
+            <div class="step-emoji">🥗</div>
+            <h2>Wie ernährst du dich?</h2>
+            <p class="step-sub">Kein Zwang — du kannst später wechseln.</p>
+            <div class="option-list">
+              <button class="option-list-btn active"><span class="option-list-emoji">🔥</span><span class="option-list-label">Kalorien zählen</span></button>
+              <button class="option-list-btn"><span class="option-list-emoji">🌿</span><span class="option-list-label">SanaMana</span></button>
+              <button class="option-list-btn"><span class="option-list-emoji">💪</span><span class="option-list-label">High Protein</span></button>
+            </div>
+            <button class="ob-primary" onclick="show('ob-4')">Weiter</button>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  'ob-4': {
+    title: 'Onboarding 4/4 — Fertig', desc: 'Zusammenfassung mit berechnetem Budget.',
+    flows: [{name: 'App starten → Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="onboarding-container">
+        <div class="onboarding-card">
+          <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+          <p class="progress-label">Fertig!</p>
+          <div class="step" style="text-align: center;">
+            <div class="step-emoji">🎉</div>
+            <h2>Alles klar, Thomas!</h2>
+            <p class="step-sub">Dein Tagesbudget steht.</p>
+            <div style="background: var(--bg-green); border-radius: 16px; padding: 20px; margin: 16px 0;">
+              <div style="font-size: 42px; font-weight: 700; color: var(--green);">2.400</div>
+              <div style="font-size: 12px; color: var(--text-3);">kcal pro Tag</div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div><div style="font-size: 15px; font-weight: 700;">150g</div><div style="font-size: 10px; color: var(--text-3);">Protein</div></div>
+                <div><div style="font-size: 15px; font-weight: 700;">270g</div><div style="font-size: 10px; color: var(--text-3);">KH</div></div>
+                <div><div style="font-size: 15px; font-weight: 700;">80g</div><div style="font-size: 10px; color: var(--text-3);">Fett</div></div>
+              </div>
+            </div>
+            <button class="ob-primary" onclick="show('dashboard')">Los geht's! 🚀</button>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  // ─── DASHBOARD ───
+  dashboard: {
+    title: 'Dashboard', desc: 'Kalorien-Donut + Makros + Wasser + Heute-Log. Grüner Ring, blaue Nav.',
+    flows: [
+      {name: 'Mahlzeit erfassen', to: 'meals'},
+      {name: 'Sport tracken', to: 'sport'},
+      {name: 'Rezepte', to: 'rezepte'},
+      {name: 'Einkaufsliste', to: 'einkaufsliste'},
+      {name: 'Verlauf', to: 'verlauf'},
+      {name: 'Wochenrückblick', to: 'weekly-review'},
+      {name: 'Profil', to: 'profile'}
+    ],
+    time: '9:41',
+    body: `
+      <div class="dashboard">
+        <div class="dash-header">
+          <p class="dash-date">Mittwoch, 10. September</p>
+          <h1 class="dash-greeting">Hi Thomas! 👋</h1>
+          <div class="dash-header-actions">
+            <button class="icon-btn" onclick="show('profile')">${Icon.user()}</button>
+            <button class="icon-btn">${Icon.moon()}</button>
+            <button class="icon-btn" onclick="show('login')">${Icon.logout()}</button>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-title-row">
+            <div class="card-title-left">${Icon.flame()}<h2 class="card-title">Kalorien</h2></div>
+            <button class="card-nav-btn" onclick="show('weekly-review')">${Icon.calendar()}</button>
+          </div>
+          <div class="donut-layout">
+            <div class="donut-box">
+              ${donutRing(1470, 2400)}
+              <div class="donut-center">
+                <span class="donut-remaining">930</span>
+                <span class="donut-label">kcal frei</span>
+              </div>
+            </div>
+            <div class="calorie-stats-col">
+              <div class="calorie-stat-item">
+                <div><span class="calorie-num">2400</span><span class="calorie-lbl">Ziel</span></div>
+              </div>
+              <div class="calorie-divider-h"></div>
+              <div class="calorie-stat-item" onclick="show('meals')">
+                <div><span class="calorie-num">1470</span><span class="calorie-lbl">Verbraucht</span></div>
+                <div class="calorie-add-chip">${Icon.plusSm()}</div>
+              </div>
+              <div class="calorie-divider-h"></div>
+              <div class="calorie-stat-item" onclick="show('sport')">
+                <div><span class="calorie-num" style="color: var(--green);">240</span><span class="calorie-lbl">Ersportet</span></div>
+                <div class="calorie-add-chip">${Icon.plusSm()}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-title-row">
+            <div class="card-title-left">${Icon.bar()}<h2 class="card-title">Makros</h2></div>
+          </div>
+          <div class="macro-rings-row">
+            ${macroRing(92, 150, '#3b82f6', Icon.beef(), 'Protein')}
+            ${macroRing(168, 270, '#f59e0b', Icon.wheat(), 'KH')}
+            ${macroRing(42, 80, '#8b5cf6', Icon.drop(), 'Fett')}
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="water-header">
+            <div class="card-title-left">${Icon.droplets()}<h2 class="card-title">Wasser</h2></div>
+          </div>
+          <div class="water-content">
+            <div class="water-ring-wrap">
+              <div class="water-ring-box">
+                ${waterRing(1200, 2500)}
+                <div class="water-ring-center" style="flex-direction: column; gap: 2px;">
+                  <span style="font-size: 10px; color: var(--text-4);">1.2 / 2.5 l</span>
+                </div>
+              </div>
+            </div>
+            <div class="water-text-col">
+              <div class="water-text-row">
+                <span class="water-text-value">2.5 l</span>
+                <span class="water-text-label">Ziel</span>
+              </div>
+              <div class="water-text-row">
+                <span class="water-text-value" style="color: var(--water-ring);">1.2 l</span>
+                <span class="water-text-label">Getrunken</span>
+              </div>
+            </div>
+            <div class="water-btns-col">
+              <button class="water-btn">
+                <div class="water-btn-icon-row">${Icon.glass()}</div>
+                <span class="water-btn-name">Glas</span>
+                <span class="water-btn-ml">250 ml</span>
+              </button>
+              <button class="water-btn">
+                <div class="water-btn-icon-row">${Icon.glass()}</div>
+                <span class="water-btn-name">Flasche</span>
+                <span class="water-btn-ml">750 ml</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-title-row">
+            <div class="card-title-left">${Icon.trophy()}<h2 class="card-title">Heute</h2></div>
+            <button class="card-nav-btn" onclick="show('verlauf')">${Icon.history()}</button>
+          </div>
+          <div class="log-list">
+            <div class="log-entry">
+              <span class="log-icon">${Icon.utensils()}</span>
+              <span class="log-label">Skyr mit Beeren</span>
+              <span class="log-kcal">+340 kcal</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-icon">${Icon.utensils()}</span>
+              <span class="log-label">Big Mac Bowl</span>
+              <span class="log-kcal">+490 kcal</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-icon">${Icon.utensils()}</span>
+              <span class="log-label">Apfel</span>
+              <span class="log-kcal">+95 kcal</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('home')}
+    `
+  },
+
+  // ─── MEALS ───
+  meals: {
+    title: 'Mahlzeiten', desc: 'Chat-Card mit Mahlzeit-Type-Tabs + KI-Dialog.',
+    flows: [{name: 'Zurück zum Dashboard', to: 'dashboard'}, {name: 'Favoriten', to: 'favoriten'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('dashboard')">${Icon.back()}</button>
+          <h1 class="page-title">Mahlzeit</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+
+        <div class="chat-card">
+          <div class="meal-type-tabs">
+            <button class="meal-tab">🌅 Frühst.</button>
+            <button class="meal-tab active">🍽 Mittag</button>
+            <button class="meal-tab">🌙 Abend</button>
+            <button class="meal-tab">🍎 Snack</button>
+          </div>
+
+          <div class="chat-msg bot">Was hast du gegessen? Schreib einfach los.</div>
+          <div class="chat-msg user">Skyr mit Beeren und Haferflocken</div>
+          <div class="chat-msg bot">Ok — 3 Items erkannt: Skyr 200g, Beeren 100g, Haferflocken 30g. Passt das?</div>
+
+          <div class="chat-input-row">
+            <input class="chat-input" placeholder="Nachricht…" value="ja passt, speichern">
+            <button class="chat-send">${Icon.send()}</button>
+          </div>
+        </div>
+
+        <div class="section-title">Heute</div>
+        <div class="fav-item">
+          <div class="fav-item-body">
+            <div class="fav-item-name">🥣 Skyr mit Beeren</div>
+            <div class="fav-item-meta">Frühstück · 08:15 · 3 Items</div>
+          </div>
+          <span style="color: var(--green); font-weight: 700; font-size: 14px;">340</span>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body">
+            <div class="fav-item-name">🥗 Big Mac Bowl</div>
+            <div class="fav-item-meta">Mittag · 13:20 · 4 Items</div>
+          </div>
+          <span style="color: var(--green); font-weight: 700; font-size: 14px;">490</span>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body">
+            <div class="fav-item-name">🍎 Apfel</div>
+            <div class="fav-item-meta">Snack · 16:00</div>
+          </div>
+          <span style="color: var(--green); font-weight: 700; font-size: 14px;">95</span>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('home')}
+    `
+  },
+
+  // ─── SPORT ───
+  sport: {
+    title: 'Sport', desc: 'Grid mit Sportarten, active-State grün.',
+    flows: [{name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('dashboard')">${Icon.back()}</button>
+          <h1 class="page-title">Sport</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+
+        <div class="sport-grid">
+          <button class="sport-btn"><div class="sport-icon">🚶</div><span class="sport-name">Spazieren</span></button>
+          <button class="sport-btn active"><div class="sport-icon">🚴</div><span class="sport-name">Fahrrad</span></button>
+          <button class="sport-btn"><div class="sport-icon">🏃</div><span class="sport-name">Joggen</span></button>
+          <button class="sport-btn"><div class="sport-icon">🏋️</div><span class="sport-name">Gym</span></button>
+          <button class="sport-btn"><div class="sport-icon">🏊</div><span class="sport-name">Schwimmen</span></button>
+          <button class="sport-btn"><div class="sport-icon">➕</div><span class="sport-name">Weiteres</span></button>
+        </div>
+
+        <div class="chat-card" style="margin-bottom: 12px;">
+          <div class="input-group"><label>Dauer (Min)</label><input value="30"></div>
+          <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #9a3412;">
+            🔥 Ca. 240 kcal verbraucht (30 Min Fahrrad)
+          </div>
+          <button class="import-btn">Speichern</button>
+        </div>
+
+        <div class="section-title">Heute</div>
+        <div class="fav-item">
+          <div class="fav-item-body">
+            <div class="fav-item-name">🚴 Fahrrad</div>
+            <div class="fav-item-meta">30 Min · 07:45</div>
+          </div>
+          <span style="color: var(--green); font-weight: 700; font-size: 14px;">240</span>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('sport')}
+    `
+  },
+
+  // ─── REZEPTE ───
+  rezepte: {
+    title: 'Rezepte (Landing)', desc: 'Tile-List mit farbigen Icon-Kacheln.',
+    flows: [{name: 'Kochbuch', to: 'kochbuch'}, {name: 'Wochenplan', to: 'wochenplan'}, {name: 'Favoriten', to: 'favoriten'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <div class="page-header-spacer"></div>
+          <h1 class="page-title">Rezepte</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+        <p class="rz-intro">Was kommt diese Woche auf den Tisch?</p>
+        <div class="rz-tiles">
+          <button class="rz-tile" onclick="show('wochenplan')">
+            <div class="rz-tile-icon" style="background: #3b82f622; color: #3b82f6;">📅</div>
+            <div class="rz-tile-body">
+              <span class="rz-tile-title">Wochenplan</span>
+              <span class="rz-tile-sub">Dein Essensplan für die Woche</span>
+            </div>
+            <span class="rz-tile-arrow">›</span>
+          </button>
+          <button class="rz-tile" onclick="show('meals')">
+            <div class="rz-tile-icon" style="background: #8b5cf622; color: #8b5cf6;">✨</div>
+            <div class="rz-tile-body">
+              <span class="rz-tile-title">Ideen</span>
+              <span class="rz-tile-sub">Schnelle Rezept-Ideen per Chat</span>
+            </div>
+            <span class="rz-tile-arrow">›</span>
+          </button>
+          <button class="rz-tile" onclick="show('favoriten')">
+            <div class="rz-tile-icon" style="background: #f59e0b22; color: #f59e0b;">⭐</div>
+            <div class="rz-tile-body">
+              <span class="rz-tile-title">Favoriten</span>
+              <span class="rz-tile-sub">Deine gekochten Hits</span>
+            </div>
+            <span class="rz-tile-arrow">›</span>
+          </button>
+          <button class="rz-tile" onclick="show('kochbuch')">
+            <div class="rz-tile-icon" style="background: #10b98122; color: #10b981;">📖</div>
+            <div class="rz-tile-body">
+              <span class="rz-tile-title">Kochbuch</span>
+              <span class="rz-tile-sub">Rezepte aus Insta & Co. importieren</span>
+            </div>
+            <span class="rz-tile-arrow">›</span>
+          </button>
+        </div>
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('rezepte')}
+    `
+  },
+
+  // ─── KOCHBUCH ───
+  kochbuch: {
+    title: 'Kochbuch', desc: 'Rezept-Karten mit Thumbnails, Import-Button oben.',
+    flows: [{name: 'Rezept ansehen', to: 'kochbuch-detail'}, {name: 'Import öffnen', to: 'kochbuch-import'}, {name: 'Zurück zu Rezepte', to: 'rezepte'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('rezepte')">${Icon.back()}</button>
+          <h1 class="page-title">Kochbuch</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+        <button class="kb-add-btn" onclick="show('kochbuch-import')">${Icon.plusSm()} Rezept importieren</button>
+
+        <div class="kb-card" onclick="show('kochbuch-detail')">
+          <div class="kb-thumb">🍔</div>
+          <div class="kb-body">
+            <div class="kb-title">Big Mac Bowl</div>
+            <div class="kb-desc">Zum Abnehmen — Rinderhack, Salat, Kartoffeln</div>
+            <div class="kb-meta">
+              <span>373 kcal</span>
+              <span>39g Protein</span>
+              <a class="kb-source-link">${Icon.ext()} instagram · @koelleforniagurl</a>
+            </div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background: linear-gradient(135deg, #a5d6a7, #66bb6a);">🥗</div>
+          <div class="kb-body">
+            <div class="kb-title">Green Power Bowl</div>
+            <div class="kb-desc">Skyr, Beeren, Superfoods</div>
+            <div class="kb-meta"><span>320 kcal</span><span>25g Protein</span><span>manuell</span></div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background: linear-gradient(135deg, #ffab91, #ff7043);">🍝</div>
+          <div class="kb-body">
+            <div class="kb-title">Pasta Cherrytomaten</div>
+            <div class="kb-desc">Schnelle Pasta mit Knoblauch</div>
+            <div class="kb-meta"><span>510 kcal</span><span>16g Protein</span><a class="kb-source-link">${Icon.ext()} instagram · @simplecookingberlin</a></div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background: linear-gradient(135deg, #90caf9, #42a5f5);">🥣</div>
+          <div class="kb-body">
+            <div class="kb-title">Skyr-Beeren-Bowl</div>
+            <div class="kb-desc">Proteinreiches Frühstück</div>
+            <div class="kb-meta"><span>300 kcal</span><span>28g Protein</span><a class="kb-source-link">${Icon.ext()} instagram · @fitfoodie_de</a></div>
+          </div>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('rezepte')}
+    `
+  },
+
+  'kochbuch-detail': {
+    title: 'Rezept-Detail', desc: 'Hero-Image, Zutaten, Zubereitung. Back-Overlay auf Image.',
+    flows: [{name: 'Zurück zum Kochbuch', to: 'kochbuch'}],
+    time: '9:41',
+    body: `
+      <div class="page" style="padding: 0 0 100px;">
+        <div class="kb-detail-image">
+          <button class="kb-back-overlay" onclick="show('kochbuch')">${Icon.back()}</button>
+          🍔
+        </div>
+        <div class="kb-detail-body">
+          <div class="kb-detail-title">Big Mac Bowl</div>
+          <a class="kb-detail-source">${Icon.ext()} @koelleforniagurl auf Instagram</a>
+          <div class="kb-detail-meta">
+            <span>👥 1 Portion</span>
+            <span>⏱ 20 Min</span>
+            <span>📊 einfach</span>
+          </div>
+          <div class="kb-macros-card">
+            <div class="kb-macros-item"><div class="kb-macros-value">373</div><div class="kb-macros-label">KCAL</div></div>
+            <div class="kb-macros-item"><div class="kb-macros-value" style="color: #3b82f6;">39g</div><div class="kb-macros-label">PROTEIN</div></div>
+            <div class="kb-macros-item"><div class="kb-macros-value" style="color: #f59e0b;">33g</div><div class="kb-macros-label">KH</div></div>
+            <div class="kb-macros-item"><div class="kb-macros-value" style="color: #8b5cf6;">7g</div><div class="kb-macros-label">FETT</div></div>
+          </div>
+          <div class="kb-section">
+            <div class="kb-section-title">Zutaten</div>
+            <div class="kb-ingredient">½ Eisbergsalat</div>
+            <div class="kb-ingredient">2 große Tomaten</div>
+            <div class="kb-ingredient">½ weiße Zwiebel</div>
+            <div class="kb-ingredient">200g Gurke</div>
+            <div class="kb-ingredient">150g mageres Rinderhack</div>
+            <div class="kb-ingredient">150g Kartoffeln</div>
+          </div>
+          <div class="kb-section">
+            <div class="kb-section-title">Zubereitung</div>
+            <div class="kb-step"><span class="kb-step-num">1.</span><div>Salat, Tomaten, Zwiebel und Gurke klein schneiden.</div></div>
+            <div class="kb-step"><span class="kb-step-num">2.</span><div>Rinderhack in einer Pfanne anbraten.</div></div>
+            <div class="kb-step"><span class="kb-step-num">3.</span><div>Kartoffeln würfeln, im Airfryer knusprig backen.</div></div>
+            <div class="kb-step"><span class="kb-step-num">4.</span><div>Sauce aus Miracle Whip, Ketchup, Senf, Gurkenwasser rühren.</div></div>
+            <div class="kb-step"><span class="kb-step-num">5.</span><div>Alles in einer Schüssel anrichten, Sauce drüber.</div></div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  'kochbuch-import': {
+    title: 'Rezept-Import', desc: 'Modal-Style Dialog mit URL-Feld.',
+    flows: [{name: 'Zurück zum Kochbuch', to: 'kochbuch'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('kochbuch')">✕</button>
+          <h1 class="page-title">Rezept importieren</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-card); margin-bottom: 16px;">
+          <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Link einfügen</div>
+          <div style="font-size: 13px; color: var(--text-3); margin-bottom: 16px;">Instagram-Reel oder Blog-URL — die KI holt sich alles Nötige.</div>
+          <div class="import-input-wrap">
+            <span class="import-input-icon">${Icon.link()}</span>
+            <input class="import-form-input" placeholder="https://www.instagram.com/reel/..." value="https://www.instagram.com/reel/DX4cvLBMQwg/">
+          </div>
+          <button class="import-btn">Importieren</button>
+        </div>
+
+        <div class="section-title">Wie das funktioniert</div>
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-card);">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="width: 26px; height: 26px; background: var(--bg-green); color: var(--green); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">1</div>
+              <div style="font-size: 13px; color: var(--text-2);">Auf Instagram „Link kopieren" antippen</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="width: 26px; height: 26px; background: var(--bg-green); color: var(--green); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">2</div>
+              <div style="font-size: 13px; color: var(--text-2);">Einfügen — KI parst Caption und Nährwerte</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="width: 26px; height: 26px; background: var(--bg-green); color: var(--green); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">3</div>
+              <div style="font-size: 13px; color: var(--text-2);">Vor Speichern nochmal prüfen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+
+  // ─── WOCHENPLAN ───
+  wochenplan: {
+    title: 'Wochenplan', desc: 'Tages-Cards, "heute" grün umrandet.',
+    flows: [{name: 'Zurück zu Rezepte', to: 'rezepte'}, {name: 'Einkaufsliste', to: 'einkaufsliste'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('rezepte')">${Icon.back()}</button>
+          <h1 class="page-title">Woche 37</h1>
+          <button class="icon-btn" onclick="show('einkaufsliste')">${Icon.cart()}</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-4); margin: -8px 4px 16px;">7.–13. September 2026</p>
+
+        <div class="wp-day">
+          <div class="wp-day-header"><div class="wp-day-name">Montag</div><div class="wp-day-date">7. Sep</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Früh</div><div class="wp-slot-name">Skyr-Beeren-Bowl</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Mittag</div><div class="wp-slot-name">Big Mac Bowl</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Abend</div><div class="wp-slot-name wp-slot-empty">nichts geplant</div></div>
+        </div>
+        <div class="wp-day">
+          <div class="wp-day-header"><div class="wp-day-name">Dienstag</div><div class="wp-day-date">8. Sep</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Früh</div><div class="wp-slot-name">Overnight Oats</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Mittag</div><div class="wp-slot-name">Pasta Cherrytomaten</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Abend</div><div class="wp-slot-name">Reste Big Mac Bowl</div></div>
+        </div>
+        <div class="wp-day today">
+          <div class="wp-day-header"><div class="wp-day-name">Mittwoch — heute</div><div class="wp-day-date">10. Sep</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Früh</div><div class="wp-slot-name">Skyr-Beeren-Bowl ✓</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Mittag</div><div class="wp-slot-name">Big Mac Bowl ✓</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Abend</div><div class="wp-slot-name">Ofengemüse & Feta</div></div>
+        </div>
+        <div class="wp-day">
+          <div class="wp-day-header"><div class="wp-day-name">Donnerstag</div><div class="wp-day-date">11. Sep</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Früh</div><div class="wp-slot-name wp-slot-empty">nichts geplant</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Mittag</div><div class="wp-slot-name wp-slot-empty">nichts geplant</div></div>
+          <div class="wp-slot"><div class="wp-slot-time">Abend</div><div class="wp-slot-name wp-slot-empty">nichts geplant</div></div>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('rezepte')}
+    `
+  },
+
+  einkaufsliste: {
+    title: 'Einkaufsliste', desc: 'Kategorisierte Items, abhakbar.',
+    flows: [{name: 'Zurück zum Wochenplan', to: 'wochenplan'}, {name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('wochenplan')">${Icon.back()}</button>
+          <h1 class="page-title">Einkaufsliste</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+
+        <div class="section-title">🥬 Obst & Gemüse</div>
+        <div class="ek-item"><div class="ek-check"></div><div class="ek-name">Eisbergsalat · 1 Kopf</div></div>
+        <div class="ek-item"><div class="ek-check"></div><div class="ek-name">Tomaten · 4 Stück</div></div>
+        <div class="ek-item"><div class="ek-check done">✓</div><div class="ek-name done">Cherrytomaten · 400g</div></div>
+
+        <div class="section-title">🥛 Molkerei</div>
+        <div class="ek-item"><div class="ek-check"></div><div class="ek-name">Skyr Natur · 500g</div></div>
+        <div class="ek-item"><div class="ek-check"></div><div class="ek-name">Feta · 200g</div></div>
+
+        <div class="section-title">🥩 Fleisch</div>
+        <div class="ek-item"><div class="ek-check"></div><div class="ek-name">Rinderhack mager · 300g</div></div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('einkauf')}
+    `
+  },
+
+  // ─── FAVORITEN ───
+  favoriten: {
+    title: 'Favoriten', desc: 'Gespeicherte Lieblings-Mahlzeiten.',
+    flows: [{name: 'Zurück zu Rezepte', to: 'rezepte'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('rezepte')">${Icon.back()}</button>
+          <h1 class="page-title">Favoriten</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+        <div class="search-wrap">
+          <span class="search-icon">${Icon.search()}</span>
+          <input class="search-input" placeholder="Suchen…">
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body"><div class="fav-item-name">⭐ Skyr mit Beeren</div><div class="fav-item-meta">Frühstück · 340 kcal</div></div>
+          <button class="fav-add-btn">${Icon.plusSm()}</button>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body"><div class="fav-item-name">⭐ Overnight Oats</div><div class="fav-item-meta">Frühstück · 420 kcal</div></div>
+          <button class="fav-add-btn">${Icon.plusSm()}</button>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body"><div class="fav-item-name">⭐ Big Mac Bowl</div><div class="fav-item-meta">Mittag · 490 kcal</div></div>
+          <button class="fav-add-btn">${Icon.plusSm()}</button>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body"><div class="fav-item-name">⭐ Hähnchen & Reis</div><div class="fav-item-meta">Mittag · 577 kcal</div></div>
+          <button class="fav-add-btn">${Icon.plusSm()}</button>
+        </div>
+        <div class="fav-item">
+          <div class="fav-item-body"><div class="fav-item-name">⭐ Apfel</div><div class="fav-item-meta">Snack · 95 kcal</div></div>
+          <button class="fav-add-btn">${Icon.plusSm()}</button>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+      ${nav('rezepte')}
+    `
+  },
+
+  // ─── VERLAUF ───
+  verlauf: {
+    title: 'Verlauf', desc: 'Tages-Rückblick mit Ziel-Vergleich.',
+    flows: [{name: 'Weekly Review', to: 'weekly-review'}, {name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('dashboard')">${Icon.back()}</button>
+          <h1 class="page-title">Verlauf</h1>
+          <button class="icon-btn" onclick="show('weekly-review')">${Icon.bar()}</button>
+        </div>
+        <div class="section-title">Diese Woche</div>
+        <div class="day-entry"><div><div class="day-entry-name">Dienstag</div><div class="day-entry-date">9. Sep 2026</div></div><div class="day-entry-stats"><div class="day-entry-kcal">2.150 kcal</div><div class="day-entry-goal ok">−250 unter Ziel</div></div></div>
+        <div class="day-entry"><div><div class="day-entry-name">Montag</div><div class="day-entry-date">8. Sep 2026</div></div><div class="day-entry-stats"><div class="day-entry-kcal">2.680 kcal</div><div class="day-entry-goal over">+280 über Ziel</div></div></div>
+        <div class="day-entry"><div><div class="day-entry-name">Sonntag</div><div class="day-entry-date">7. Sep 2026</div></div><div class="day-entry-stats"><div class="day-entry-kcal">2.290 kcal</div><div class="day-entry-goal ok">−110 unter Ziel</div></div></div>
+        <div class="section-title">Letzte Woche</div>
+        <div class="day-entry"><div><div class="day-entry-name">Samstag</div><div class="day-entry-date">6. Sep</div></div><div class="day-entry-stats"><div class="day-entry-kcal">2.480 kcal</div><div class="day-entry-goal ok">+80 knapp</div></div></div>
+        <div class="day-entry"><div><div class="day-entry-name">Freitag</div><div class="day-entry-date">5. Sep</div></div><div class="day-entry-stats"><div class="day-entry-kcal">2.010 kcal</div><div class="day-entry-goal ok">−390</div></div></div>
+
+        <div style="height: 76px;"></div>
+      </div>
+    `
+  },
+
+  'weekly-review': {
+    title: 'Weekly Review', desc: 'Sonntägliches KI-Fazit mit Vorschlägen.',
+    flows: [{name: 'Zurück zum Verlauf', to: 'verlauf'}, {name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('verlauf')">${Icon.back()}</button>
+          <h1 class="page-title">Wochenrückblick</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+        <div class="wr-hero">
+          <div class="wr-hero-emoji">📊</div>
+          <div class="wr-hero-title">Woche 36</div>
+          <div class="wr-hero-sub">31. Aug – 6. Sep 2026</div>
+        </div>
+        <div class="dash-card">
+          <div class="card-title-row"><div class="card-title-left">${Icon.bar()}<h2 class="card-title">Zusammenfassung</h2></div></div>
+          <div class="stat-row"><span class="lbl">Ø Kalorien</span><span class="val">2.340 kcal</span></div>
+          <div class="stat-row"><span class="lbl">Ziel-Treffer</span><span class="val" style="color: var(--green);">5 / 7 Tage</span></div>
+          <div class="stat-row"><span class="lbl">Sport-Tage</span><span class="val">4</span></div>
+          <div class="stat-row"><span class="lbl">Wasser-Ø</span><span class="val">2.1 l</span></div>
+        </div>
+        <div class="dash-card" style="background: var(--bg-green);">
+          <div class="card-title-row"><div class="card-title-left" style="color: var(--green);">💬<h2 class="card-title" style="color: var(--green);">Feedback</h2></div></div>
+          <div style="font-size: 13px; line-height: 1.5; color: var(--text-2);">
+            5 von 7 Tagen im Ziel — gut. Freitag war der Ausreißer. Fahr am Wochenende deutlich unter Budget, aber lass keinen Tag komplett aus.
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="card-title-row"><div class="card-title-left">🎯<h2 class="card-title">Nächste Woche</h2></div></div>
+          <div style="font-size: 13px; line-height: 1.6; color: var(--text-2);">
+            • Freitagabend nur eine Portion.<br>
+            • Mittwoch fehlt Sport in der Planung.<br>
+            • Trink morgens zuerst 500 ml Wasser.
+          </div>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+    `
+  },
+
+  // ─── PROFILE ───
+  profile: {
+    title: 'Profil', desc: 'Persönliche Daten, Ziele, Konzept.',
+    flows: [{name: 'Einstellungen', to: 'settings'}, {name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('dashboard')">${Icon.back()}</button>
+          <h1 class="page-title">Profil</h1>
+          <button class="icon-btn" onclick="show('settings')">⚙</button>
+        </div>
+        <div class="profile-hero">
+          <div class="profile-avatar">T</div>
+          <div class="profile-name">Thomas Wordenbeck</div>
+          <div class="profile-email">thomas.wordenbeck@gmail.com</div>
+        </div>
+        <div class="section-title">Meine Daten</div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🎯</div>Ziel</div><span style="color: var(--text-3); font-size: 13px;">Halten ›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🥗</div>Konzept</div><span style="color: var(--text-3); font-size: 13px;">Kalorien zählen ›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">⚖️</div>Gewicht</div><span style="color: var(--text-3); font-size: 13px;">82.1 kg ›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">📏</div>Größe</div><span style="color: var(--text-3); font-size: 13px;">182 cm ›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🎂</div>Alter</div><span style="color: var(--text-3); font-size: 13px;">35 ›</span></div>
+
+        <div class="section-title">Kalorien-Budget</div>
+        <div class="dash-card" style="text-align: center;">
+          <div style="font-size: 32px; font-weight: 700; color: var(--green);">2.400</div>
+          <div style="font-size: 12px; color: var(--text-4); margin-top: 2px;">kcal / Tag (berechnet)</div>
+        </div>
+
+        <div style="height: 76px;"></div>
+      </div>
+    `
+  },
+
+  settings: {
+    title: 'Einstellungen', desc: 'App-Konfiguration, Benachrichtigungen, Konto.',
+    flows: [{name: 'Zurück zum Profil', to: 'profile'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('profile')">${Icon.back()}</button>
+          <h1 class="page-title">Einstellungen</h1>
+          <div class="page-header-spacer"></div>
+        </div>
+        <div class="section-title">Allgemein</div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🔔</div>Benachrichtigungen</div><span class="settings-row-arrow">›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🌙</div>Erscheinungsbild</div><span style="color: var(--text-3); font-size: 13px;">System ›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🌐</div>Sprache</div><span style="color: var(--text-3); font-size: 13px;">Deutsch ›</span></div>
+        <div class="section-title">Sport</div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">🏃</div>Standard-Aktivitäten</div><span class="settings-row-arrow">›</span></div>
+        <div class="section-title">Daten</div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon">📤</div>Export</div><span class="settings-row-arrow">›</span></div>
+        <div class="settings-row" onclick="show('login')"><div class="settings-row-left"><div class="settings-row-icon" style="background: #fee2e2;">🚪</div><span style="color: #dc2626;">Abmelden</span></div></div>
+
+        <div style="height: 76px;"></div>
+      </div>
+    `
+  },
+
+  gewicht: {
+    title: 'Gewicht', desc: 'Gewichts-Trend über 30 Tage.',
+    flows: [{name: 'Zurück zum Profil', to: 'profile'}, {name: 'Zurück zum Dashboard', to: 'dashboard'}],
+    time: '9:41',
+    body: `
+      <div class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="show('profile')">${Icon.back()}</button>
+          <h1 class="page-title">Gewicht</h1>
+          <button class="icon-btn">${Icon.plusSm()}</button>
+        </div>
+        <div style="text-align: center; padding: 20px 0;">
+          <div style="font-size: 44px; font-weight: 700;">82.1 <span style="font-size: 18px; color: var(--text-3);">kg</span></div>
+          <div style="font-size: 13px; color: var(--green); margin-top: 4px;">↓ 0.4 kg diese Woche</div>
+        </div>
+        <div class="dash-card">
+          <div class="card-title-row"><div class="card-title-left">${Icon.bar()}<h2 class="card-title">Verlauf (30 Tage)</h2></div></div>
+          <div style="height: 140px; background: linear-gradient(180deg, rgba(22,163,74,0.08) 0%, transparent 100%); border-radius: 10px;">
+            <svg viewBox="0 0 300 140" style="width: 100%; height: 100%;">
+              <polyline points="0,40 30,45 60,42 90,50 120,48 150,55 180,52 210,60 240,58 270,65 300,68" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-4);">
+            <span>vor 30 T · 83.2 kg</span>
+            <span>heute · 82.1 kg</span>
+          </div>
+        </div>
+      </div>
+    `
+  }
+};
+
+// ==================================================================
+// Screen List (order in overview)
+// ==================================================================
+const groups = [
+  { title: 'Auth & Onboarding', ids: ['login', 'register', 'ob-1', 'ob-2', 'ob-3', 'ob-4'] },
+  { title: 'Haupt-Tabs (Bottom-Nav)', ids: ['dashboard', 'meals', 'sport', 'rezepte', 'einkaufsliste'] },
+  { title: 'Rezepte', ids: ['kochbuch', 'kochbuch-detail', 'kochbuch-import', 'wochenplan', 'favoriten'] },
+  { title: 'Weiteres', ids: ['verlauf', 'weekly-review', 'profile', 'settings', 'gewicht'] }
+];
+
+// ==================================================================
+// Render overview
+// ==================================================================
+function renderOverview() {
+  const gridEl = document.getElementById('grid');
+  let html = '';
+  for (const g of groups) {
+    html += `<div class="group-title">${g.title}</div>`;
+    for (const id of g.ids) {
+      const s = screens[id];
+      html += `
+        <div class="thumb" onclick="show('${id}')">
+          <div class="thumb-preview">
+            <div class="thumb-preview-inner">
+              <div style="width: 100%; height: 100%; overflow: hidden; position: relative; pointer-events: none; transform-origin: top left; transform: scale(0.36); width: 278%; height: 278%;">
+                ${s.body}
+              </div>
+            </div>
+          </div>
+          <div class="thumb-info">
+            <div class="thumb-name">${s.title}</div>
+            <div class="thumb-desc">${s.desc}</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+  gridEl.innerHTML = html;
+}
+
+function show(id) {
+  const s = screens[id];
+  if (!s) return;
+  document.getElementById('overview').style.display = 'none';
+  const c = document.getElementById('detail-container');
+  c.classList.add('active');
+  c.innerHTML = `
+    <div class="detail-nav">
+      <button class="detail-back" onclick="goHome()">← Übersicht</button>
+      <div class="detail-title">${s.title}</div>
+      <div class="detail-desc">${s.desc}</div>
+      <div class="detail-flow-title">Verwandte Screens</div>
+      <div class="detail-flow-list">
+        ${s.flows.map(f => `<a onclick="show('${f.to}')">${f.name} →</a>`).join('')}
+      </div>
+    </div>
+    <div class="iphone">
+      <div class="iphone-notch"></div>
+      <div class="iphone-screen">
+        <div class="status-bar">
+          <span>${s.time}</span>
+          <span class="status-icons">●●●● 🔋</span>
+        </div>
+        <div class="kalo-app">${s.body}</div>
+      </div>
+    </div>
+  `;
+  window.scrollTo(0, 0);
+  history.replaceState(null, '', '#' + id);
+}
+
+function goHome() {
+  document.getElementById('overview').style.display = 'block';
+  document.getElementById('detail-container').classList.remove('active');
+  history.replaceState(null, '', location.pathname);
+  window.scrollTo(0, 0);
+}
+
+renderOverview();
+
+const initial = location.hash.replace('#', '');
+if (initial && screens[initial]) show(initial);
+</script>
+
+
+<style>
+  html,body{background:#f8fafc!important;overflow:hidden!important}
+  #overview,.detail-nav,.iphone-notch,.status-bar{display:none!important}
+  #detail-container{display:block!important;padding:0!important;margin:0!important}
+  .iphone{transform:none!important;position:fixed!important;inset:0!important;width:100%!important;height:100%!important;
+    padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;margin:0!important}
+  .iphone-screen{width:100%!important;height:100%!important;border-radius:0!important}
+</style>
+<script>window.addEventListener('load',()=>show('dashboard'));</script>
+</body>
+</html>

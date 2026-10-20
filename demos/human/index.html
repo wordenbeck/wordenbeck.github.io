@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Human vs. AI — Identity Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0509;
+    --burgundy: #2d0a1e;
+    --red: #e8003d;
+    --red-bright: #ff1744;
+    --pink: #e91e8c;
+    --orange: #ff4444;
+    --text: #ffffff;
+    --muted: #9e8590;
+    --glass: rgba(45,10,30,0.45);
+    --line: rgba(232,0,61,0.18);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at 15% 10%, rgba(232,0,61,0.22), transparent 50%),
+      radial-gradient(ellipse at 85% 90%, rgba(233,30,140,0.18), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,68,68,0.05), transparent 70%),
+      linear-gradient(180deg, #0d0509 0%, #050003 100%);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ======= SCREEN SYSTEM ======= */
+  .screen {
+    position: fixed; inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 56px 64px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    overflow: hidden;
+  }
+  .screen.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* shared display fonts/colors */
+  .display { font-family: 'Space Grotesk', sans-serif; }
+  .accent-grad {
+    background: linear-gradient(135deg, var(--red), var(--pink) 55%, var(--orange));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* eyebrow pill */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    background: rgba(232,0,61,0.05);
+    width: fit-content;
+    box-shadow: 0 0 16px rgba(232,0,61,0.2);
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; background: var(--red);
+    border-radius: 50%; box-shadow: 0 0 8px var(--red);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.4; transform: scale(0.8); } }
+
+  /* buttons */
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 18px 32px;
+    border-radius: 100px;
+    border: 1px solid var(--red);
+    background: linear-gradient(135deg, var(--red), var(--red-bright));
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 0 24px rgba(232,0,61,0.4), inset 0 0 16px rgba(255,255,255,0.05);
+    white-space: nowrap;
+  }
+  .btn:hover {
+    box-shadow: 0 0 40px rgba(232,0,61,0.8), inset 0 0 20px rgba(255,255,255,0.08);
+    transform: translateY(-2px);
+  }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn.ghost {
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: none;
+    backdrop-filter: blur(8px);
+  }
+  .btn.ghost:hover {
+    border-color: var(--red); color: var(--red);
+    box-shadow: 0 0 24px rgba(232,0,61,0.4);
+  }
+  .btn.small { padding: 12px 22px; font-size: 12px; }
+
+  /* session bar (top-left) */
+  .session-bar {
+    position: fixed;
+    top: 16px; left: 16px;
+    display: flex; align-items: center; gap: 10px;
+    z-index: 1500;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .session-bar:hover { opacity: 1; }
+  .session-bar .label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  /* mute corner (top right, discrete) */
+  .mute-corner {
+    position: fixed;
+    top: 16px; right: 16px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.3);
+    color: rgba(255,255,255,0.35);
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 0;
+  }
+  .mute-corner:hover {
+    color: var(--red);
+    border-color: var(--red);
+    box-shadow: 0 0 14px rgba(232,0,61,0.4);
+  }
+  .mute-corner.muted { color: rgba(255,255,255,0.2); }
+
+  /* reset corner (bottom right, discrete) */
+  .reset-corner {
+    position: fixed;
+    bottom: 16px; right: 16px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.3);
+    color: rgba(255,255,255,0.25);
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+  }
+  .reset-corner:hover {
+    color: var(--red);
+    border-color: var(--red);
+    transform: rotate(-90deg);
+    box-shadow: 0 0 14px rgba(232,0,61,0.4);
+    opacity: 1;
+  }
+
+  /* ============ SCREEN 1 : START ============ */
+  #screen-start {
+    justify-content: center;
+    align-items: flex-start;
+  }
+  #screen-start .inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .start-top {
+    display: flex; justify-content: flex-start; align-items: flex-end;
+    margin-bottom: 36px;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .start-ctas-bottom {
+    display: flex; gap: 12px;
+  }
+  .start-footer {
+    margin-top: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  h1.main {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(72px, 13vw, 192px);
+    line-height: 1;
+    margin: 0 0 24px;
+    letter-spacing: -0.045em;
+    white-space: nowrap;
+  }
+  h1.main .vs {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  h1.main .ai {
+    background: linear-gradient(135deg, var(--red) 0%, var(--pink) 50%, var(--orange) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 40px rgba(232,0,61,0.4));
+  }
+  .sub {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(20px, 2.2vw, 30px);
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    margin-bottom: 36px;
+  }
+  .sub::after {
+    content: "";
+    display: block;
+    width: 80px; height: 2px;
+    background: linear-gradient(90deg, var(--red), transparent);
+    margin-top: 16px;
+  }
+  .lede {
+    max-width: 720px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #d8c8d0;
+    margin: 0 0 56px;
+    font-weight: 400;
+  }
+  .lede em {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stats-bar {
+    display: flex; gap: 40px;
+    justify-content: flex-end;
+  }
+  .stat { text-align: right; }
+  .stat .v {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px; font-weight: 700;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat .l {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* ============ HOW IT WORKS ============ */
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr; } }
+  .how-steps {
+    list-style: none; counter-reset: step;
+    padding: 0; margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; line-height: 1.6;
+    color: #d8c8d0;
+  }
+  .how-steps li {
+    counter-increment: step;
+    padding: 16px 0 16px 56px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .how-steps li:last-child { border-bottom: none; }
+  .how-steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--red);
+    width: 40px; height: 40px;
+    border: 1px solid var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px rgba(232,0,61,0.3);
+  }
+  .how-steps strong { color: #fff; font-weight: 600; }
+
+  .how-preview-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .mini-slot {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(232,0,61,0.12);
+  }
+  .mini-reel-group + .mini-reel-group { margin-top: 14px; }
+  .mini-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .mini-reel-group.human .mini-label { color: var(--pink); }
+  .mini-reel-row { display: flex; gap: 6px; }
+  .mini-reel {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mini-reel.locked {
+    border-color: var(--red);
+    background: linear-gradient(135deg, rgba(232,0,61,0.18), rgba(233,30,140,0.08));
+    box-shadow: 0 0 12px rgba(232,0,61,0.3);
+  }
+  .mini-reel-group.human .mini-reel.locked {
+    border-color: var(--pink);
+    background: linear-gradient(135deg, rgba(233,30,140,0.18), rgba(232,0,61,0.08));
+    box-shadow: 0 0 12px rgba(233,30,140,0.3);
+  }
+
+  /* ============ SCREEN 2 : SLOT ============ */
+  #screen-slot {
+    justify-content: center;
+    align-items: center;
+  }
+  #screen-slot .inner {
+    max-width: 1100px; width: 100%;
+    display: flex; flex-direction: column;
+    align-items: center;
+  }
+  .slot-header { text-align: center; margin-bottom: 36px; }
+  .slot-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(36px, 4vw, 56px);
+    margin: 16px 0 0;
+    letter-spacing: -0.02em;
+    perspective: 800px;
+  }
+  .slot-word {
+    display: inline-block;
+    transform-style: preserve-3d;
+    transform-origin: center center;
+  }
+  /* reel-lock rotation — duration set in JS to match the powerup exactly.
+     Curve keeps it visibly spinning until near the end, then settles smoothly. */
+  .slot-word.spinning {
+    animation: word-reel var(--spin-dur, 4.2s) cubic-bezier(0.33, 0, 0.15, 1) forwards;
+  }
+  @keyframes word-reel {
+    0%   { transform: rotateX(0deg); }
+    100% { transform: rotateX(2520deg); }
+  }
+  .slot-stage {
+    width: 100%;
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 50px rgba(232,0,61,0.15);
+  }
+  .reel-group + .reel-group { margin-top: 22px; }
+  .reel-label {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .reel-group.human .reel-label { color: var(--pink); }
+  .reel-label svg { width: 16px; height: 16px; filter: drop-shadow(0 0 6px currentColor); }
+  .reel-row { display: flex; gap: 12px; }
+  .reel {
+    flex: 1; min-width: 0;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    height: 64px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    text-align: center;
+    color: var(--muted);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .reel.spinning {
+    color: var(--text);
+    border-color: var(--red);
+    box-shadow: 0 0 16px rgba(232,0,61,0.4);
+  }
+  .reel.locked {
+    color: var(--text);
+    border-color: var(--red);
+    background: linear-gradient(135deg, rgba(232,0,61,0.15), rgba(233,30,140,0.08));
+    box-shadow: 0 0 24px rgba(232,0,61,0.5);
+  }
+  .reel-group.human .reel.locked {
+    border-color: var(--pink);
+    background: linear-gradient(135deg, rgba(233,30,140,0.15), rgba(232,0,61,0.08));
+    box-shadow: 0 0 24px rgba(233,30,140,0.5);
+  }
+  .reel .text { display: block; }
+
+  .slot-actions {
+    display: flex; gap: 12px;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  /* ============ SCREEN 3 : RESULT ============ */
+  #screen-result {
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+  #screen-result .inner {
+    max-width: 1200px; width: 100%;
+    margin: 0 auto;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .top-bar .back {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none; border: none;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color 0.2s;
+  }
+  .top-bar .back:hover { color: var(--red); }
+
+  .role-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--red);
+    border-radius: 24px;
+    padding: 28px 36px;
+    display: flex; align-items: center; gap: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 50px rgba(232,0,61,0.25), inset 0 0 40px rgba(232,0,61,0.05);
+  }
+  .role-icon {
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    filter: drop-shadow(0 0 20px rgba(232,0,61,0.7));
+    flex-shrink: 0;
+  }
+  .role-icon svg { width: 32px; height: 32px; }
+  .role-info .label {
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.3em; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .role-info .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 30px;
+    letter-spacing: -0.02em;
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+  .skill-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--red);
+    border-radius: 24px;
+    padding: 28px 32px;
+    box-shadow: 0 0 40px rgba(232,0,61,0.2), inset 0 0 30px rgba(232,0,61,0.04);
+  }
+  .skill-card.human {
+    border-color: var(--pink);
+    box-shadow: 0 0 40px rgba(233,30,140,0.2), inset 0 0 30px rgba(233,30,140,0.04);
+  }
+  .skill-card .head {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(232,0,61,0.25);
+  }
+  .skill-card.human .head {
+    color: var(--pink);
+    border-bottom-color: rgba(233,30,140,0.25);
+  }
+  .skill-card .head svg {
+    width: 18px; height: 18px;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  .skill-list { list-style: none; padding: 0; margin: 0; counter-reset: idx; }
+  .skill-list li {
+    counter-increment: idx;
+    padding: 13px 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 21px;
+    letter-spacing: -0.005em;
+    display: flex; gap: 16px; align-items: center;
+    color: var(--text);
+  }
+  .skill-list li::before {
+    width: 26px; height: 26px;
+    font-size: 11px;
+  }
+  .skill-list li + li { border-top: 1px solid rgba(255,255,255,0.04); }
+  .skill-list li::before {
+    content: counter(idx);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 600;
+    color: var(--red);
+    width: 22px; height: 22px;
+    border: 1px solid var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .skill-card.human .skill-list li::before { color: var(--pink); border-color: var(--pink); }
+
+  .timer-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 22px 28px;
+    margin-bottom: 18px;
+  }
+  .timer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .timer-left {
+    display: flex; flex-direction: column; gap: 12px;
+    min-width: 0;
+  }
+  .timer-presets { display: flex; gap: 8px; }
+  .preset {
+    padding: 10px 18px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.02);
+    color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; letter-spacing: 0.2em;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .preset:hover, .preset.active {
+    border-color: var(--red); color: var(--red);
+    box-shadow: 0 0 16px rgba(232,0,61,0.3);
+    background: rgba(232,0,61,0.05);
+  }
+  .timer-center {
+    display: flex; align-items: center; gap: 14px;
+    flex: 0 0 auto;
+  }
+  .timer-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 92px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    background: linear-gradient(180deg, var(--text) 30%, var(--red) 130%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(232,0,61,0.55));
+  }
+  .add-30 {
+    padding: 9px 14px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; letter-spacing: 0.2em;
+    border-radius: 100px; cursor: pointer;
+    text-transform: uppercase;
+  }
+  .add-30:hover { border-color: var(--red); color: var(--red); }
+  .timer-right { display: flex; gap: 10px; align-items: center; }
+  .jeopardy-toggle.playing {
+    animation: theme-cycle 6.5s ease-in-out infinite;
+  }
+  @keyframes theme-cycle {
+    0%   { color:#e8003d; border-color:#e8003d; box-shadow:0 0 14px rgba(232,0,61,0.45); }
+    33%  { color:#e91e8c; border-color:#e91e8c; box-shadow:0 0 30px rgba(233,30,140,0.9); }
+    66%  { color:#ff6b4a; border-color:#ff6b4a; box-shadow:0 0 22px rgba(255,107,74,0.7); }
+    100% { color:#e8003d; border-color:#e8003d; box-shadow:0 0 14px rgba(232,0,61,0.45); }
+  }
+
+  .footer-actions {
+    display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    align-items: center;
+  }
+  .footer-actions .group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ============ SCREEN 4 : AI PERSPECTIVE ============ */
+  #screen-ai {
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+  #screen-ai .inner {
+    max-width: 1100px; width: 100%; margin: 0 auto;
+  }
+  .ai-mini-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 20px 28px;
+    display: flex; align-items: center; gap: 20px;
+    margin-bottom: 20px;
+  }
+  .ai-mini-card .icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 16px rgba(232,0,61,0.5));
+  }
+  .ai-mini-card .icon svg { width: 24px; height: 24px; }
+  .ai-mini-card .meta { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  .ai-mini-card .role-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 22px;
+  }
+  .ai-mini-card .tags { font-size: 12px; color: var(--muted); }
+  .ai-mini-card .tags .ai { color: var(--red); }
+  .ai-mini-card .tags .hu { color: var(--pink); }
+
+  .scenario {
+    background: linear-gradient(135deg, rgba(232,0,61,0.08), rgba(233,30,140,0.04));
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #ece0e5;
+  }
+  .scenario .label {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .reflection {
+    background: rgba(232,0,61,0.12);
+    border: 1px solid var(--red);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 30px rgba(232,0,61,0.25);
+  }
+  .reflection .label {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .reflection .q {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #fff;
+    min-height: 1.5em;
+  }
+  .reflection .q .cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: var(--red);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink-cursor 0.8s steps(2) infinite;
+    box-shadow: 0 0 8px var(--red);
+  }
+  @keyframes blink-cursor { 50% { opacity: 0; } }
+  /* reflection label with countdown + skip */
+  .reflection .label {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .reflection .countdown {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--red);
+    background: rgba(232,0,61,0.08);
+    border: 1px solid rgba(232,0,61,0.3);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .reflection .skip-btn {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(232,0,61,0.3);
+    background: rgba(232,0,61,0.08);
+    color: var(--red);
+    font-size: 9px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+    line-height: 1;
+  }
+  .reflection .skip-btn:hover {
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(232,0,61,0.6);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="session-bar" id="session-bar" style="display:none;">
+  <span class="label" id="session-label"></span>
+</div>
+
+<!-- discrete mute toggle top-right -->
+<button class="mute-corner" id="mute-btn" onclick="toggleMute()" title="Mute / unmute">
+  <span id="mute-icon">♪</span>
+</button>
+
+<!-- discrete reset bottom-right -->
+<div class="reset-corner" onclick="resetSession()" title="Fresh session">⟲</div>
+
+<!-- ============ SCREEN 1 : START ============ -->
+<section id="screen-start" class="screen active">
+  <div class="inner">
+    <div class="start-top">
+      <div class="eyebrow"><span class="dot"></span>The Future of Work · A Reflection Game</div>
+    </div>
+
+    <h1 class="main"><span class="vs">Human</span> vs. <span class="ai">AI</span></h1>
+    <div class="sub">Identity Cards</div>
+
+    <p class="lede">
+      Draw a role and a set of skills.<br>
+      Discover what AI <em>takes over</em> — and what remains <em>yours</em>.<br>
+      Discuss with your team, then reveal the AI perspective.
+    </p>
+
+    <div class="start-footer">
+      <div class="start-ctas-bottom">
+        <button class="btn" onclick="startGame()">Start →</button>
+        <button class="btn ghost" onclick="go('screen-how')">How it works</button>
+      </div>
+      <div class="stats-bar">
+        <div class="stat"><div class="v">10</div><div class="l">Roles</div></div>
+        <div class="stat"><div class="v">36</div><div class="l">AI Skills</div></div>
+        <div class="stat"><div class="v">35</div><div class="l">Human<br>Strengths</div></div>
+        <div class="stat"><div class="v">~15m</div><div class="l">per round</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN HOW IT WORKS ============ -->
+<section id="screen-how" class="screen">
+  <div class="inner" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+    <div class="top-bar">
+      <button class="back" onclick="go('screen-start')">← Back</button>
+      <div class="eyebrow"><span class="dot"></span>How it works</div>
+    </div>
+    <h1 class="main" style="font-size: clamp(40px, 6vw, 72px); margin-bottom: 24px;">How to <span class="ai">Play</span></h1>
+
+    <div class="how-grid">
+      <ol class="how-steps">
+        <li><strong>Spin</strong> the slot machine to draw an identity card — a role, three AI skills, three human strengths.</li>
+        <li><strong>Discuss</strong> as a group for 5, 10 or 15 minutes: where does AI help, where do humans win?</li>
+        <li><strong>Reveal</strong> the AI perspective — a short scenario from 2030 and one reflection question.</li>
+        <li><strong>Spin again</strong> — new role, new conversation.</li>
+      </ol>
+
+      <div class="how-preview">
+        <div class="how-preview-label">Preview · what you'll see</div>
+        <div class="mini-slot">
+          <div class="mini-reel-group">
+            <div class="mini-label">Role</div>
+            <div class="mini-reel locked">Product Manager</div>
+          </div>
+          <div class="mini-reel-group">
+            <div class="mini-label">AI Skills</div>
+            <div class="mini-reel-row">
+              <div class="mini-reel locked">Categorize feedback</div>
+              <div class="mini-reel locked">Scan tech trends</div>
+              <div class="mini-reel locked">Calculate forecasts</div>
+            </div>
+          </div>
+          <div class="mini-reel-group human">
+            <div class="mini-label">Human Strengths</div>
+            <div class="mini-reel-row">
+              <div class="mini-reel locked">Develop vision</div>
+              <div class="mini-reel locked">Sell ideas</div>
+              <div class="mini-reel locked">Inspire enthusiasm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <button class="btn" onclick="startGame()">Got it · Start →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 2 : SLOT ============ -->
+<section id="screen-slot" class="screen">
+  <div class="inner">
+    <div class="slot-header">
+      <div class="eyebrow"><span class="dot"></span>Drawing your identity</div>
+      <h2>Spin the <span class="accent-grad slot-word" id="slot-word">Machine</span></h2>
+    </div>
+
+    <div class="slot-stage">
+      <div class="reel-group">
+        <div class="reel-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+          </svg>
+          Role
+        </div>
+        <div class="reel-row">
+          <div class="reel" id="reel-role"><span class="text">—</span></div>
+        </div>
+      </div>
+
+      <div class="reel-group">
+        <div class="reel-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <rect x="9" y="9" width="6" height="6"/>
+            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>
+          </svg>
+          AI Skills
+        </div>
+        <div class="reel-row">
+          <div class="reel" id="reel-ai-0"><span class="text">—</span></div>
+          <div class="reel" id="reel-ai-1"><span class="text">—</span></div>
+          <div class="reel" id="reel-ai-2"><span class="text">—</span></div>
+        </div>
+      </div>
+
+      <div class="reel-group human">
+        <div class="reel-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 5a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V8a3 3 0 0 0-3-3z"/>
+            <path d="M9 8a3 3 0 0 1-3-3M15 8a3 3 0 0 0 3-3M9 16a3 3 0 0 0-3 3M15 16a3 3 0 0 1 3 3"/>
+          </svg>
+          Human Strengths
+        </div>
+        <div class="reel-row">
+          <div class="reel" id="reel-hu-0"><span class="text">—</span></div>
+          <div class="reel" id="reel-hu-1"><span class="text">—</span></div>
+          <div class="reel" id="reel-hu-2"><span class="text">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slot-actions">
+      <button class="btn ghost" onclick="go('screen-start')">← Cancel</button>
+      <button class="btn" id="spin-btn" onclick="spin()">▶ Spin</button>
+      <button class="btn" id="confirm-btn" style="display:none;" onclick="go('screen-result')">Confirm →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 3 : RESULT ============ -->
+<section id="screen-result" class="screen">
+  <div class="inner">
+    <div class="top-bar">
+      <button class="back" onclick="go('screen-slot')">← Back</button>
+      <div class="eyebrow"><span class="dot"></span>Your Identity Card</div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+        </svg>
+      </div>
+      <div class="role-info">
+        <div class="label">Role</div>
+        <div class="name" id="result-role">—</div>
+      </div>
+    </div>
+
+    <div class="skill-grid">
+      <div class="skill-card">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <rect x="9" y="9" width="6" height="6"/>
+            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>
+          </svg>
+          AI Skills
+        </div>
+        <ul class="skill-list" id="result-ai"></ul>
+      </div>
+      <div class="skill-card human">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 5a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V8a3 3 0 0 0-3-3z"/>
+            <path d="M9 8a3 3 0 0 1-3-3M15 8a3 3 0 0 0 3-3M9 16a3 3 0 0 0-3 3M15 16a3 3 0 0 1 3 3"/>
+          </svg>
+          Human Strengths
+        </div>
+        <ul class="skill-list" id="result-hu"></ul>
+      </div>
+    </div>
+
+    <div class="timer-card">
+      <div class="timer-row">
+        <div class="timer-left">
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:10px; letter-spacing:0.3em; color:var(--muted); text-transform:uppercase;">Discussion Timer</div>
+          <div class="timer-presets">
+            <button class="preset active" data-min="5" onclick="setTimer(5)">5 MIN</button>
+            <button class="preset" data-min="10" onclick="setTimer(10)">10 MIN</button>
+            <button class="preset" data-min="15" onclick="setTimer(15)">15 MIN</button>
+          </div>
+        </div>
+        <div class="timer-center">
+          <div class="timer-display" id="timer-display">10:00</div>
+          <button class="add-30" onclick="addTime(30)">+30 SEC</button>
+        </div>
+        <div class="timer-right">
+          <button class="btn ghost small jeopardy-toggle" id="jeopardy-btn" onclick="toggleJeopardy()" title="Jeopardy theme loop">♫ Theme</button>
+          <button class="btn small" id="timer-toggle" onclick="toggleTimer()">▶ Start Timer</button>
+          <button class="btn ghost small" onclick="stopTimer()">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <div class="group">
+        <button class="btn ghost small" onclick="newVariant()">↻ New Variant</button>
+      </div>
+      <div class="group">
+        <button class="btn small" onclick="go('screen-ai')">Reveal AI Perspective →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 4 : AI PERSPECTIVE ============ -->
+<section id="screen-ai" class="screen">
+  <div class="inner">
+    <div class="top-bar">
+      <button class="back" onclick="go('screen-result')">← Back</button>
+      <div class="eyebrow"><span class="dot"></span>AI Perspective · 2030</div>
+    </div>
+
+    <div class="ai-mini-card">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="role-name" id="ai-role">—</div>
+        <div class="tags"><span class="ai" id="ai-skills-tag">—</span> · <span class="hu" id="ai-human-tag">—</span></div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <span class="label">Scenario</span>
+      <div id="ai-scenario">—</div>
+    </div>
+
+    <div class="reflection">
+      <span class="label" id="ai-reflection-label">Reflection</span>
+      <div class="q" id="ai-reflection">—</div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="btn ghost" onclick="go('screen-result')">← Back to card</button>
+      <button class="btn" onclick="newVariant()">↻ Spin Again</button>
+    </div>
+  </div>
+</section>
+
+
+<script>
+// ============================================================
+// AUDIO ENGINE — synthesized chiptune via Web Audio API
+// ============================================================
+const Audio8 = {
+  ctx: null,
+  master: null,
+  muted: true,
+  tickTimer: null,
+
+  init() {
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = this.muted ? 0 : 0.5;
+    this.master.connect(this.ctx.destination);
+  },
+  resume() {
+    this.init();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  setMuted(m) {
+    this.muted = m;
+    if (this.master) this.master.gain.value = m ? 0 : 0.5;
+  },
+
+  // core note: one oscillator with envelope
+  note(freq, start, dur, type = 'square', vol = 0.3, dest = null) {
+    const t0 = this.ctx.currentTime + start;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(dest || this.master);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  },
+
+  // short UI blip
+  blip() {
+    if (!this.ctx) return;
+    this.note(660, 0, 0.06, 'square', 0.18);
+  },
+
+  // mario-ish coin: quick up two-tone
+  coin() {
+    if (!this.ctx) return;
+    this.note(988, 0, 0.07, 'square', 0.28);   // B5
+    this.note(1319, 0.07, 0.18, 'square', 0.28); // E6
+  },
+
+  // power-up ascending arpeggio
+  powerup() {
+    if (!this.ctx) return;
+    const seq = [523, 659, 784, 1047, 1319]; // C E G C E
+    seq.forEach((f, i) => this.note(f, i * 0.08, 0.12, 'square', 0.26));
+  },
+
+  // success jingle (for reveal)
+  jingle() {
+    if (!this.ctx) return;
+    const seq = [[784,0],[988,0.12],[1319,0.24],[1047,0.40]];
+    seq.forEach(([f,t]) => this.note(f, t, 0.22, 'triangle', 0.3));
+  },
+
+  // Mario "course clear" victory fanfare (timer end)
+  courseClear() {
+    if (!this.ctx) return;
+    const seq = [
+      [392,0,0.13],[523.25,0.13,0.13],[659.25,0.26,0.13],
+      [783.99,0.39,0.13],[1046.5,0.52,0.13],[1318.51,0.65,0.13],
+      [1567.98,0.78,0.4,0.32],[1318.51,1.18,0.5,0.3]
+    ];
+    seq.forEach(n => this.note(n[0], n[1], n[2], 'square', n[3] || 0.28));
+  },
+
+  // Zelda "secret found" 8-note jingle (reflection reveal)
+  secretFound() {
+    if (!this.ctx) return;
+    const seq = [
+      [783.99,0,0.13],[739.99,0.13,0.13],[622.25,0.26,0.13],
+      [440,0.39,0.13],[415.30,0.52,0.13],[659.25,0.65,0.13],
+      [830.61,0.78,0.13],[1046.5,0.91,0.4,0.32]
+    ];
+    seq.forEach(n => this.note(n[0], n[1], n[2], 'square', n[3] || 0.3));
+  },
+
+  // ---- Jeopardy "Think!" theme on endless loop ----
+  jeopardyOn: false,
+  jeopardyGain: null,
+  jeopardyTimer: null,
+
+  // note frequencies (incl. Ab / Eb for the chromatic line)
+  freq(name) {
+    const map = {
+      C2:65.41,D2:73.42,E2:82.41,F2:87.31,G2:98.00,Ab2:103.83,A2:110.00,B2:123.47,
+      C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196.00,Ab3:207.65,A3:220.00,B3:246.94,
+      C4:261.63,D4:293.66,Eb4:311.13,E4:329.63,F4:349.23,G4:392.00,Ab4:415.30,A4:440.00,B4:493.88,
+      C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880.00,REST:0
+    };
+    return map[name];
+  },
+  nesWaveCache: {},
+  nesPulseWave(duty) {
+    if (this.nesWaveCache[duty]) return this.nesWaveCache[duty];
+    const n=24, real=new Float32Array(n), imag=new Float32Array(n);
+    for (let k=1;k<n;k++) imag[k]=(2/(k*Math.PI))*Math.sin(Math.PI*k*duty);
+    const w=this.ctx.createPeriodicWave(real, imag, {disableNormalization:false});
+    this.nesWaveCache[duty]=w; return w;
+  },
+  nesPulse(freq, start, dur, duty, vol) {
+    if (!freq) return;
+    const t = this.ctx.currentTime + start;
+    const osc=this.ctx.createOscillator(), g=this.ctx.createGain();
+    osc.setPeriodicWave(this.nesPulseWave(duty));
+    osc.frequency.value=freq;
+    const a=0.004, r=Math.min(0.03,dur*0.25);
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+a);
+    g.gain.setValueAtTime(vol,t+Math.max(a,dur-r));
+    g.gain.linearRampToValueAtTime(0,t+dur*0.95);
+    osc.connect(g); g.connect(this.jeopardyGain);
+    osc.start(t); osc.stop(t+dur);
+  },
+  nesTri(freq, start, dur, vol) {
+    if (!freq) return;
+    const t = this.ctx.currentTime + start;
+    const osc=this.ctx.createOscillator(), g=this.ctx.createGain();
+    osc.type="triangle"; osc.frequency.value=freq;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.004);
+    g.gain.setValueAtTime(vol,t+dur*0.9);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    osc.connect(g); g.connect(this.jeopardyGain);
+    osc.start(t); osc.stop(t+dur);
+  },
+  nesNoise(start, dur, hp, vol) {
+    const t = this.ctx.currentTime + start;
+    const buf=this.ctx.createBuffer(1, Math.ceil(this.ctx.sampleRate*dur), this.ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const src=this.ctx.createBufferSource(); src.buffer=buf;
+    const f=this.ctx.createBiquadFilter(); f.type="highpass"; f.frequency.value=hp;
+    const g=this.ctx.createGain();
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    src.connect(f); f.connect(g); g.connect(this.jeopardyGain);
+    src.start(t);
+  },
+  nesChordArp(notes, start, dur) {
+    const real=notes.filter(x=>x!==0);
+    if (!real.length) return;
+    const seg=Math.min(dur*0.45,0.12);
+    this.nesPulse(real[0], start, seg, 0.25, 0.06);
+    if (real[1]) this.nesPulse(real[1], start+seg, seg, 0.25, 0.06);
+  },
+
+  // NES "Think!" — verified melody, 132 BPM (1:1 from chat)
+  jeopardyLoopOnce() {
+    const BPM=132, BEAT=60/BPM, Q=BEAT, H=BEAT*2, E=BEAT/2;
+    const F=(n)=>this.freq(n);
+    const MELODY=[
+      [F('G4'),Q],[F('C5'),Q],[F('G4'),Q],[F('E4'),Q],
+      [F('F4'),E],[F('G4'),E],[F('C5'),Q],[F('G4'),H],
+      [F('G4'),Q],[F('C5'),Q],[F('G4'),Q],[F('C5'),Q],
+      [F('E5'),Q],[F('D5'),Q],[F('C5'),Q],[F('B4'),Q],
+      [F('A4'),Q],[F('Ab4'),Q],[F('G4'),H],
+      [F('G4'),Q],[F('C5'),Q],[F('G4'),Q],[F('E4'),Q],
+      [F('F4'),E],[F('G4'),E],[F('C5'),Q],[F('G4'),H],
+      [F('C5'),Q],[F('A4'),Q],[F('G4'),Q],[F('F4'),Q],
+      [F('E4'),Q],[F('D4'),Q],[F('C4'),H]
+    ];
+    const CHORD=[
+      [[F('C4'),F('E4'),F('G4'),F('A4')],Q],[0,Q],[[F('C4'),F('E4'),F('G4')],Q],[0,Q],
+      [[F('F3'),F('A3'),F('C4'),F('D4')],Q],[0,Q],[[F('G3'),F('B3'),F('D4'),F('F4')],H],
+      [[F('C4'),F('E4'),F('G4')],Q],[0,Q],[[F('C4'),F('E4'),F('G4')],Q],[0,Q],
+      [[F('C4'),F('E4'),F('G4')],Q],[0,Q],[[F('G3'),F('B3'),F('D4')],Q],[0,Q],
+      [[F('F3'),F('A3'),F('C4')],Q],[[F('Ab3'),F('C4'),F('Eb4')],Q],[[F('G3'),F('B3'),F('D4')],H],
+      [[F('C4'),F('E4'),F('G4'),F('A4')],Q],[0,Q],[[F('C4'),F('E4'),F('G4')],Q],[0,Q],
+      [[F('F3'),F('A3'),F('C4'),F('D4')],Q],[0,Q],[[F('G3'),F('B3'),F('D4'),F('F4')],H],
+      [[F('C4'),F('E4'),F('G4')],Q],[[F('F3'),F('A3'),F('C4')],Q],[[F('G3'),F('B3'),F('D4')],Q],[[F('G3'),F('B3'),F('F4')],Q],
+      [[F('C4'),F('E4'),F('G4')],H]
+    ];
+    const BASS=[
+      [F('C2'),Q],[F('G2'),Q],[F('C2'),Q],[F('E2'),Q],
+      [F('F2'),Q],[F('D2'),Q],[F('G2'),H],
+      [F('C2'),Q],[F('G2'),Q],[F('C2'),Q],[F('G2'),Q],
+      [F('C2'),Q],[F('E2'),Q],[F('G2'),Q],[F('G2'),Q],
+      [F('F2'),Q],[F('Ab2'),Q],[F('G2'),H],
+      [F('C2'),Q],[F('G2'),Q],[F('C2'),Q],[F('E2'),Q],
+      [F('F2'),Q],[F('D2'),Q],[F('G2'),H],
+      [F('C2'),Q],[F('F2'),Q],[F('G2'),Q],[F('G2'),Q],
+      [F('C2'),H]
+    ];
+    const seq=(notes, fn)=>{ let t=0; for(const [v,d] of notes){ fn(v,t,d); t+=d; } return t; };
+    const len = seq(MELODY, (f,t,d)=>this.nesPulse(f,t,d,0.5,0.20));
+    seq(CHORD, (c,t,d)=>{ if(Array.isArray(c)) this.nesChordArp(c,t,d); });
+    seq(BASS, (f,t,d)=>this.nesTri(f,t,d,0.45));
+    const beats=Math.round(len/BEAT);
+    for (let i=0;i<beats;i++){
+      const tb=i*BEAT;
+      this.nesNoise(tb, 0.025, 11000, 0.05);
+      this.nesNoise(tb+BEAT*0.5, 0.03, 9000, 0.06);
+      if (i%2===1) this.nesNoise(tb, 0.08, 1800, 0.16);
+    }
+    return len;
+  },
+
+  startJeopardy() {
+    this.resume();
+    if (this.jeopardyOn) return;
+    this.jeopardyOn = true;
+    if (!this.jeopardyGain) {
+      this.jeopardyGain = this.ctx.createGain();
+      this.jeopardyGain.connect(this.master);
+    }
+    this.jeopardyGain.gain.cancelScheduledValues(this.ctx.currentTime);
+    this.jeopardyGain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+    const loop = () => {
+      const dur = this.jeopardyLoopOnce();
+      this.jeopardyTimer = setTimeout(() => { if (this.jeopardyOn) loop(); }, dur * 1000);
+    };
+    loop();
+  },
+
+  stopJeopardy() {
+    this.jeopardyOn = false;
+    if (this.jeopardyTimer) { clearTimeout(this.jeopardyTimer); this.jeopardyTimer = null; }
+    if (this.jeopardyGain && this.ctx) {
+      const now = this.ctx.currentTime;
+      this.jeopardyGain.gain.cancelScheduledValues(now);
+      this.jeopardyGain.gain.setValueAtTime(this.jeopardyGain.gain.value, now);
+      this.jeopardyGain.gain.linearRampToValueAtTime(0, now + 0.15);
+    }
+  },
+
+  // continuous fast ticking while reels spin
+  startTick() {
+    if (!this.ctx) return;
+    this.stopTick();
+    const doTick = () => {
+      this.note(1200 + Math.random()*200, 0, 0.02, 'square', 0.08);
+    };
+    this.tickTimer = setInterval(doTick, 60);
+  },
+  stopTick() {
+    if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null; }
+  }
+};
+
+function toggleMute() {
+  Audio8.setMuted(!Audio8.muted);
+  const btn = document.getElementById('mute-btn');
+  const icon = document.getElementById('mute-icon');
+  btn.classList.toggle('muted', Audio8.muted);
+  icon.textContent = Audio8.muted ? '✕' : '♪';
+}
+
+function setJeopardy(on) {
+  const btn = document.getElementById('jeopardy-btn');
+  if (on) {
+    Audio8.startJeopardy();
+    if (btn) { btn.classList.add('playing'); btn.innerHTML = '■ Theme'; }
+  } else {
+    Audio8.stopJeopardy();
+    if (btn) { btn.classList.remove('playing'); btn.innerHTML = '♫ Theme'; }
+  }
+}
+function toggleJeopardy() { setJeopardy(!Audio8.jeopardyOn); }
+
+// ============================================================
+// DATA — 10 roles × 2 sets = 20 identity cards
+// ============================================================
+const SETS = [
+  // SOFTWARE DEVELOPER
+  { role: "Software Developer", variant: "A",
+    ai: ["Generate code", "Detect code dependencies", "Automate tests"],
+    human: ["Think creatively", "Process failure", "Stay curious"],
+    scenario: "AI writes the boilerplate, catches the dependencies you'd spend hours tracing, and runs 10,000 test cases overnight. Your morning starts not with writing code — but with reviewing what the machine built and asking: is this actually what we wanted? You're the one who gets excited about a weird edge case nobody else noticed. Who tries the unconventional approach just to see if it works. Who turns a failed deployment into a lesson the whole team learns from.",
+    reflection: "When AI can write code faster than you can type — what does it mean to be a good developer?" },
+  { role: "Software Developer", variant: "B",
+    ai: ["Explain legacy code", "Measure technical debt", "Document decisions"],
+    human: ["Give mentoring", "Embody values", "Address uncomfortable topics"],
+    scenario: "The AI has finally decoded that 12-year-old service nobody dared to touch. It mapped the debt, explained the logic, generated the docs. Now someone has to decide what to do with that knowledge — and have the hard conversation with the team about why it got this way in the first place. You're the institutional memory with a conscience. The one who tells the junior dev the truth about what shortcuts cost. Who says out loud what the codebase has been silently screaming for years.",
+    reflection: "What do you protect your team from — and should you?" },
+
+  // SCRUM MASTER
+  { role: "Scrum Master", variant: "A",
+    ai: ["Evaluate sprint data", "Analyze retrospectives", "Classify tickets"],
+    human: ["Create psychological safety", "Mediate conflicts", "Read a room"],
+    scenario: "The AI delivers the retrospective analysis before the meeting even starts. Patterns across 12 sprints, ticket trends, velocity anomalies — all there. But when two senior devs haven't spoken properly in three weeks, no dashboard catches that. You walk into the room and feel it immediately. You create the space where someone finally says what everyone has been thinking. That's not a metric. That's you.",
+    reflection: "If AI could run the perfect retrospective — what would be missing?" },
+  { role: "Scrum Master", variant: "B",
+    ai: ["Generate burndown charts", "Identify knowledge gaps", "Draft stakeholder updates"],
+    human: ["Say no", "Defend priorities", "Navigate politics"],
+    scenario: "Burndowns are automated. Updates write themselves. The AI even flags when the team is overloaded before the sprint starts. And still — someone has to walk into the room with the stakeholder who wants to add just one small thing in week three and say: no. That's not a workflow. That's courage. And it has your name on it.",
+    reflection: "Where do you hide behind the process — and where do you actually lead?" },
+
+  // PRODUCT MANAGER
+  { role: "Product Manager", variant: "A",
+    ai: ["Categorize feedback", "Scan tech trends", "Calculate forecasts"],
+    human: ["Develop vision", "Sell ideas", "Inspire enthusiasm"],
+    scenario: "AI processes 10,000 user feedback entries overnight and hands you a prioritized list by morning. Trends, forecasts, competitive signals — synthesized before your first coffee. But nobody gets excited about a prioritized list. You're the one who takes those signals and turns them into a story the team believes in. Who walks into a room full of skeptics and leaves with believers. The AI gave you the data. The vision is yours.",
+    reflection: "What is your product intuition worth — and how do you know when to trust it over the data?" },
+  { role: "Product Manager", variant: "B",
+    ai: ["Validate acceptance criteria", "Model workflows", "Aggregate market data"],
+    human: ["Find compromise", "Include diverse perspectives", "Weigh ethical questions"],
+    scenario: "Acceptance criteria validated, workflows modeled, market landscape mapped — all automated. Now comes the part no model handles well: the feature that works perfectly for your core user and completely excludes another. The tradeoff that has no right answer. You're the one who makes sure that question even gets asked. Who slows the team down just long enough to think about who isn't in the room.",
+    reflection: "Whose voice is missing in your product decisions — and why?" },
+
+  // PROJECT MANAGER
+  { role: "Project Manager", variant: "A",
+    ai: ["Model risks", "Structure rollout plans", "Draft stakeholder updates"],
+    human: ["Navigate politics", "Find compromise", "Stay calm in crisis"],
+    scenario: "Every risk is modeled, every rollout structured, every update drafted before you've had your first coffee. The AI sees the Gantt chart. It does not see the CFO who just changed priorities on a Friday afternoon. You're the one who stays calm when three workstreams collide and everyone looks to you for the answer. Who finds the compromise that nobody else could see. Who walks out of the political minefield with the project still alive.",
+    reflection: "When everything is tracked and automated — what does it mean to truly lead a project?" },
+  { role: "Project Manager", variant: "B",
+    ai: ["Estimate costs", "Map dependencies", "Aggregate market data"],
+    human: ["Take responsibility", "Defend priorities", "Address uncomfortable topics"],
+    scenario: "Cost models run themselves. Dependencies are mapped in seconds. Market data arrives automatically. And yet — someone has to stand in front of the steering committee and say: this is going to cost more than we planned, and here's why it's still worth it. You're the one who carries the uncomfortable truth into the room. Who defends the priority nobody wants to hear. Who doesn't hide behind the spreadsheet.",
+    reflection: "Where do you use data as a shield — and where do you actually own the decision?" },
+
+  // TECH LEAD
+  { role: "Tech Lead", variant: "A",
+    ai: ["Detect code dependencies", "Measure technical debt", "Optimize performance"],
+    human: ["Give mentoring", "Foster error culture", "Think long-term"],
+    scenario: "The AI audits the entire codebase overnight. Technical debt measured, dependencies mapped, performance bottlenecks flagged. You wake up to a full report. But the junior dev who's afraid to push to main? The team that's shipping fast but learning nothing? The architecture decision that looks fine today but breaks in three years? That's yours. You're not just building software — you're building the people who build software.",
+    reflection: "Are you growing your team — or just keeping the product alive?" },
+  { role: "Tech Lead", variant: "B",
+    ai: ["Generate code", "Automate tests", "Scan tech trends"],
+    human: ["Say no", "Embody values", "Lead with courage"],
+    scenario: "AI generates, tests, and stays current on every framework so you don't have to. The technical baseline is covered. Now someone wants to use the shiny new tool that isn't production-ready. Or ship something that technically works but isn't right. You're the one who says no — not because of bureaucracy, but because you know what good looks like. And you're willing to stake your credibility on it.",
+    reflection: "What does technical leadership mean when AI can out-code most of your team?" },
+
+  // DEVOPS ENGINEER
+  { role: "DevOps Engineer", variant: "A",
+    ai: ["Orchestrate deployments", "Monitor metrics", "Detect anomalies"],
+    human: ["Stay calm in crisis", "Process failure", "Show self-reflection"],
+    scenario: "Pipelines run themselves. Metrics stream in real time. Anomalies surface before anyone notices. The AI is faster, more consistent, and never has an off day. Then production goes down at 2am in a way no model predicted. Something cascaded in a direction nobody saw coming. You're the one who stays calm, works the problem, and learns something the AI will need you to teach it next time.",
+    reflection: "When the system fails in a way nobody expected — what do you bring that the automation can't?" },
+  { role: "DevOps Engineer", variant: "B",
+    ai: ["Scale infrastructure", "Check compliance", "Automate processes"],
+    human: ["Demand sustainability", "Set boundaries", "Think long-term"],
+    scenario: "Scaling is automated, compliance checked, processes running without human input. Efficiency maxed. But who asks whether we should be running 40 environments when 10 would do? Who pushes back when the team wants to ship fast and skip the security review? Who thinks about what this infrastructure costs — not just in euros, but in complexity the next team inherits? That's the human in the loop.",
+    reflection: "What would your future self say about the architecture decisions you're making today?" },
+
+  // UX DESIGNER
+  { role: "UX Designer", variant: "A",
+    ai: ["Categorize feedback", "Generate test cases", "Aggregate market data"],
+    human: ["Show empathy", "Read a room", "Invent creative solutions"],
+    scenario: "AI processes thousands of user feedback entries, runs usability test scenarios, maps the competitive landscape. You have more data than any designer in history. And still — the user who clicks through the flow perfectly in testing but gives up in real life? The frustration that doesn't show up in the metrics? The insight that only comes from sitting next to a real person while they use your product? That's not in the dataset. That's you, paying attention.",
+    reflection: "When AI can generate 100 design variants in seconds — what does your taste, your judgment, and your empathy for users actually stand for?" },
+  { role: "UX Designer", variant: "B",
+    ai: ["Draft user stories", "Visualize roadmaps", "Detect duplicates"],
+    human: ["Sell ideas", "Build trust", "Include diverse perspectives"],
+    scenario: "User stories drafted, roadmaps visualized, duplicate patterns cleaned up. The AI keeps the backlog coherent. But the stakeholder who doesn't believe design matters? The engineer who thinks UX is decoration? The product roadmap that's missing the perspective of users who don't look like the team that built it? That's political work. That's trust work. That's yours.",
+    reflection: "Whose experience is your design optimized for — and who gets left out?" },
+
+  // BUSINESS ANALYST
+  { role: "Business Analyst", variant: "A",
+    ai: ["Analyze data", "Model workflows", "Evaluate feedback surveys"],
+    human: ["Explain complexity", "Translate culture", "Include diverse perspectives"],
+    scenario: "Data analyzed, workflows modeled, survey results synthesized. The AI handles the volume no human could process. But the process that looks perfect on paper and breaks down in practice because of how two departments actually work together? The insight that only comes from understanding the history, the politics, the unspoken rules? You're the one who translates between the world as it's documented and the world as it actually is.",
+    reflection: "What does the data not tell you — and how do you know when to trust what you see instead?" },
+  { role: "Business Analyst", variant: "B",
+    ai: ["Document decisions", "Classify tickets", "Identify knowledge gaps"],
+    human: ["Address uncomfortable topics", "Nurture relationships", "Show willingness to learn"],
+    scenario: "Decisions documented, tickets sorted, knowledge gaps surfaced automatically. The analytical groundwork runs itself. But the requirement that nobody wants to write down because it would reveal a disagreement? The stakeholder who holds the real answer but doesn't trust the process yet? The question that stops the room because nobody had asked it out loud? That's you. That's still irreplaceable.",
+    reflection: "What question are you not asking — because you already think you know the answer?" },
+
+  // AGILE COACH
+  { role: "Agile Coach", variant: "A",
+    ai: ["Analyze retrospectives", "Evaluate sprint data", "Identify knowledge gaps"],
+    human: ["Create psychological safety", "Foster error culture", "Show self-reflection"],
+    scenario: "Retro patterns analyzed across 20 teams. Sprint data benchmarked. Knowledge gaps mapped. The AI sees what no single coach could track. But the team that scores green on every metric and is quietly burning out? The leader who says all the right words and undermines the culture in every 1:1? The psychological safety that only exists because you were in the room? That doesn't show up in the data.",
+    reflection: "Are you coaching the team you see — or the team that shows up in the metrics?" },
+  { role: "Agile Coach", variant: "B",
+    ai: ["Model workflows", "Draft stakeholder updates", "Generate burndown charts"],
+    human: ["Develop vision", "Inspire enthusiasm", "Sustain excitement"],
+    scenario: "Tools suggested, workflows mapped, updates generated. The operational layer is covered. But transformation isn't a workflow. It's people choosing to work differently — and then choosing it again when it gets hard. Someone has to carry the vision when the energy drops in month four. Someone has to make people believe the change is worth it on the days when it doesn't feel like it is. That's not a process. That's you.",
+    reflection: "What does it take to keep people inspired in a transformation that never fully ends?" },
+
+  // DOMAIN LEAD
+  { role: "Domain Lead", variant: "A",
+    ai: ["Scan tech trends", "Model risks", "Calculate forecasts"],
+    human: ["Develop vision", "Navigate politics", "Think long-term"],
+    scenario: "Trends monitored, risks modeled, forecasts calculated. The AI gives you a clearer view of the landscape than any analyst team could. But the strategic bet that the data says is risky but your experience says is right? The coalition you need to build before the idea even gets a hearing? The vision that has to survive three org changes and two new CxOs? That's leadership. That's judgment. That's yours.",
+    reflection: "What would you decide differently if you trusted your own judgment more than the forecast?" },
+  { role: "Domain Lead", variant: "B",
+    ai: ["Map dependencies", "Document decisions", "Summarize incident reports"],
+    human: ["Take responsibility", "Embody values", "Give trust"],
+    scenario: "Dependencies mapped, decisions documented, incidents summarized. The institutional memory is automated. But the team that needs to know someone is accountable — not a process, not a system, a person? The decision that was made three years ago that nobody remembers why? The trust you give a team before they've earned it because you believe in what they could become? That's what a domain lead carries that no system can.",
+    reflection: "What does your team need from you that they can't get from a tool?" },
+];
+
+// Pool for slot reel spinning visual (mixed bag, just for animation drama)
+const SPIN_POOL_AI = [...new Set(SETS.flatMap(s => s.ai))];
+const SPIN_POOL_HU = [...new Set(SETS.flatMap(s => s.human))];
+const SPIN_POOL_ROLES = [...new Set(SETS.map(s => s.role))];
+
+// ============================================================
+// SESSION QUEUE — routes through all 20 sets, then reshuffles
+// ============================================================
+let queue = [];
+let usedThisCycle = [];
+let currentSet = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function refillQueue() {
+  // Start of a new cycle: shuffle all sets
+  queue = shuffle(SETS.map((_, i) => i));
+  usedThisCycle = [];
+}
+
+function drawNext() {
+  if (queue.length === 0) refillQueue();
+  const idx = queue.shift();
+  usedThisCycle.push(idx);
+  currentSet = SETS[idx];
+  updateSessionInfo();
+  return currentSet;
+}
+
+function resetSession() {
+  if (!confirm('Start a fresh session? All draws will be cleared.')) return;
+  queue = [];
+  usedThisCycle = [];
+  currentSet = null;
+  refillQueue();
+  updateSessionInfo();
+  go('screen-start');
+}
+
+function updateSessionInfo() {
+  const bar = document.getElementById('session-bar');
+  const label = document.getElementById('session-label');
+  if (usedThisCycle.length === 0) {
+    bar.style.display = 'none';
+  } else {
+    bar.style.display = 'flex';
+    label.textContent = `Draw ${usedThisCycle.length} / ${SETS.length}`;
+  }
+}
+
+// ============================================================
+// SCREEN NAVIGATION
+// ============================================================
+function go(id) {
+  // leaving the result screen → reset timer + stop theme
+  if (id !== 'screen-result') {
+    stopTimer();
+  }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'screen-ai') startReflectionAnimation();
+  else cancelReflectionAnimation();
+}
+
+// ============================================================
+// REVEAL ANIMATION — countdown → typewriter with em-dash pause
+// ============================================================
+let reflectionTimers = [];
+let reflectionCountdownInterval = null;
+
+function cancelReflectionAnimation() {
+  reflectionTimers.forEach(t => clearTimeout(t));
+  reflectionTimers = [];
+  if (reflectionCountdownInterval) {
+    clearInterval(reflectionCountdownInterval);
+    reflectionCountdownInterval = null;
+  }
+}
+
+function startReflectionAnimation() {
+  cancelReflectionAnimation();
+  if (!currentSet) return;
+
+  const labelEl = document.getElementById('ai-reflection-label');
+  const qEl = document.getElementById('ai-reflection');
+
+  // initial state: label with countdown + skip button
+  let secondsLeft = 30;
+  const renderLabel = () => {
+    const m = Math.floor(secondsLeft/60);
+    const s = (secondsLeft%60).toString().padStart(2,'0');
+    labelEl.innerHTML = `Reflection <span class="countdown">${m}:${s}</span><button class="skip-btn" onclick="skipReflectionCountdown()" title="Reveal now">▸</button>`;
+  };
+  renderLabel();
+  qEl.innerHTML = '<span class="cursor"></span>';
+
+  reflectionCountdownInterval = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      clearInterval(reflectionCountdownInterval);
+      reflectionCountdownInterval = null;
+      triggerReflectionType();
+    } else {
+      renderLabel();
+    }
+  }, 1000);
+}
+
+function skipReflectionCountdown() {
+  if (reflectionCountdownInterval) {
+    clearInterval(reflectionCountdownInterval);
+    reflectionCountdownInterval = null;
+  }
+  triggerReflectionType();
+}
+
+function triggerReflectionType() {
+  const labelEl = document.getElementById('ai-reflection-label');
+  const qEl = document.getElementById('ai-reflection');
+  labelEl.innerHTML = 'Reflection';
+
+  const TYPE_SPEED = 32;       // ms per char
+  const PAUSE_AT_DASH = 1100;  // ms pause at em-dash
+
+  const text = currentSet.reflection;
+  const dashIdx = text.indexOf('—');
+
+  let part1, part2;
+  if (dashIdx > 0) {
+    part1 = text.slice(0, dashIdx).trim();
+    part2 = text.slice(dashIdx + 1).trim();
+  } else {
+    const commaIdx = text.indexOf(',');
+    if (commaIdx > 0) {
+      part1 = text.slice(0, commaIdx + 1);
+      part2 = text.slice(commaIdx + 1).trim();
+    } else {
+      part1 = text;
+      part2 = '';
+    }
+  }
+
+  typePart(qEl, part1, TYPE_SPEED, () => {
+    // brief pause at em-dash (cursor keeps blinking)
+    const prefix = part1 + ' — ';
+    qEl.innerHTML = part1 + ' —<span class="cursor"></span>';
+    reflectionTimers.push(setTimeout(() => {
+      qEl.innerHTML = prefix + '<span class="cursor"></span>';
+      Audio8.secretFound();
+      typePart(qEl, part2, TYPE_SPEED, null, prefix);
+    }, PAUSE_AT_DASH));
+  });
+}
+
+function typePart(el, text, speed, done, prefix = '') {
+  let i = 0;
+  const tick = () => {
+    if (i > text.length) { if (done) done(); return; }
+    el.innerHTML = prefix + text.slice(0, i) + '<span class="cursor"></span>';
+    i++;
+    reflectionTimers.push(setTimeout(tick, speed));
+  };
+  tick();
+}
+
+function startGame() {
+  Audio8.resume();
+  if (queue.length === 0 && usedThisCycle.length === 0) refillQueue();
+  resetReels();
+  go('screen-slot');
+  // auto-spin shortly after entering
+  setTimeout(() => spin(), 300);
+}
+
+function newVariant() {
+  resetReels();
+  go('screen-slot');
+  setTimeout(() => spin(), 300);
+}
+
+// ============================================================
+// SLOT MACHINE
+// ============================================================
+let spinning = false;
+
+function resetReels() {
+  const allReels = document.querySelectorAll('#screen-slot .reel');
+  allReels.forEach(r => {
+    r.classList.remove('spinning', 'locked');
+    r.querySelector('.text').textContent = '—';
+  });
+  document.getElementById('spin-btn').style.display = '';
+  document.getElementById('confirm-btn').style.display = 'none';
+}
+
+const SPIN_TOTAL_MS = 4200; // single source of truth: powerup + headline lock together
+
+function spin() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('spin-btn').disabled = true;
+
+  Audio8.resume();
+  Audio8.startTick();
+  // spin the headline word in sync — duration tied to the powerup moment
+  const word = document.getElementById('slot-word');
+  if (word) {
+    word.style.setProperty('--spin-dur', (SPIN_TOTAL_MS/1000) + 's');
+    word.classList.remove('spinning'); void word.offsetWidth; word.classList.add('spinning');
+    word.addEventListener('animationend', () => word.classList.remove('spinning'), { once: true });
+  }
+  const set = drawNext();
+  const reels = {
+    role:   { el: document.getElementById('reel-role'),  pool: SPIN_POOL_ROLES, final: set.role },
+    ai0:    { el: document.getElementById('reel-ai-0'),  pool: SPIN_POOL_AI,    final: set.ai[0] },
+    ai1:    { el: document.getElementById('reel-ai-1'),  pool: SPIN_POOL_AI,    final: set.ai[1] },
+    ai2:    { el: document.getElementById('reel-ai-2'),  pool: SPIN_POOL_AI,    final: set.ai[2] },
+    hu0:    { el: document.getElementById('reel-hu-0'),  pool: SPIN_POOL_HU,    final: set.human[0] },
+    hu1:    { el: document.getElementById('reel-hu-1'),  pool: SPIN_POOL_HU,    final: set.human[1] },
+    hu2:    { el: document.getElementById('reel-hu-2'),  pool: SPIN_POOL_HU,    final: set.human[2] },
+  };
+
+  // start all spinning
+  const intervals = {};
+  Object.entries(reels).forEach(([k, r]) => {
+    r.el.classList.add('spinning');
+    intervals[k] = setInterval(() => {
+      r.el.querySelector('.text').textContent = r.pool[Math.floor(Math.random()*r.pool.length)];
+    }, 70);
+  });
+
+  // lock sequence
+  const lockOrder = ['role', 'ai0', 'ai1', 'ai2', 'hu0', 'hu1', 'hu2'];
+  const lockDelays = [1400, 2100, 2400, 2700, 3300, 3600, 3900];
+
+  lockOrder.forEach((k, i) => {
+    setTimeout(() => {
+      clearInterval(intervals[k]);
+      const r = reels[k];
+      r.el.classList.remove('spinning');
+      r.el.classList.add('locked');
+      r.el.querySelector('.text').textContent = r.final;
+      Audio8.coin();
+    }, lockDelays[i]);
+  });
+
+  // after all locked
+  setTimeout(() => {
+    spinning = false;
+    Audio8.stopTick();
+    Audio8.powerup();
+    document.getElementById('spin-btn').style.display = 'none';
+    document.getElementById('confirm-btn').style.display = '';
+    document.getElementById('spin-btn').disabled = false;
+    populateResult();
+  }, SPIN_TOTAL_MS);
+}
+
+// ============================================================
+// RESULT POPULATION
+// ============================================================
+function populateResult() {
+  if (!currentSet) return;
+  document.getElementById('result-role').textContent = currentSet.role;
+  const aiUl = document.getElementById('result-ai');
+  const huUl = document.getElementById('result-hu');
+  aiUl.innerHTML = currentSet.ai.map(x => `<li>${x}</li>`).join('');
+  huUl.innerHTML = currentSet.human.map(x => `<li>${x}</li>`).join('');
+
+  // AI screen
+  document.getElementById('ai-role').textContent = currentSet.role;
+  document.getElementById('ai-skills-tag').textContent = currentSet.ai.join(' · ');
+  document.getElementById('ai-human-tag').textContent = currentSet.human.join(' · ');
+  document.getElementById('ai-scenario').textContent = currentSet.scenario;
+  // reflection is set by the reveal animation, not here
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+let timerSeconds = 300;
+let timerInterval = null;
+let timerRunning = false;
+
+function renderTimer() {
+  const m = Math.floor(timerSeconds/60).toString().padStart(2,'0');
+  const s = (timerSeconds%60).toString().padStart(2,'0');
+  document.getElementById('timer-display').textContent = `${m}:${s}`;
+}
+function setTimer(min) {
+  stopTimer();
+  timerSeconds = min*60;
+  document.querySelectorAll('.preset').forEach(p => p.classList.toggle('active', +p.dataset.min === min));
+  renderTimer();
+}
+function addTime(sec) {
+  timerSeconds += sec;
+  renderTimer();
+}
+function toggleTimer() {
+  const btn = document.getElementById('timer-toggle');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.textContent = '▶ Resume';
+    setJeopardy(false);
+  } else {
+    timerRunning = true;
+    btn.textContent = '⏸ Pause';
+    setJeopardy(true);
+    timerInterval = setInterval(() => {
+      if (timerSeconds > 0) { timerSeconds--; renderTimer(); }
+      else {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.textContent = '▶ Start Timer';
+        setJeopardy(false);
+        Audio8.courseClear();
+      }
+    }, 1000);
+  }
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  setJeopardy(false);
+  document.getElementById('timer-toggle').textContent = '▶ Start Timer';
+  // reset to active preset
+  const activePreset = document.querySelector('.preset.active');
+  timerSeconds = (activePreset ? +activePreset.dataset.min : 10) * 60;
+  renderTimer();
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  const active = document.querySelector('.screen.active').id;
+  if (active === 'screen-start' && (e.code === 'Space' || e.code === 'Enter')) {
+    e.preventDefault(); startGame();
+  } else if (active === 'screen-slot' && e.code === 'Space' && !spinning) {
+    e.preventDefault();
+    if (document.getElementById('confirm-btn').style.display === 'none') spin();
+    else go('screen-result');
+  }
+});
+
+// init
+renderTimer();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Website-Rundgang</title>
+<style>
+  html,body{margin:0;background:#fff}
+  body{overflow:hidden}
+  img{display:block;width:1440px;transition:opacity .35s ease}
+  img.fade{opacity:0}
+</style>
+</head>
+<body>
+<img id="page" alt="">
+<script>
+  // Lange Screenshots einer Website; die Demo blättert und scrollt darin.
+  const SETS = {
+    vuca:   { home: 'vuca-home.jpg', archiv: 'vuca-archiv.jpg', folge: 'vuca-folge.jpg', transkript: 'vuca-transkript.jpg' },
+    zirkus: { home: 'zirkus-home.jpg', spenden: 'zirkus-spenden.jpg' },
+  };
+  const set = SETS[new URLSearchParams(location.search).get('set')] || SETS.vuca;
+  const img = document.getElementById('page');
+  let current = null;
+
+  window.showPage = name => new Promise(resolve => {
+    if (current === name) return resolve();
+    const first = current === null;
+    current = name;
+    img.classList.add('fade');
+    setTimeout(() => {
+      img.onload = () => { window.scrollTo(0, 0); img.classList.remove('fade'); resolve(); };
+      img.src = '../../img/' + set[name];
+    }, first ? 0 : 250);
+  });
+  showPage(Object.keys(set)[0]);
+</script>
+</body>
+</html>
