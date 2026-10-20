@@ -8,7 +8,7 @@ window.CONTENT = {
   de: {
     nav: { work: "Projekte", backBtn: "Zurück", why: "Warum diese Seite", about: "Über mich", back: "Alle Projekte", theme: "Hell/Dunkel umschalten", all: "Alle Projekte ansehen" },
     name: "Thomas Wordenbeck",
-    role: "Produktmanager, der selbst baut",
+    role: "Erst das Problem. Dann das Werkzeug.",
     intro:
       "Ich denke seit vielen Jahren in Produkten. Jetzt habe ich endlich das Werkzeug, meine Ideen auch selbst umzusetzen. Hier zeige ich eine Auswahl davon: Produkte für den eigenen Alltag und für Menschen in meinem Umfeld.",
     status: { live: "Live", paused: "Pausiert" },
@@ -19,7 +19,7 @@ window.CONTENT = {
   en: {
     nav: { work: "Projects", backBtn: "Back", why: "Why this site", about: "About me", back: "All projects", theme: "Toggle light/dark", all: "See all projects" },
     name: "Thomas Wordenbeck",
-    role: "A product manager who builds",
+    role: "First the problem. Then the tool.",
     intro:
       "I have been thinking in products for many years. Now I finally have the tools to build my own ideas. Here is a selection: products for my own everyday life and for people around me.",
     status: { live: "Live", paused: "Paused" },

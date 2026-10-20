@@ -77,7 +77,7 @@ def home():
 {header(root)}
 <main class="wrap">
   <section class="intro">
-    <h1><img class="logo-lg" src="favicon.svg" alt="" width="64" height="64"><span data-k="name"></span></h1>
+    <h1><img class="logo-lg" src="icons/logo-e.svg" alt="" width="60" height="60"><span data-k="name"></span></h1>
     <div class="role" data-k="role"></div>
     <p data-k="intro"></p>
     <div class="intro-links">
