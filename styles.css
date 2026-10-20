@@ -310,3 +310,10 @@ header.top nav a:hover,.menu-btn:hover{color:var(--ink)}
 .p-head h1{display:flex;align-items:center;gap:16px}
 .p-head h1 .ic{width:48px;height:48px;flex:none;stroke-width:1.7}
 @media (max-width:900px){.p-head h1 .ic{width:34px;height:34px}}
+
+/* Logo in der Leiste und auf der Startseite */
+header.top .who{display:inline-flex;align-items:center;gap:9px}
+header.top .who .logo{width:24px;height:24px;flex:none;border-radius:6px}
+.intro h1{display:inline-flex;align-items:center;gap:20px}
+.intro h1 .logo-lg{width:64px;height:64px;flex:none;border-radius:15px;box-shadow:0 8px 24px rgba(0,113,227,.25)}
+@media (max-width:900px){.intro h1{gap:12px}.intro h1 .logo-lg{width:42px;height:42px;border-radius:10px}}

@@ -43,7 +43,7 @@ def head(root):
 
 def header(root):
     return f"""<header class="top"><div class="wrap top-in">
-  <a class="who" href="{root or './'}" data-k="name"></a>
+  <a class="who" href="{root or './'}"><img class="logo" src="{root}favicon.svg" alt="" width="24" height="24"><span data-k="name"></span></a>
   <nav>
     <div class="menu">
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><span data-k="nav.work"></span>{CHEVRON}</button>
@@ -77,7 +77,7 @@ def home():
 {header(root)}
 <main class="wrap">
   <section class="intro">
-    <h1 data-k="name"></h1>
+    <h1><img class="logo-lg" src="favicon.svg" alt="" width="64" height="64"><span data-k="name"></span></h1>
     <div class="role" data-k="role"></div>
     <p data-k="intro"></p>
     <div class="intro-links">
