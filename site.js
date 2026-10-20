@@ -33,6 +33,8 @@
     document.querySelectorAll('[data-k]').forEach(el => { el.textContent = get(t, el.dataset.k); });
     document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
     document.querySelectorAll('[data-linkedin]').forEach(a => { a.href = C.linkedin; });
+    document.querySelector('meta[name="description"]')?.setAttribute('content', t.description);
+    document.querySelector('.switcher')?.setAttribute('aria-label', t.labels.projects);
     themeButton();
     menuItems();
   }

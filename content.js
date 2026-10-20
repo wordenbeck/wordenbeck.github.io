@@ -12,7 +12,8 @@ window.CONTENT = {
     intro:
       "Ich denke seit vielen Jahren in Produkten. Jetzt habe ich endlich das Werkzeug, meine Ideen auch selbst umzusetzen. Hier zeige ich eine Auswahl davon: Produkte für den eigenen Alltag und für Menschen in meinem Umfeld.",
     status: { live: "Live", paused: "Pausiert" },
-    labels: { tabs: ["Worum es geht", "Highlights", "Technik"], visit: "Website ansehen", about: "Worum es geht", pause: "Pause", play: "Abspielen", more: "Weitere Projekte", linkedin: "LinkedIn-Profil", aboutLink: "Mehr zu mir", discover: "Produkte entdecken", open: "Demo ansehen", why: "Warum es diese Seite gibt" },
+    labels: { tabs: ["Worum es geht", "Highlights", "Technik"], visit: "Website ansehen", about: "Worum es geht", pause: "Pause", play: "Abspielen", more: "Weitere Projekte", linkedin: "LinkedIn-Profil", aboutLink: "Mehr zu mir", projects: "Projekte", discover: "Produkte entdecken", open: "Demo ansehen", why: "Warum es diese Seite gibt" },
+    description: "Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.",
     footer: "Gebaut mit Claude Code.",
   },
   en: {
@@ -22,7 +23,8 @@ window.CONTENT = {
     intro:
       "I have been thinking in products for many years. Now I finally have the tools to build my own ideas. Here is a selection: products for my own everyday life and for people around me.",
     status: { live: "Live", paused: "Paused" },
-    labels: { tabs: ["What it’s about", "Highlights", "Under the hood"], visit: "Visit website", about: "What it’s about", pause: "Pause", play: "Play", more: "More projects", linkedin: "LinkedIn profile", aboutLink: "More about me", discover: "Explore products", open: "View demo", why: "Why this site exists" },
+    labels: { tabs: ["What it’s about", "Highlights", "Under the hood"], visit: "Visit website", about: "What it’s about", pause: "Pause", play: "Play", more: "More projects", linkedin: "LinkedIn profile", aboutLink: "More about me", projects: "Projects", discover: "Explore products", open: "View demo", why: "Why this site exists" },
+    description: "Products for my own everyday life and for people around me – built by Thomas Wordenbeck.",
     footer: "Built with Claude Code.",
   },
 
@@ -81,7 +83,7 @@ window.CONTENT = {
       numbers: [
         { value: 150, label: "product teams supported" },
         { value: 10, label: "MVPs built" },
-        { value: 5000, label: "users in production supported" },
+        { value: 5000, label: "users supported in production" },
       ],
       stationsTitle: "Career",
       stations: [
@@ -93,7 +95,7 @@ window.CONTENT = {
           text: "Agile software development with offshore teams in Bangalore, a financing portal for around 1,000 dealers, backlog ownership and coaching of business teams." },
         { when: "2007 – 2019", what: "Application Management & IT Service Management", where: "GEFA BANK",
           text: "Product ownership in operations for business-critical applications in regulated banking: requirements, releases, quality assurance, audits. In parallel, establishing business analysis as a company-wide practice." },
-        { when: "2004 – 2007", what: "Apprenticeship as IT specialist", where: "GEFA",
+        { when: "2004 – 2007", what: "Apprenticeship as an IT business specialist", where: "GEFA",
           text: "Where it all started, back then with SQL scripts instead of AI." },
       ],
       strengthsTitle: "What I bring",
@@ -107,7 +109,7 @@ window.CONTENT = {
       education: [
         "M.Sc. Business Informatics, TH Köln (part-time)",
         "B.A. Business Administration, FH Südwestfalen (part-time)",
-        "Apprenticeship as IT specialist (Informatikkaufmann)",
+        "Apprenticeship as an IT business specialist (Informatikkaufmann)",
       ],
       certsTitle: "Certifications",
       certs: [
@@ -202,7 +204,7 @@ window.CONTENT = {
           "Just write down what you ate. Kalo recognises the ingredients and replies in Ruhr Valley dialect.",
           "Logged. The daily budget updates right away.",
         ],
-        highlights: [["Simple", "As simple and fast as possible. That is what sets Kalo apart from other trackers."], ["Log meals by chat", "Just write down what you ate. Kalo recognises ingredients, amounts and calories."], ["Feedback with character", "Every meal gets a comment in Ruhr Valley dialect. Honest, never preachy."], ["Everything at a glance", "Calories, macros, water and exercise in one dashboard."], ["Built around your goal", "Lose, maintain or build, by calories, high protein or SanaMana."], ["Weekly review", "Every Sunday a summary of the week with suggestions for the next one."]],
+        highlights: [["Simple", "As simple and fast as possible. That is what sets Kalo apart from other trackers."], ["Log meals by chat", "Just write down what you ate. Kalo recognises ingredients, amounts and calories."], ["Feedback with character", "Every meal gets a comment in Ruhr Valley dialect. Honest, never preachy."], ["Everything at a glance", "Calories, macros, water and exercise in one dashboard."], ["Built around your goal", "Lose weight, maintain or build muscle, by calories, high protein or SanaMana."], ["Weekly review", "Every Sunday a summary of the week with suggestions for the next one."]],
         tech: [["Setup", "React with TypeScript and Vite, designed as an iPhone app. Supabase handles login, database and eight server functions."], ["Meal analysis", "A server function sends the input to the Llama 3.3 language model (via Groq). A detailed prompt with examples makes sure it always returns structured data: foods, amounts, calories, macros, a comment and, if unclear, a follow-up question."], ["Personality by prompt", "The Ruhr Valley tone is defined in the prompt with required vocabulary, tone rules and counter-examples. How outspoken Kalo gets depends on how well the meal fits the chosen diet."], ["Context", "Every request includes the daily budget, what has already been eaten, the time, the diet concept and the goal, so the answer fits the situation."], ["More AI features", "Weekly review, recipe suggestions, meal plan and shopping list each run as their own server function."]],
         text:
           "I had started a diet and wanted to eat more mindfully, so I built my own calorie tracker with exactly the features I needed. The most fun part was logging meals with AI: you simply write down what you ate, the app recognises the ingredients and replies in Ruhr Valley dialect. Once I no longer used it myself, I paused the project. Mahlzeit grew out of it.",
@@ -240,7 +242,7 @@ window.CONTENT = {
           "The weekly plan becomes a shopping list, with export to Bring.",
           "While cooking, the app guides you through the recipe step by step.",
         ],
-        highlights: [["Recipes from Instagram", "Paste a link or share straight from Instagram. It becomes a clean recipe."], ["Plan the week", "Put recipes on weekdays with a single tap."], ["Shopping list on autopilot", "All ingredients of the week added up, portions adjustable, export to Bring."], ["Cooking mode", "Step by step, with timers detected from the recipe text."], ["For the whole household", "Several devices, one shared plan. Changes show up everywhere instantly."]],
+        highlights: [["Recipes from Instagram", "Paste a link or share straight from Instagram. It becomes a clean recipe."], ["Plan the week", "Drop recipes into the week with a single tap."], ["Shopping list on autopilot", "All ingredients of the week added up, portions adjustable, export to Bring."], ["Cooking mode", "Step by step, with timers detected from the recipe text."], ["For the whole household", "Several devices, one shared plan. Changes show up everywhere instantly."]],
         tech: [["Setup", "React with TypeScript and Vite, installable as an app (PWA), hosted on Vercel."], ["Data and sync", "Supabase with anonymous login, no sign-up needed. A household is a shared space with a join code; the database keeps households cleanly separated and syncs changes live between devices."], ["Recipe import", "A server function reads the reel's text and thumbnail and sends them with a parser prompt to Gemini. Back comes a structured recipe: ingredients with amount, unit and note, steps, time and difficulty. If the model is overloaded it retries up to three times; if the text can't be read, you can paste it yourself."], ["Share from Instagram", "Once installed, Mahlzeit registers as a share target on the phone, so a reel can be sent straight from Instagram."], ["Shopping list", "Identical ingredients are added up across all recipes by name and unit and scaled to the chosen portions. Spices without an amount are listed together at the end."], ["Export to Bring", "A small server function provides the list in a recipe format that the Bring app imports via a link."]],
         text:
           "After calories, my focus shifted: planning meals consistently and thinking through the big weekly shop in advance. Mahlzeit plans the week, turns it into a shopping list and exports it to list apps such as Bring. Recipes come from specific diet concepts and from Instagram: paste a link, AI reads the recipe from the reel and puts it into shape. Every household builds up its own collection. While cooking, the app guides you through each recipe step by step.",
@@ -277,7 +279,7 @@ window.CONTENT = {
           "Then the AI perspective is revealed, with a question to reflect on.",
         ],
         highlights: [["Slot machine", "Draws one of ten DevOps roles, plus three AI capabilities and three human strengths."], ["Discussion timer", "5, 10 or 15 minutes, extendable at the push of a button."], ["AI perspective", "A future scenario and a reflection question for the drawn role."], ["Made for the projector", "Large type, arcade look, controlled with space bar and enter."], ["Fully offline", "No installation, no account, no running costs."]],
-        tech: [["Setup", "A single HTML file with CSS and JavaScript, no framework and no build step. It runs in any browser, even without internet."], ["Content", "20 hand-written sets, two per role, each with AI capabilities, human strengths, a scenario and a reflection question. A shuffled deck makes sure nothing repeats until every set has come up once."], ["Sound without audio files", "The chiptune music is generated live in the browser with the Web Audio API, from melody, chord and bass sequences."], ["Staging", "The reels spin in time with the music. The reflection question appears after a countdown, typed out like on a typewriter, so the group thinks for itself first."]],
+        tech: [["Setup", "A single HTML file with CSS and JavaScript, no framework and no build step. It runs in any browser, even without internet."], ["Content", "20 hand-written sets, two per role, each with AI capabilities, human strengths, a scenario and a reflection question. A shuffled deck makes sure nothing repeats until every set has come up once."], ["Sound without audio files", "The chiptune music is generated live in the browser with the Web Audio API, from melody, chord and bass sequences."], ["Presentation", "The reels spin in time with the music. The reflection question appears after a countdown, typed out like on a typewriter, so the group thinks for itself first."]],
         text:
           "Built for a team event with around 50 people from several European countries. A retro arcade slot machine draws one of ten DevOps roles, plus three AI capabilities and three human strengths. A timer gives small groups time to discuss, then “Reveal AI Perspective” shows a future scenario and a reflection question for that role. There are no points and no winners. Everyone works out for themselves: What will I still do myself, and where does AI do the job better? The app runs fully offline in the browser with no API costs, accompanied by chiptune sounds inspired by classic Mario games.",
       },
@@ -315,8 +317,8 @@ window.CONTENT = {
           "Every new episode automatically gets its own page.",
           "Every episode is transcribed, and the key learnings come from it.",
         ],
-        highlights: [["Always up to date", "New episodes appear on the site automatically and are transcribed."], ["On every platform", "Each episode with direct links to Spotify, Apple Podcasts, Deezer and Amazon Music."], ["Searchable archive", "Every episode searchable and filterable by value, season and year."], ["Short links", "vucablaster.de/62 goes straight to the episode, which makes it easy to share on LinkedIn."]],
-        tech: [["Static site", "A Python script builds every page from the podcast host's RSS feed, the Apple and Deezer APIs and maintained content files. Hosted on GitHub Pages with a custom domain."], ["Automation", "A GitHub workflow runs every hour. When a new episode comes out, its page is created along with a ticket and checklist for the host."], ["Platform links", "Spotify and Amazon offer no simple access without a developer account. So an automated browser (Playwright) opens their public podcast pages and matches episodes by the number in the title."], ["Transcripts", "The speech recognition model Whisper runs directly on GitHub's servers, with pause detection and a filter against repetition loops. Only approved transcripts are shown."], ["Maintenance without code", "Content lives in simple files so the hosts can change it themselves."]],
+        highlights: [["Always up to date", "New episodes appear on the site automatically and are transcribed."], ["On every platform", "Each episode with direct links to Spotify, Apple Podcasts, Deezer and Amazon Music."], ["Searchable archive", "Every episode searchable and filterable by core value, season and year."], ["Short links", "vucablaster.de/62 goes straight to the episode, which makes it easy to share on LinkedIn."]],
+        tech: [["Static site", "A Python script builds every page from the podcast hosting provider's RSS feed, the Apple and Deezer APIs and maintained content files. Hosted on GitHub Pages with a custom domain."], ["Automation", "A GitHub workflow runs every hour. When a new episode comes out, its page is created along with a ticket and checklist for the host."], ["Platform links", "Spotify and Amazon offer no simple access without a developer account. So an automated browser (Playwright) opens their public podcast pages and matches episodes by the number in the title."], ["Transcripts", "The speech recognition model Whisper runs directly on GitHub's servers, with pause detection and a filter against repetition loops. Only approved transcripts are shown."], ["Maintenance without code", "Content lives in simple files so the hosts can change it themselves."]],
         text:
           "The website for the VUCA Blaster podcast. It largely maintains itself: when a new episode comes out, it automatically appears on the home page and gets its own page with links to Spotify, Apple Podcasts, Deezer and Amazon Music. The episode is also transcribed, and the key learnings are derived from the transcript. A searchable archive shows every episode at a glance. The hosts can look after the site without any coding knowledge.",
       },
@@ -352,7 +354,7 @@ window.CONTENT = {
           "The history remembers every game and shows the leaderboard.",
         ],
         highlights: [["Two games, one app", "Track points for the card games Uno and Flip 7, each with its own rules."], ["Quick entry", "Type the points, totals update, the next round sets itself up."], ["Winner ceremony", "Crown, leaderboard and confetti."], ["History and facts", "King of the week, eternal runner-up, best win rate and more."], ["No account", "Runs entirely on the phone, even offline."]],
-        tech: [["Setup", "A single HTML file as an installable app (PWA) with a service worker. It works without internet."], ["Storage", "The current game and the history live only on the device (localStorage). No database, no server."], ["Rules per game", "Flip 7 with a points target between 100 and 250. Uno with a round target (4, 8, 12 or open) and reversed scoring."], ["Facts from the history", "The app works out streaks, win rates, the favourite game, the regular guest and the eternal runner-up, and picks a few on every visit."], ["Details", "Colours change with the game, numbers count up with an animation, and phones give short vibration feedback."]],
+        tech: [["Setup", "A single HTML file as an installable app (PWA) with a service worker. It works without internet."], ["Storage", "The current game and the history live only on the device (localStorage). No database, no server."], ["Rules per game", "Flip 7 with a points target between 100 and 250. Uno with a round target (4, 8, 12 or open) and reversed scoring."], ["Facts from the history", "The app works out streaks, win rates, the favourite game, the most regular player and the eternal runner-up, and picks a few on every visit."], ["Details", "Colours change with the game, numbers count up with an animation, and phones give short vibration feedback."]],
         text:
           "For our game nights with Uno and Flip 7. Enter points, check the standings, crown the king or queen of the evening. The app runs entirely on the phone, with no database and no account. It still remembers every past game and surfaces interesting facts about them.",
       },
@@ -388,7 +390,7 @@ window.CONTENT = {
           "The children painted these pictures themselves.",
           "The donation timeline shows how close the goal is.",
         ],
-        highlights: [["The project explained", "What the children can look forward to and what the circus project supports."], ["Children's drawings", "A gallery with the pictures the children painted."], ["Easy to donate", "By bank transfer or GiroCode, scanned with a banking app."], ["Donation timeline", "Progress towards the goal, every donation as a timeline or feed."]],
+        highlights: [["The project explained", "What the children can look forward to and what the circus project supports."], ["Children’s drawings", "A gallery with the pictures the children painted."], ["Easy to donate", "By bank transfer or GiroCode, scanned with a banking app."], ["Donation timeline", "Progress towards the goal, every donation as a timeline or feed."]],
         tech: [["Setup", "A React site that is compiled ahead of time into plain files and served as a static site via Vercel."], ["Maintenance", "Texts, the donation goal and all donations live in one file. I add new donations as a list; the total and timeline are calculated from it."], ["Motion with care", "The donation ring counts up once it scrolls into view. Anyone who has reduced motion enabled sees the final value straight away."], ["Timeline", "The size of each dot shows the size of the donation."], ["No payment provider", "GiroCode is enough for bank transfers and costs the school no fees."]],
         text:
           "In 2028, the Regenbogenschule primary school in Velbert-Neviges is bringing a circus project to its pupils together with Zirkus Dobbelino. The site explains the project, shows pictures the children painted for it and collects donations by bank transfer or GiroCode. A donation timeline shows how close the goal is. I keep adding new donations and updates as they come in.",
