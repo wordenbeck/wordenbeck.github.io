@@ -1,0 +1,33 @@
+/* Gemeinsame Grundlagen der V2-Varianten: Geräte-Rahmen der Demo, Tipp-Kreise, Fokus. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid #2997ff; outline-offset: 3px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Gerät */
+.dv { position: relative; flex: none; }
+.dv-view { position: absolute; overflow: hidden; }
+.dv-scaled { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.dv iframe { display: block; border: 0; background: #fff; pointer-events: none; color-scheme: light; }
+.dv-phone { border-radius: 46px; background: #1d1d1f; box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 40px 80px -20px rgba(0,0,0,.6); }
+.dv-phone .dv-view { inset: var(--bezel, 9px); border-radius: 37px; }
+.dv-desktop { border-radius: 12px; background: #2c2c2e; box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 40px 80px -20px rgba(0,0,0,.6); }
+.dv-bar { position: absolute; inset: 0 0 auto; height: 30px; display: flex; align-items: center; justify-content: center; gap: 6px; font: 500 12px/1 system-ui, sans-serif; color: rgba(255,255,255,.55); }
+.dv-bar i { position: absolute; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18); }
+.dv-bar i:nth-child(1) { left: 12px } .dv-bar i:nth-child(2) { left: 26px } .dv-bar i:nth-child(3) { left: 40px }
+.dv-desktop .dv-view { inset: 30px 0 0; border-radius: 0 0 12px 12px; }
+
+.taps { position: absolute; inset: 0; pointer-events: none; }
+.tap { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent, #2997ff) 35%, transparent);
+  border: 2px solid color-mix(in srgb, var(--accent, #2997ff) 80%, transparent);
+  animation: tap .8s ease-out forwards; }
+@keyframes tap { 0% { transform: scale(.6); opacity: 0 } 20% { transform: scale(1); opacity: 1 } 100% { transform: scale(1.5); opacity: 0 } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

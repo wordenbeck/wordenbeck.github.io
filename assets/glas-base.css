@@ -1,0 +1,128 @@
+/* Glas-Fundament: Farben, Schrift, Glasflächen, Kopf/Fuß, Knöpfe, iPhone- und Browser-Rahmen.
+   Genutzt von allen Seiten. */
+:root {
+  --bg: #060a12;
+  --ink: #eef2f8;
+  --soft: #c3cad6;
+  --muted: #8a94a6;
+  --glass: rgba(255, 255, 255, .045);
+  --glass-2: rgba(255, 255, 255, .08);
+  --edge: rgba(255, 255, 255, .1);
+  --blue: #2997ff;
+  --font: "Sora", system-ui, sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --side: clamp(16px, 5vw, 80px);
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--font); letter-spacing: -.005em; min-height: 100vh; }
+::selection { background: var(--blue); color: #fff; }
+main { overflow-x: clip; }
+
+/* Raumlicht: zwei sehr weiche Lichtquellen, fest im Hintergrund */
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60vw 50vh at 12% -10%, rgba(41, 151, 255, .16), transparent 70%),
+              radial-gradient(50vw 50vh at 100% 110%, rgba(120, 140, 255, .08), transparent 70%), var(--bg); }
+.ambient.tinted { background: radial-gradient(50vw 60vh at 28% 30%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+              radial-gradient(50vw 50vh at 100% 110%, rgba(41, 151, 255, .08), transparent 70%), var(--bg); }
+
+/* Glas */
+.glass { position: relative; background: var(--glass); backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 0 1px var(--edge), 0 20px 50px -20px rgba(0,0,0,.6); }
+
+/* Kopf */
+.top { position: relative; z-index: 30; display: flex; justify-content: space-between; align-items: center; padding: 16px clamp(16px, 4vw, 48px); }
+.who { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+.who img { border-radius: 6px; }
+.pillbar { display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 99px; font-size: 14px; }
+.pillbar a { padding: 7px 14px; border-radius: 99px; color: var(--soft); transition: background .25s, color .25s; }
+.pillbar a:hover, .pillbar a[aria-current=page] { background: var(--glass-2); color: #fff; }
+.lang { display: flex; margin-left: 4px; padding-left: 6px; border-left: 1px solid var(--edge); }
+.lang button { font-size: 12px; font-weight: 600; padding: 6px 9px; border-radius: 99px; color: var(--muted); }
+.lang button[aria-pressed=true] { color: #fff; background: var(--glass-2); }
+
+/* Knöpfe */
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: 99px; font-weight: 500; font-size: 15px; transition: background .25s, box-shadow .25s, color .25s; }
+.btn.primary { background: var(--blue); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 10px 30px -10px rgba(41,151,255,.7); }
+.btn.primary:hover { background: #47a6ff; }
+.btn.glass:hover { background: var(--glass-2); }
+.back { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 16px 0 10px; border-radius: 99px; font-size: 14px; color: var(--soft); transition: background .2s, color .2s; }
+.back:hover { background: var(--glass-2); color: #fff; }
+
+/* Kleinteile */
+.ci { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--glass-2); color: var(--accent); box-shadow: inset 0 0 0 1px var(--edge); flex: none; }
+.st { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); padding: 3px 9px; border-radius: 99px; background: var(--glass-2); white-space: nowrap; }
+.st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #30d158; box-shadow: 0 0 8px #30d158; }
+.st.s-paused::before { background: var(--muted); box-shadow: none; }
+.go { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--blue); }
+.go svg { transition: transform .3s var(--ease); }
+a:hover .go svg, .go:hover svg { transform: translateX(3px); }
+
+.foot { max-width: 1440px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 26px; padding: 24px var(--side) 40px; font-size: 13px; color: var(--muted); }
+.foot a:hover { color: var(--ink); }
+
+/* ---------- iPhone ----------
+   Breite kommt von außen, die Höhe ergibt sich (Seitenverhältnis 1 : 2.1819).
+   Aufbau: Rahmen 4 % · Statusleiste 11.09 % · App-Bild 390×844 */
+.iph { position: relative; container-type: inline-size; aspect-ratio: 1 / 2.1819; flex: none; }
+.iph-frame { position: absolute; inset: 0; padding: 4cqw; border-radius: 17cqw; background: #0c0c0e;
+  box-shadow: inset 0 0 0 .55cqw #5b5b61, inset 0 0 0 1.1cqw #232326, inset 0 0 0 1.5cqw #000,
+              0 40px 80px -24px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255,255,255,.04); }
+/* Tasten links (Aktion, laut, leise) und rechts (Seite) */
+.iph-frame::before, .iph-frame::after { content: ""; position: absolute; width: .9cqw; border-radius: 1cqw; background: #3a3a3f; }
+.iph-frame::before { left: -.8cqw; top: 20%; height: 6.5%; box-shadow: 0 calc(10.5cqw) 0 #3a3a3f, 0 calc(25cqw) 0 #3a3a3f; }
+.iph-frame::after { right: -.8cqw; top: 27%; height: 11%; }
+.iph-scr { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; border-radius: 13cqw; background: var(--sb, #fff); }
+.iph-bar { flex: none; height: 11.09cqw; display: flex; align-items: center; justify-content: space-between; padding: 1.2cqw 7.6cqw 0 10cqw;
+  background: var(--sb, #fff); color: var(--sb-ink, #000); transition: background .4s, color .4s;
+  font: 600 4.1cqw/1 -apple-system, "SF Pro Text", system-ui, sans-serif; letter-spacing: -.01em; }
+.iph-icons { display: flex; align-items: center; gap: 1.3cqw; }
+.iph-icons svg { height: 2.9cqw; width: auto; fill: currentColor; }
+.iph-icons svg:last-child { height: 3.1cqw; }
+.iph-island { position: absolute; top: 2.5cqw; left: 50%; width: 28cqw; height: 8.2cqw; translate: -50% 0; border-radius: 99px; background: #000; z-index: 2; }
+.iph-body { position: relative; flex: 1; overflow: hidden; background: #fff; }
+.iph-body > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity .6s ease; }
+.iph-body > img.on, .iph-body > img:only-child { opacity: 1; }
+/* Live-Demo im iPhone */
+.dv-real .dv-view { position: absolute; inset: 0; overflow: hidden; }
+.dv-real .iph { width: 100%; height: 100%; }
+
+/* ---------- Browserfenster ---------- */
+.brw { position: relative; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: #1b1f27;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 30px 70px -24px rgba(0,0,0,.8); }
+.brw-bar { position: relative; flex: none; height: 30px; display: flex; align-items: center; justify-content: center; }
+.brw-bar i { position: absolute; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18); }
+.brw-bar i:nth-child(1) { left: 12px } .brw-bar i:nth-child(2) { left: 26px } .brw-bar i:nth-child(3) { left: 40px }
+.brw-bar span { font: 500 11px/1 system-ui, sans-serif; color: rgba(255,255,255,.5); padding: 5px 14px; border-radius: 6px; background: rgba(255,255,255,.06); max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.brw-body { position: relative; flex: 1; overflow: hidden; background: #fff; }
+.brw-body > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; opacity: 0; transition: opacity .6s ease, object-position 7s linear; }
+.brw-body > img.on, .brw-body > img:only-child { opacity: 1; }
+.brw.pan.panning .brw-body > img { object-position: 50% 100%; }
+
+/* Demo-Bühne */
+.slot { position: relative; flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; }
+.dv-desktop { background: #1b1f27; }
+.chips { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.chips button { position: relative; overflow: hidden; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 15px 0 6px; border-radius: 99px; font-size: 13px; color: var(--soft); white-space: nowrap; transition: background .3s, color .3s; }
+.chips b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--glass-2); font-size: 12px; font-weight: 600; }
+.chips button:hover { color: #fff; }
+.chips button.on { color: #fff; background: var(--glass-2); }
+.chips button.on b { background: var(--accent); color: #0a0a0a; }
+.chips i { position: absolute; left: 14px; right: 14px; bottom: 3px; height: 2px; border-radius: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; opacity: .8; }
+.chips .on i { animation: grow var(--dur, 8s) linear forwards; }
+.paused .chips .on i { animation-play-state: paused; }
+@keyframes grow { to { transform: scaleX(1); } }
+.pp { flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--glass-2); transition: background .2s; }
+.pp:hover { background: rgba(255,255,255,.14); }
+@media (max-width: 640px) {
+  .chips button:not(.on) span { display: none; }
+  .chips button:not(.on) { padding: 0 6px; }
+  .chips b { flex: none; }
+}
+.pop { animation: pop .5s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+
+@media (max-width: 640px) {
+  .pillbar a { display: none; }
+  .lang { border: 0; margin: 0; padding: 0; }
+}

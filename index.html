@@ -1,51 +1,26 @@
 <!doctype html>
-<html lang="de" data-theme="dark">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thomas Wordenbeck</title>
 <meta name="description" content="Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.">
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
-<meta name="color-scheme" content="dark light">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#060a12">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261020153600">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/core.css?v=20261021171251">
+<link rel="stylesheet" href="assets/glas-base.css?v=20261021171251">
+<link rel="stylesheet" href="assets/glas-pages.css?v=20261021171251">
+<link rel="stylesheet" href="assets/home.css?v=20261021171251">
 </head>
 <body data-page="home" data-root="">
-<header class="top"><div class="wrap top-in">
-  <a class="who" href="./"><img class="logo" src="favicon.svg" alt="" width="24" height="24"><span data-k="name"></span></a>
-  <nav>
-    <div class="menu">
-      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><span data-k="nav.work"></span><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <div class="menu-panel" id="menu-panel" hidden></div>
-    </div>
-    <a class="nav-link" href="warum/" data-k="nav.why"></a>
-    <a class="nav-link" href="ueber-mich/" data-k="nav.about"></a>
-    <button class="theme-btn" id="theme-btn" type="button"></button>
-    <div class="lang"><button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button></div>
-  </nav>
-</div></header>
-<main class="wrap">
-  <section class="intro">
-    <h1><img class="logo-lg" src="icons/logo-e.svg" alt="" width="60" height="60"><span data-k="name"></span></h1>
-    <div class="role" data-k="role"></div>
-    <p data-k="intro"></p>
-    <div class="intro-links">
-      <a class="btn primary" href="#projekte" data-k="labels.discover"></a>
-      <a class="btn secondary" href="warum/" data-k="nav.why"></a>
-      <a class="btn secondary" href="ueber-mich/" data-k="labels.aboutLink"></a>
-    </div>
-  </section>
-  <section class="grid" id="projekte"></section>
-</main>
-<footer class="wrap site-foot">
-  <span>© 2026 Thomas Wordenbeck</span>
-  <a data-linkedin href="#" target="_blank" rel="noopener">LinkedIn ↗</a>
-  <span data-k="footer"></span>
-</footer>
-<script src="content.js?v=20261020153600"></script>
-<script src="site.js?v=20261020153600"></script>
+<div id="app"></div>
+<script src="content.js?v=20261021171251"></script>
+<script src="assets/core.js?v=20261021171251"></script>
+<script src="assets/glas-ui.js?v=20261021171251"></script>
+<script src="assets/app.js?v=20261021171251"></script>
 </body>
 </html>
