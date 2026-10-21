@@ -85,6 +85,9 @@
           </div>
         </section>
       </main>`);
+    // Slogan in zwei Zeilen: nach dem ersten Satz umbrechen
+    const role = document.querySelector('.hero h1 em');
+    role.innerHTML = esc(role.textContent).replace('. ', '.<br>');
     tintPhones();
     carousel();
 

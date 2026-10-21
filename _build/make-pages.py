@@ -26,18 +26,18 @@ def page(kind, root, project=None):
             if kind == "project" else "")
     pid = f' data-project="{project}"' if project else ""
     return f"""<!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thomas Wordenbeck</title>
 <meta name="description" content="Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#060a12">
+<script>try{{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}}catch(e){{}}</script>
+<meta name="color-scheme" content="dark light">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 {links}
 </head>
 <body data-page="{kind}" data-root="{root}"{pid}>

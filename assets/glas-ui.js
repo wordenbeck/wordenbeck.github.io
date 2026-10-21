@@ -1,21 +1,52 @@
 // Bausteine im Glas-Stil: Kopf, Fuß, Projektseite, „Warum diese Seite“ und „Über mich“.
 // GLAS_PAGES (von make-pages.py gesetzt) = Wege zur Startseite, zu Warum und zu Über mich.
 (() => {
-  const { C, t, esc, lang, projects, current, url, icon, status, extra, fill, reveal, countUp, stage, ICON, ROOT, calm } = V2;
+  const { C, t, esc, lang, projects, current, url, icon, status, extra, fill, reveal, countUp, stage, ICON, ROOT, calm, store } = V2;
   const app = document.getElementById('app');
   const page = document.body.dataset.page;
   const PAGES = Object.assign({ why: ROOT + 'warum/', about: ROOT + 'ueber-mich/', home: ROOT || './' }, window.GLAS_PAGES || {});
 
+  // Kopf wie in V1: Projekte-Menü, Warum, Über mich, Hell/Dunkel, Sprache
   const header = () => `
-    <header class="top">
-      <a class="who" href="${PAGES.home}"><img src="${ROOT}favicon.svg" alt="" width="22" height="22"><span data-k="name"></span></a>
-      <nav class="glass pillbar">
-        <a href="${page === 'home' ? '#projekte' : PAGES.home + '#projekte'}" data-k="nav.work"></a>
+    <header class="top"><div class="top-in">
+      <a class="who" href="${PAGES.home}"><img src="${ROOT}favicon.svg" alt="" width="24" height="24"><span data-k="name"></span></a>
+      <nav>
+        <div class="menu">
+          <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><span data-k="nav.work"></span>${ICON.chevron}</button>
+          <div class="menu-panel" id="menu-panel" hidden>${projects.map(p => `
+            <a class="menu-item${p.id === document.body.dataset.project ? ' is-current' : ''}" href="${url(p)}" style="--accent:${p.accent}">
+              ${icon(p, 18)}<span class="mi-t">${esc(p.title)}</span><span class="mi-s">${esc(p.tagline)}</span></a>`).join('')}
+          </div>
+        </div>
         <a href="${PAGES.why}" data-k="nav.why"${page === 'story' ? ' aria-current="page"' : ''}></a>
         <a href="${PAGES.about}" data-k="nav.about"${page === 'about' ? ' aria-current="page"' : ''}></a>
-        <span class="lang"><button data-lang="de">DE</button><button data-lang="en">EN</button></span>
+        <button class="theme-btn" id="theme-btn" type="button"></button>
+        <div class="lang"><button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button></div>
       </nav>
-    </header>`;
+    </div></header>`;
+
+  // Hell/Dunkel: Wahl merken, Symbol zeigt jeweils den anderen Modus
+  function themeButton() {
+    const b = document.getElementById('theme-btn'); if (!b) return;
+    const html = document.documentElement;
+    const paint = () => {
+      const dark = html.dataset.theme !== 'light';
+      b.innerHTML = dark ? ICON.sun : ICON.moon;
+      b.setAttribute('aria-label', t('nav.theme')); b.title = t('nav.theme');
+    };
+    b.addEventListener('click', () => { html.dataset.theme = html.dataset.theme === 'light' ? 'dark' : 'light'; store('theme', html.dataset.theme); paint(); });
+    paint();
+  }
+
+  // Projekte-Menü auf- und zuklappen
+  function menu() {
+    const btn = document.querySelector('.menu-btn'), panel = document.getElementById('menu-panel');
+    if (!btn) return;
+    const set = open => { panel.hidden = !open; btn.setAttribute('aria-expanded', open); };
+    btn.addEventListener('click', e => { e.stopPropagation(); set(panel.hidden); });
+    document.addEventListener('click', e => { if (!panel.hidden && !panel.contains(e.target)) set(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+  }
 
   const footer = () => `
     <footer class="foot">
@@ -36,6 +67,8 @@
   function mount(html, ambient = '') {
     app.innerHTML = `<div class="ambient ${ambient}" aria-hidden="true"></div>${header()}${html}${footer()}`;
     fill();
+    themeButton();
+    menu();
     // Einblenden starten – per Timer, damit es auch in Hintergrund-Tabs (ohne Bild-Rendering) passiert
     setTimeout(() => document.body.classList.add('loaded'), 30);
     const b = document.getElementById('back'); if (b) backButton(b);
@@ -48,8 +81,25 @@
     const tabs = t('labels.tabs');
     document.title = `${p.title} – Thomas Wordenbeck`;
     document.body.style.setProperty('--accent', p.accent);
+    // Variante der rechten Spalte: a = alles im Glaskasten, b = offen ohne Kasten, c = Titel offen, Inhalte im Kasten
+    const v = (V2.params.get('v') || document.body.dataset.detail || 'a').toLowerCase();
+    // Variante der Kapitel-Leiste: 1 = wie V1, 2 = nur aktives Kapitel mit Namen, 3 = schmale Fortschrittslinien
+    const kv = V2.params.get('k') || document.body.dataset.chips || '1';
+    const head = `
+      <div class="p-head">
+        <span class="ci big">${icon(p, 24)}</span>
+        <div><h1>${esc(p.title)}</h1><p class="p-tag">${esc(p.tagline)}</p></div>
+      </div>
+      <div class="p-meta"><span class="st s-${p.status}">${status(p)}</span>${p.stack.map(s => `<span class="pill">${esc(s)}</span>`).join('')}</div>
+      ${p.url ? `<a class="btn primary small visit" href="${p.url}" target="_blank" rel="noopener"><span data-k="labels.visit"></span>${ICON.out}</a>` : ''}`;
+    const body = `
+      <div class="seg" role="tablist"><span class="thumb" id="thumb"></span>${tabs.map((x, k) => `<button role="tab" data-tab="${k}" aria-selected="${k === 0}">${esc(x)}</button>`).join('')}</div>
+      <div class="panel" id="panel"></div>`;
+    const right = v === 'b' ? `<div class="p-open">${head}${body}</div>`
+      : v === 'c' ? `<div class="p-open">${head}</div><div class="p-card glass">${body}</div>`
+      : `<div class="p-card glass">${head}${body}</div>`;
     mount(`
-      <main class="proj is-${p.demo.device}">
+      <main class="proj is-${p.demo.device} pv-${v} kv-${kv}">
         <section class="p-stage">
           <div class="p-dev"><div class="slot" id="slot"></div></div>
           <div class="ctrl glass">
@@ -60,33 +110,22 @@
         </section>
         <aside class="p-info">
           <a class="back glass" id="back" href="${PAGES.home}#projekte">${ICON.back}<span data-k="nav.backBtn"></span></a>
-          <div class="p-card glass">
-            <div class="p-head">
-              <span class="ci big">${icon(p, 24)}</span>
-              <div><h1>${esc(p.title)}</h1><p>${esc(p.tagline)}</p></div>
-            </div>
-            <div class="p-meta">
-              <span class="st s-${p.status}">${status(p)}</span>
-              ${p.url ? `<a class="ext" href="${p.url}" target="_blank" rel="noopener"><span data-k="labels.visit"></span>${ICON.out}</a>` : ''}
-            </div>
-            <div class="seg" role="tablist"><span class="thumb" id="thumb"></span>${tabs.map((x, k) => `<button role="tab" data-tab="${k}" aria-selected="${k === 0}">${esc(x)}</button>`).join('')}</div>
-            <div class="panel" id="panel"></div>
-          </div>
+          ${right}
           <div class="others">
             <h2 data-k="labels.more"></h2>
-            <div class="o-grid">${others.map(o => `<a class="o glass" href="${url(o)}" style="--accent:${o.accent}"><span class="ci">${icon(o, 16)}</span><span>${esc(o.title)}</span></a>`).join('')}</div>
+            <div class="o-grid">${others.map(o => `<a class="o${v === 'b' ? '' : ' glass'}" href="${url(o)}" style="--accent:${o.accent}"><span class="ci">${icon(o, 16)}</span><span>${esc(o.title)}</span></a>`).join('')}</div>
           </div>
         </aside>
       </main>`, 'tinted');
 
-    // Umschaltleiste mit gleitendem Daumen
+    // Blauer Umschalter mit gleitendem Daumen (wie V1)
     const panel = document.getElementById('panel'), thumb = document.getElementById('thumb');
     const tabBtns = [...document.querySelectorAll('[data-tab]')];
-    const moveThumb = b => { thumb.style.width = b.offsetWidth + 'px'; thumb.style.transform = `translateX(${b.offsetLeft - 4}px)`; };
+    const moveThumb = b => { thumb.style.width = b.offsetWidth + 'px'; thumb.style.transform = `translateX(${b.offsetLeft - 3}px)`; };
     const render = k => {
       if (k === 0) panel.innerHTML = `<p class="lede">${esc(p.text)}</p>`;
-      if (k === 1) panel.innerHTML = `<ul class="hl">${p.highlights.map(([h, s]) => `<li><b>${esc(h)}</b><span>${esc(s)}</span></li>`).join('')}</ul>`;
-      if (k === 2) panel.innerHTML = `<dl class="tech">${p.tech.map(([h, s]) => `<div><dt>${esc(h)}</dt><dd>${esc(s)}</dd></div>`).join('')}</dl><ul class="stack">${p.stack.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`;
+      if (k === 1) panel.innerHTML = `<div class="hl-tiles">${p.highlights.map(([h, s]) => `<div class="hl-tile"><h3>${esc(h)}</h3><p>${esc(s)}</p></div>`).join('')}</div>`;
+      if (k === 2) panel.innerHTML = `<div class="tech-rows">${p.tech.map(([h, s]) => `<div><h3>${esc(h)}</h3><p>${esc(s)}</p></div>`).join('')}</div>`;
       panel.firstElementChild.classList.add('pop');
     };
     tabBtns.forEach(b => b.addEventListener('click', () => {
@@ -102,16 +141,21 @@
     const cap = document.getElementById('caption');
     const pp = document.getElementById('pp');
     const s = stage({
-      slot: document.getElementById('slot'), project: p, maxPhone: 0.8, iphone: true,
+      slot: document.getElementById('slot'), project: p, maxPhone: 0.72, iphone: true,
       onChapter: (k, dur) => {
         cap.classList.remove('pop'); void cap.offsetWidth;
         cap.textContent = p.captions[k]; cap.classList.add('pop');
-        btns.forEach((b, j) => { b.classList.remove('on'); if (j === k) { b.style.setProperty('--dur', dur + 'ms'); void b.offsetWidth; b.classList.add('on'); } });
+        btns.forEach((b, j) => { b.classList.remove('on'); b.classList.toggle('done', j < k); if (j === k) { b.style.setProperty('--dur', dur + 'ms'); void b.offsetWidth; b.classList.add('on'); } });
       },
       onPause: v => { pp.innerHTML = v ? ICON.play : ICON.pause; document.querySelector('.p-stage').classList.toggle('paused', v); },
     });
     btns.forEach((b, k) => b.addEventListener('click', () => s.go(k)));
     pp.addEventListener('click', () => s.toggle());
+
+    // Passen nicht alle Kapitelnamen in die Leiste, zeigt nur das aktive Kapitel seinen Namen (wie V1)
+    const chips = document.getElementById('chapters'), ctrl = chips.parentElement;
+    const fit = () => { chips.classList.remove('compact'); if (chips.scrollWidth > chips.clientWidth + 1) chips.classList.add('compact'); };
+    new ResizeObserver(fit).observe(ctrl);
   }
 
   // ---------- Warum diese Seite ----------
