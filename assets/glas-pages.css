@@ -3,7 +3,7 @@
 /* ---------- Projektseite ---------- */
 .proj { max-width: 1480px; margin: 0 auto; padding: 4px clamp(16px, 4vw, 48px) 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 3vw, 48px); align-items: start; }
 .proj.is-desktop { grid-template-columns: 1.6fr 1fr; }
-.p-stage { position: sticky; top: calc(var(--header) + 16px); min-width: 0; height: calc(100vh - var(--header) - 40px); min-height: 600px; max-height: 980px; display: flex; flex-direction: column; align-items: center; }
+.p-stage { position: sticky; top: 20px; min-width: 0; height: calc(100vh - 40px); min-height: 600px; max-height: 980px; display: flex; flex-direction: column; align-items: center; }
 .is-desktop .p-stage { height: auto; min-height: 0; }
 .p-dev { flex: 1; min-height: 0; width: 100%; display: flex; }
 .is-desktop .p-dev { flex: none; aspect-ratio: 1440 / 930; }
@@ -11,39 +11,18 @@
   0 50px 100px -30px rgba(0,0,0,.9), 0 0 140px -40px var(--accent); }
 .p-stage .dv-desktop { box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 50px 100px -30px rgba(0,0,0,.9), 0 0 140px -40px var(--accent); }
 .ctrl { display: flex; align-items: center; gap: 6px; padding: 5px; border-radius: 99px; margin-top: 22px; max-width: 100%; }
-/* ---------- Kapitel-Leiste: drei Varianten ---------- */
-/* K1 – wie V1: dezente Leiste, aktives Kapitel als helle Pille, Nummer in Projektfarbe, dünner Fortschritt */
-.kv-1 .ctrl, .kv-2 .ctrl { background: color-mix(in srgb, var(--ink) 10%, transparent); box-shadow: none; padding: 3px; gap: 4px; }
-.kv-1 .chips, .kv-2 .chips { gap: 2px; }
-.kv-1 .chips button, .kv-2 .chips button { height: 34px; padding: 0 14px; gap: 6px; color: var(--soft); }
-.kv-1 .chips b, .kv-2 .chips b { width: auto; height: auto; background: none; font-size: 13px; opacity: .6; }
-.kv-1 .chips button.on, .kv-2 .chips button.on { background: var(--ink); color: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,.25); }
-.kv-1 .chips button.on b, .kv-2 .chips button.on b { background: none; color: var(--accent); opacity: 1; filter: brightness(.85) saturate(1.3); }
-.kv-1 .chips i, .kv-2 .chips i { bottom: 3px; height: 2px; opacity: 1; }
-.kv-1 .chips.compact button:not(.on) span { display: none; }
-.kv-1 .chips.compact button:not(.on) { padding: 0 10px; }
-.kv-1 .pp, .kv-2 .pp { width: 34px; height: 34px; background: none; }
-.kv-1 .pp:hover, .kv-2 .pp:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); }
-/* K2 – nur das aktive Kapitel zeigt seinen Namen, die anderen sind kleine Nummern */
-.kv-2 .chips button:not(.on) span { display: none; }
-.kv-2 .chips button:not(.on) { width: 34px; padding: 0; justify-content: center; }
-.kv-2 .chips button { transition: background .35s, color .35s, width .35s var(--ease); }
-/* K3 – keine Pillen: Name des aktuellen Kapitels, darunter je Kapitel eine schmale Fortschrittslinie */
-.kv-3 .ctrl { background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; width: min(420px, 100%); padding: 0; gap: 12px; align-items: flex-end; }
-.kv-3 .chips { flex: 1; gap: 6px; overflow: visible; padding-top: 22px; position: relative; }
-.kv-3 .chips button { flex: 1; height: 18px; padding: 0; border-radius: 0; background: none !important; color: var(--soft); justify-content: flex-start; overflow: visible; }
-.kv-3 .chips b { display: none; }
-.kv-3 .chips span { position: absolute; left: 0; top: -2px; font-size: 13px; font-weight: 500; white-space: nowrap; opacity: 0; transition: opacity .3s; pointer-events: none; }
-.kv-3 .chips button.on span { opacity: 1; color: var(--ink); }
-.kv-3 .chips button { position: static; }
-.kv-3 .chips i { position: relative; display: block; left: 0; right: 0; bottom: auto; width: 100%; height: 3px; margin-top: 7px; border-radius: 3px; opacity: 1; transform: none;
-  background: color-mix(in srgb, var(--ink) 16%, transparent); overflow: hidden; }
-.kv-3 .chips i::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
-.kv-3 .chips .on i { animation: none; }
-.kv-3 .chips .on i::after { animation: grow var(--dur, 8s) linear forwards; }
-.kv-3 .chips button.done i::after { transform: none; opacity: .55; }
-.paused.kv-3 .chips .on i::after, .kv-3 .paused .chips .on i::after { animation-play-state: paused; }
-.kv-3 .pp { width: 32px; height: 32px; }
+/* Kapitel-Leiste: dezent wie V1, nur das aktive Kapitel zeigt seinen Namen in einer hellen Pille */
+.ctrl { background: color-mix(in srgb, var(--ink) 10%, transparent); box-shadow: none; padding: 3px; gap: 4px; }
+.chips { gap: 2px; }
+.chips button { height: 34px; padding: 0 14px; gap: 6px; color: var(--soft); transition: background .35s, color .35s; }
+.chips b { width: auto; height: auto; background: none; font-size: 13px; opacity: .6; }
+.chips button:not(.on) { width: 34px; padding: 0; justify-content: center; }
+.chips button:not(.on) span { display: none; }
+.chips button.on { background: var(--ink); color: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.chips button.on b { background: none; color: var(--accent); opacity: 1; filter: brightness(.85) saturate(1.3); }
+.chips i { bottom: 3px; height: 2px; opacity: 1; }
+.pp { width: 34px; height: 34px; background: none; }
+.pp:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); }
 
 .caption { margin: 14px 0 0; min-height: 3em; max-width: 520px; text-align: center; color: var(--soft); font-size: 15px; }
 
@@ -52,13 +31,10 @@
 .p-info > :nth-child(2) { transition-delay: .08s } .p-info > :nth-child(3) { transition-delay: .16s }
 .loaded .p-info > * { opacity: 1; transform: none; }
 .p-info .back { align-self: flex-start; }
-.p-card { border-radius: 28px; padding: 28px; }
 .p-open { padding: 4px 4px 0; }
-.pv-c .p-card { padding: 22px 24px 24px; }
 .p-head { display: flex; gap: 16px; align-items: center; }
 .ci.big { width: 52px; height: 52px; border-radius: 16px; }
-.p-head h1 { margin: 0; font-size: clamp(32px, 3vw, 44px); line-height: 1.07; font-weight: 600; letter-spacing: -.03em; }
-.pv-b .p-head h1, .pv-c .p-head h1 { font-size: clamp(36px, 3.6vw, 52px); }
+.p-head h1 { margin: 0; font-size: clamp(36px, 3.6vw, 52px); line-height: 1.07; font-weight: 600; letter-spacing: -.03em; }
 .p-tag { margin: 4px 0 0; color: var(--muted); font-size: 17px; font-weight: 500; }
 /* Status und verwendete Technik direkt unter dem Titel */
 .p-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 18px 0 0; }
@@ -67,7 +43,6 @@
 .btn.small { height: 38px; padding: 0 16px; font-size: 14px; }
 /* Blauer Umschalter wie in V1 */
 .seg { position: relative; display: flex; gap: 2px; padding: 3px; margin-top: 24px; border-radius: 99px; background: var(--glass-2); }
-.pv-c .seg { margin-top: 0; }
 .seg button { position: relative; z-index: 1; flex: 1; padding: 8px 14px; border-radius: 99px; font-size: 13px; font-weight: 500; color: var(--soft); white-space: nowrap; transition: color .3s; }
 .seg button:hover { color: var(--ink); }
 .seg button[aria-selected=true] { color: #fff; }
@@ -76,8 +51,7 @@
 .lede { margin: 0; color: var(--text); font-size: 16px; line-height: 1.65; }
 /* Highlights als Kacheln (wie V1) */
 .hl-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.hl-tile { padding: 16px 18px; border-radius: 16px; background: var(--glass-2); }
-.pv-b .hl-tile { background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+.hl-tile { padding: 16px 18px; border-radius: 16px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
 .hl-tile h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; letter-spacing: -.015em; }
 .hl-tile p { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
 /* Technik als Zeilen (wie V1) */
@@ -87,7 +61,7 @@
 .tech-rows p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--soft); }
 .others { padding-top: 8px; }
 .others h2 { margin: 8px 0 12px; font-size: 14px; font-weight: 500; color: var(--muted); }
-.pv-b .o { background: var(--glass-2); }
+.o { background: var(--glass-2); }
 .o-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 .o { display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; border-radius: 16px; font-size: 14px; font-weight: 500; transition: box-shadow .3s, background .3s; }
 .o:hover { background: var(--glass-2); box-shadow: inset 0 1px 0 var(--hi), inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 30px -8px var(--accent); }

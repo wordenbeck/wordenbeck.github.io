@@ -81,10 +81,6 @@
     const tabs = t('labels.tabs');
     document.title = `${p.title} – Thomas Wordenbeck`;
     document.body.style.setProperty('--accent', p.accent);
-    // Variante der rechten Spalte: a = alles im Glaskasten, b = offen ohne Kasten, c = Titel offen, Inhalte im Kasten
-    const v = (V2.params.get('v') || document.body.dataset.detail || 'a').toLowerCase();
-    // Variante der Kapitel-Leiste: 1 = wie V1, 2 = nur aktives Kapitel mit Namen, 3 = schmale Fortschrittslinien
-    const kv = V2.params.get('k') || document.body.dataset.chips || '1';
     const head = `
       <div class="p-head">
         <span class="ci big">${icon(p, 24)}</span>
@@ -95,11 +91,8 @@
     const body = `
       <div class="seg" role="tablist"><span class="thumb" id="thumb"></span>${tabs.map((x, k) => `<button role="tab" data-tab="${k}" aria-selected="${k === 0}">${esc(x)}</button>`).join('')}</div>
       <div class="panel" id="panel"></div>`;
-    const right = v === 'b' ? `<div class="p-open">${head}${body}</div>`
-      : v === 'c' ? `<div class="p-open">${head}</div><div class="p-card glass">${body}</div>`
-      : `<div class="p-card glass">${head}${body}</div>`;
     mount(`
-      <main class="proj is-${p.demo.device} pv-${v} kv-${kv}">
+      <main class="proj is-${p.demo.device}">
         <section class="p-stage">
           <div class="p-dev"><div class="slot" id="slot"></div></div>
           <div class="ctrl glass">
@@ -110,10 +103,10 @@
         </section>
         <aside class="p-info">
           <a class="back glass" id="back" href="${PAGES.home}#projekte">${ICON.back}<span data-k="nav.backBtn"></span></a>
-          ${right}
+          <div class="p-open">${head}${body}</div>
           <div class="others">
             <h2 data-k="labels.more"></h2>
-            <div class="o-grid">${others.map(o => `<a class="o${v === 'b' ? '' : ' glass'}" href="${url(o)}" style="--accent:${o.accent}"><span class="ci">${icon(o, 16)}</span><span>${esc(o.title)}</span></a>`).join('')}</div>
+            <div class="o-grid">${others.map(o => `<a class="o" href="${url(o)}" style="--accent:${o.accent}"><span class="ci">${icon(o, 16)}</span><span>${esc(o.title)}</span></a>`).join('')}</div>
           </div>
         </aside>
       </main>`, 'tinted');
@@ -145,17 +138,12 @@
       onChapter: (k, dur) => {
         cap.classList.remove('pop'); void cap.offsetWidth;
         cap.textContent = p.captions[k]; cap.classList.add('pop');
-        btns.forEach((b, j) => { b.classList.remove('on'); b.classList.toggle('done', j < k); if (j === k) { b.style.setProperty('--dur', dur + 'ms'); void b.offsetWidth; b.classList.add('on'); } });
+        btns.forEach((b, j) => { b.classList.remove('on'); if (j === k) { b.style.setProperty('--dur', dur + 'ms'); void b.offsetWidth; b.classList.add('on'); } });
       },
       onPause: v => { pp.innerHTML = v ? ICON.play : ICON.pause; document.querySelector('.p-stage').classList.toggle('paused', v); },
     });
     btns.forEach((b, k) => b.addEventListener('click', () => s.go(k)));
     pp.addEventListener('click', () => s.toggle());
-
-    // Passen nicht alle Kapitelnamen in die Leiste, zeigt nur das aktive Kapitel seinen Namen (wie V1)
-    const chips = document.getElementById('chapters'), ctrl = chips.parentElement;
-    const fit = () => { chips.classList.remove('compact'); if (chips.scrollWidth > chips.clientWidth + 1) chips.classList.add('compact'); };
-    new ResizeObserver(fit).observe(ctrl);
   }
 
   // ---------- Warum diese Seite ----------
