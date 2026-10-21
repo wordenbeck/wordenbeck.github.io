@@ -81,13 +81,12 @@
     const tabs = t('labels.tabs');
     document.title = `${p.title} – Thomas Wordenbeck`;
     document.body.style.setProperty('--accent', p.accent);
+    // Status und Technik in einer Reihe, nur über Farbe getrennt: Status gefüllt (Live grün, Pausiert grau), Technik ruhig mit Rahmen
+    const visit = p.url ? `<a class="btn primary small visit" href="${p.url}" target="_blank" rel="noopener"><span data-k="labels.visit"></span>${ICON.out}</a>` : '';
     const head = `
-      <div class="p-head">
-        <span class="ci big">${icon(p, 24)}</span>
-        <div><h1>${esc(p.title)}</h1><p class="p-tag">${esc(p.tagline)}</p></div>
-      </div>
-      <div class="p-meta"><span class="st s-${p.status}">${status(p)}</span>${p.stack.map(s => `<span class="pill">${esc(s)}</span>`).join('')}</div>
-      ${p.url ? `<a class="btn primary small visit" href="${p.url}" target="_blank" rel="noopener"><span data-k="labels.visit"></span>${ICON.out}</a>` : ''}`;
+      <div class="p-head"><span class="ci big">${icon(p, 24)}</span><div><h1>${esc(p.title)}</h1><p class="p-tag">${esc(p.tagline)}</p></div></div>
+      <div class="meta-row"><span class="sb s-${p.status}">${status(p)}</span>${p.stack.map(s => `<span class="tp">${esc(s)}</span>`).join('')}</div>
+      ${visit}`;
     const body = `
       <div class="seg" role="tablist"><span class="thumb" id="thumb"></span>${tabs.map((x, k) => `<button role="tab" data-tab="${k}" aria-selected="${k === 0}">${esc(x)}</button>`).join('')}</div>
       <div class="panel" id="panel"></div>`;

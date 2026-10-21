@@ -36,9 +36,16 @@
 .ci.big { width: 52px; height: 52px; border-radius: 16px; }
 .p-head h1 { margin: 0; font-size: clamp(36px, 3.6vw, 52px); line-height: 1.07; font-weight: 600; letter-spacing: -.03em; }
 .p-tag { margin: 4px 0 0; color: var(--muted); font-size: 17px; font-weight: 500; }
-/* Status und verwendete Technik direkt unter dem Titel */
-.p-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 18px 0 0; }
-.pill { font-size: 12px; font-weight: 500; line-height: 1; padding: 6px 10px; border-radius: 99px; background: var(--glass-2); color: var(--soft); }
+/* Status und Technik in einer Reihe, nur über Farbe getrennt.
+   Status gefüllt (Live grün, Pausiert grau), Technik zurückgenommen mit Rahmen. */
+.meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 18px; }
+.sb, .tp { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 99px; font-size: 12px; line-height: 1; white-space: nowrap; }
+.sb { font-weight: 600; color: #30d158; background: color-mix(in srgb, #30d158 16%, transparent); }
+.sb::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.sb.s-paused { color: var(--ink); background: color-mix(in srgb, var(--ink) 18%, transparent); }
+[data-theme=light] .sb.s-live { color: #1d8a3a; background: #e3f5e8; }
+.tp { font-weight: 500; color: var(--muted); background: #000; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+[data-theme=light] .tp { background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
 .visit { margin-top: 18px; }
 .btn.small { height: 38px; padding: 0 16px; font-size: 14px; }
 /* Blauer Umschalter wie in V1 */
@@ -64,6 +71,8 @@
 .o { background: var(--glass-2); }
 .o-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 .o { display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; border-radius: 16px; font-size: 14px; font-weight: 500; transition: box-shadow .3s, background .3s; }
+.o .ci { color: var(--muted); transition: color .3s; }
+.o:hover .ci, .o:focus-visible .ci { color: var(--accent); }
 .o:hover { background: var(--glass-2); box-shadow: inset 0 1px 0 var(--hi), inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 30px -8px var(--accent); }
 
 /* ---------- Warum + Über mich ---------- */
