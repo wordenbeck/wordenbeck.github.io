@@ -128,11 +128,15 @@
   const SLIDE = 6500;
   card.style.setProperty('--slide', SLIDE + 'ms');
   let page = 0, timer = 0, started = 0, remaining = SLIDE;
+  // Hinweis aufs Wischen: Nach zwei Dritteln der Standzeit neigt sich die Karte kurz nach links und rechts –
+  // höchstens dreimal und nur, bis jemand selbst zieht oder einen Knopf drückt
+  let nudgeTimer = 0, nudges = 0, interacted = false;
   const schedule = ms => {
-    clearTimeout(timer); started = performance.now(); remaining = ms;
+    clearTimeout(timer); clearTimeout(nudgeTimer); started = performance.now(); remaining = ms;
     timer = setTimeout(() => showPage((page + 1) % PAGES.length, true), ms);
+    if (!interacted && nudges < 3) nudgeTimer = setTimeout(() => nudge(), Math.max(0, ms - SLIDE / 3));
   };
-  const pause = () => { clearTimeout(timer); remaining -= performance.now() - started; card.classList.add('paused'); };
+  const pause = () => { clearTimeout(timer); clearTimeout(nudgeTimer); remaining -= performance.now() - started; card.classList.add('paused'); };
   const resume = () => { card.classList.remove('paused'); if (!gone) schedule(Math.max(400, remaining)); };
   const showPage = (k, auto = false) => {
     if (!auto && (k < 0 || k >= PAGES.length)) {     // am Rand: kurzes Kippen statt Weiterblättern
@@ -172,8 +176,31 @@
     btnNo.style.setProperty('--hot', dx < 0 ? k : 0);
     setStack(Math.abs(dx) / (W() * .9));
   };
+  // Kurzes Links-rechts-Neigen mit Daumen und Glow, wie ein angedeutetes Wischen
+  let nudgeFrame = 0;
+  const stopNudge = () => {
+    if (!nudgeFrame) return;
+    cancelAnimationFrame(nudgeFrame); nudgeFrame = 0;
+    dx = dy = 0; paint(); card.style.transform = '';
+  };
+  const nudge = () => {
+    if (interacted || gone || dragging || document.hidden || nudges >= 3) return;
+    nudges++; dir = 1; dy = 0;
+    card.style.transition = 'none';
+    const t0 = performance.now(), MS = 1700, A = W() * .13;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / MS);
+      dx = -A * Math.sin(k * Math.PI * 2) * Math.sin(k * Math.PI);   // erst links, dann rechts, weich zurück
+      paint();
+      if (k < 1) nudgeFrame = requestAnimationFrame(step);
+      else { nudgeFrame = 0; dx = 0; paint(); card.style.transform = ''; }
+    };
+    nudgeFrame = requestAnimationFrame(step);
+  };
+
   card.addEventListener('pointerdown', e => {
     if (gone || e.button > 0 || e.target.closest('a')) return;
+    stopNudge();
     const r = card.getBoundingClientRect();
     dir = e.clientY - r.top < r.height / 2 ? 1 : -1;   // oben gegriffen dreht anders als unten (wie bei Tinder)
     sx = e.clientX; sy = e.clientY; dx = dy = 0; moved = false; dragging = true;
@@ -184,7 +211,7 @@
   addEventListener('pointermove', e => {
     if (!dragging) return;
     dx = e.clientX - sx; dy = (e.clientY - sy) * .6;
-    if (!moved && Math.hypot(dx, dy) > 6) { moved = true; card.setPointerCapture?.(e.pointerId); card.classList.add('drag'); }
+    if (!moved && Math.hypot(dx, dy) > 6) { moved = true; interacted = true; card.setPointerCapture?.(e.pointerId); card.classList.add('drag'); }
     if (!moved) return;
     hist.push({ x: e.clientX, y: e.clientY, t: performance.now() });
     if (hist.length > 6) hist.shift();
@@ -256,6 +283,7 @@
   // Knöpfe und Tastatur: gleiche Bewegung wie beim Wischen, mit kurzem Anlauf
   const choose = side => {
     if (gone) return;
+    interacted = true; stopNudge();
     dir = 1; dy = 0; dx = side * 30;
     card.style.transition = 'transform .12s ease-out'; paint();
     setTimeout(() => fling(side, side * 1.2, 0), 110);

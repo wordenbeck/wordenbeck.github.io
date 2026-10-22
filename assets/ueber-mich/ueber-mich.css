@@ -171,7 +171,7 @@ button.btn { cursor: pointer; }
 .act.pop { animation: pop .4s cubic-bezier(.2,1.6,.4,1); }
 @keyframes pop { 40% { transform: scale(1.25); } }
 .act svg { pointer-events: none; }
-.hint { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); }
+.hint { margin: 14px 0 0; font-size: 11.5px; color: var(--muted); opacity: .55; }
 
 
 /* Schmale Handys: etwas weniger Rand, damit die GEFA-Zeile in eine Zeile passt */
