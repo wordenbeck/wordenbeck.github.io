@@ -26,7 +26,8 @@
   backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px); border-bottom: 1px solid var(--edge); }
 .who-link { display: flex; align-items: center; gap: 12px; border-radius: 14px; padding: 2px 8px 2px 2px; margin: -2px -8px -2px -2px; transition: background .2s; }
 .who-link:hover { background: var(--glass-2); }
-.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: 50% 25%; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: 50% 25%;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px color-mix(in srgb, var(--ink) 35%, transparent); }   /* feiner Ring mit kleinem Abstand */
 .chat-head strong { display: block; font-size: 16px; font-weight: 600; }
 .presence { display: block; font-size: 12.5px; color: var(--muted); transition: color .2s; }
 .presence.busy { color: #30d158; }
