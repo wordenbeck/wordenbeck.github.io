@@ -1,0 +1,98 @@
+/* „Warum diese Seite“ als Messenger-Chat. Grundlagen (Farben, Kopf, Knöpfe) aus assets/glas-base.css. */
+:root, [data-theme=dark] {
+  --chat-bg: #0b111c;          /* Fläche des Chats – auch Hintergrund hinter der Bubble-Spitze */
+  --them: #1d2431;             /* Besucher: dezentes Anthrazit */
+  --them-ink: #e6eaf1;
+  --me: #1f5fae;               /* Thomas: gedämpftes Blau */
+  --me-ink: #fff;
+  --meta: rgba(255, 255, 255, .55);
+}
+[data-theme=light] {
+  --chat-bg: #eef1f6;
+  --them: #fff;
+  --them-ink: #1d1d1f;
+  --me: #2b72d6;
+  --me-ink: #fff;
+  --meta: rgba(0, 0, 0, .45);
+}
+
+.chat-page { padding: 8px 16px 72px; }
+.chat { position: relative; max-width: 680px; margin: 0 auto; border-radius: 28px; background: var(--chat-bg);
+  box-shadow: inset 0 0 0 1px var(--edge), 0 30px 80px -30px var(--shade); }
+
+/* Chat-Kopf: bleibt beim Scrollen oben stehen */
+.chat-head { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+  border-radius: 28px 28px 0 0; background: color-mix(in srgb, var(--chat-bg) 86%, transparent);
+  backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px); border-bottom: 1px solid var(--edge); }
+.who-link { display: flex; align-items: center; gap: 12px; border-radius: 14px; padding: 2px 8px 2px 2px; margin: -2px -8px -2px -2px; transition: background .2s; }
+.who-link:hover { background: var(--glass-2); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; }
+.chat-head strong { display: block; font-size: 16px; font-weight: 600; }
+.presence { display: block; font-size: 12.5px; color: var(--muted); transition: color .2s; }
+.presence.busy { color: #30d158; }
+
+/* Verlauf */
+.log { padding: 18px 16px 28px; }
+.day { width: fit-content; margin: 0 auto 18px; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--glass-2); }
+.grp { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
+.grp.visitor { align-items: flex-start; }
+.grp.thomas { align-items: flex-end; }
+
+/* Jede Bubble hält ihren Platz schon vorher frei – nichts springt, der Leser scrollt frei */
+.slot { position: relative; max-width: 78%; }
+.bubble { position: relative; margin: 0; padding: 8px 12px 8px 13px; font-size: 15.5px; line-height: 1.42; border-radius: 18px;
+  opacity: 0; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease; overflow-wrap: anywhere; }
+.slot.shown .bubble { opacity: 1; transform: none; }
+.bubble strong { font-weight: 650; }
+.visitor .bubble { background: var(--them); color: var(--them-ink); }
+.thomas .bubble { background: var(--me); color: var(--me-ink); }
+[data-theme=light] .visitor .bubble { box-shadow: 0 1px 1px rgba(0,0,0,.06); }
+
+/* Gruppen: innen engere Ecken, nur die letzte Bubble bekommt Spitze, Uhrzeit und Häkchen */
+.thomas .slot:not(.first) .bubble { border-top-right-radius: 6px; }
+.thomas .slot:not(.last) .bubble { border-bottom-right-radius: 6px; }
+.visitor .slot:not(.first) .bubble { border-top-left-radius: 6px; }
+.visitor .slot:not(.last) .bubble { border-bottom-left-radius: 6px; }
+.thomas .last .bubble { border-bottom-right-radius: 4px; }
+.visitor .last .bubble { border-bottom-left-radius: 4px; }
+.last .bubble::before, .last .bubble::after { content: ""; position: absolute; bottom: 0; height: 16px; }
+.thomas .last .bubble::before { right: -7px; width: 16px; background: var(--me); border-bottom-left-radius: 14px 12px; }
+.thomas .last .bubble::after { right: -10px; width: 10px; background: var(--chat-bg); border-bottom-left-radius: 10px; }
+.visitor .last .bubble::before { left: -7px; width: 16px; background: var(--them); border-bottom-right-radius: 14px 12px; }
+.visitor .last .bubble::after { left: -10px; width: 10px; background: var(--chat-bg); border-bottom-right-radius: 10px; }
+.meta { float: right; display: inline-flex; align-items: center; gap: 3px; margin: 6px 0 -3px 10px; font-size: 11px; line-height: 1; color: var(--meta); }
+.visitor .meta { color: var(--muted); }
+.thomas .meta svg { color: #8fd3ff; }
+
+/* Tipp-Indikator: an der Stelle der nächsten Bubble */
+.typing { position: absolute; top: 0; right: 0; display: inline-flex; gap: 4px; align-items: center; height: 34px; padding: 0 13px; border-radius: 18px 18px 4px 18px;
+  background: color-mix(in srgb, var(--me) 55%, var(--chat-bg)); animation: typeIn .15s ease; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.85); animation: dot 1s infinite ease-in-out; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+@keyframes typeIn { from { opacity: 0; transform: scale(.9); } }
+
+/* Eingabeleiste am Ende: unten im Chat, bleibt beim Hochscrollen kurz sichtbar */
+.composer { position: sticky; bottom: 0; z-index: 5; padding: 12px 14px 14px; border-radius: 0 0 28px 28px; border-top: 1px solid var(--edge);
+  background: color-mix(in srgb, var(--chat-bg) 90%, transparent); backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px);
+  opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .45s var(--ease), transform .45s var(--ease); }
+.composer.shown { opacity: 1; transform: none; pointer-events: auto; }
+.field { display: flex; align-items: center; min-height: 44px; padding: 10px 16px; border-radius: 22px; font-size: 15px; color: var(--ink);
+  background: var(--glass-2); box-shadow: inset 0 0 0 1px var(--edge); }
+.caret { width: 2px; height: 18px; margin-left: 2px; background: var(--blue); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.cta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.cta .btn { height: 44px; padding: 0 18px; font-size: 14.5px; }
+.cta .btn.primary { flex: 1 1 220px; justify-content: center; }
+.cta .btn.glass { flex: 1 1 180px; justify-content: center; }
+
+/* Handy: volle Breite, ohne Kasten-Rundung */
+@media (max-width: 700px) {
+  .chat-page { padding: 0 0 40px; }
+  .chat { border-radius: 0; box-shadow: none; }
+  .chat-head { border-radius: 0; }
+  .composer { border-radius: 0; }
+  .log { padding: 14px 10px 24px; }
+  .slot { max-width: 86%; }
+}
+@media (prefers-reduced-motion: reduce) { .bubble, .composer { transition: none; } .typing i, .caret { animation: none; } }

@@ -2,7 +2,7 @@
 
   index.html               Startseite (Glas-Hero mit iPhone-Karussell, Querkacheln)
   <id>/index.html          Projektseite je Projekt (Demo im iPhone bzw. Browserfenster)
-  warum/index.html         Warum diese Seite (roter Faden)
+  warum/index.html         Warum diese Seite als Messenger-Chat (assets/warum/)
   ueber-mich/index.html    Über mich als Match-Karte (eigene Skripte in assets/ueber-mich/)
   lebenslauf/index.html    Ausführliches Profil (Zahlen, Stationen, Stärken)
 
@@ -22,12 +22,15 @@ CSS = ["core.css", "glas-base.css", "glas-pages.css"]
 
 def page(kind, root, project=None):
     match = kind == "match"
+    chat = kind == "chat"
     # Match-Karte ohne glas-pages.css (Klassen wie .nums würden sich sonst überschneiden)
-    css = ["core.css", "glas-base.css", "ueber-mich/ueber-mich.css"] if match else CSS + (["home.css"] if kind == "home" else [])
+    css = (["core.css", "glas-base.css", "ueber-mich/ueber-mich.css"] if match else
+           ["core.css", "glas-base.css", "warum/chat.css"] if chat else CSS + (["home.css"] if kind == "home" else []))
     links = "\n".join(f'<link rel="stylesheet" href="{root}assets/{c}?v={V}">' for c in css)
-    js = ["ueber-mich/profil.js", "ueber-mich/match.js", "ueber-mich/weiter.js"] if match else ["app.js"]
+    js = (["ueber-mich/profil.js", "ueber-mich/match.js", "ueber-mich/weiter.js"] if match else
+          ["warum/chat.js"] if chat else ["app.js"])
     scripts = "\n".join(f'<script src="{root}assets/{j}?v={V}"></script>' for j in js)
-    kind = "about" if match else kind
+    kind = "about" if match else "story" if chat else kind
     demo = (f'<script src="{root}demo-player.js?v={V}"></script>\n<script src="{root}demo-scripts.js?v={V}"></script>\n'
             if kind == "project" else "")
     pid = f' data-project="{project}"' if project else ""
@@ -66,7 +69,7 @@ def write(rel, text):
 write("index.html", page("home", ""))
 for pid in IDS:
     write(f"{pid}/index.html", page("project", "../", pid))
-write("warum/index.html", page("story", "../"))
+write("warum/index.html", page("chat", "../"))
 write("ueber-mich/index.html", page("match", "../"))
 write("lebenslauf/index.html", page("about", "../"))
 print("Seiten geschrieben:", 4 + len(IDS))

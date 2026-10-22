@@ -21,7 +21,7 @@
       best: 'Das war das beste Match in der Nähe.', more: 'Weitersuchen geht natürlich.<br>Ein besseres Match ist unwahrscheinlich 😉',
       again: 'Thomas zurückholen', keepLooking: 'Weitersuchen', cv: 'Lebenslauf', card: 'Profilkarte',
       prev: 'Vorheriges Bild', next: 'Nächstes Bild', no: 'Weiter suchen', yes: 'Gefällt mir',
-      hint: 'Ziehen oder Pfeiltasten · Antippen für mehr Bilder',
+      hint: 'Ziehen oder Pfeiltasten · Links/rechts tippen zum Blättern',
     },
     en: {
       title: 'About me – Thomas Wordenbeck', years: n => `${n} years`, since: 'since 2024',
@@ -34,7 +34,7 @@
       best: 'That was the best match nearby.', more: 'You can keep looking, of course.<br>A better match is unlikely 😉',
       again: 'Bring Thomas back', keepLooking: 'Keep looking', cv: 'CV', card: 'profile card',
       prev: 'Previous photo', next: 'Next photo', no: 'Keep looking', yes: 'Like',
-      hint: 'Drag or use the arrow keys · Tap for more photos',
+      hint: 'Drag or use the arrow keys · Tap left/right to browse',
     },
   }[lang] || {};
   document.title = T.title;
