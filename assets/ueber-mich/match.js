@@ -21,7 +21,6 @@
       best: 'Das war das beste Match in der Nähe.', more: 'Weitersuchen geht natürlich.<br>Ein besseres Match ist unwahrscheinlich 😉',
       again: 'Thomas zurückholen', keepLooking: 'Weitersuchen', cv: 'Lebenslauf', card: 'Profilkarte',
       prev: 'Vorheriges Bild', next: 'Nächstes Bild', no: 'Weiter suchen', yes: 'Gefällt mir',
-      hint: 'Ziehen oder Pfeiltasten · Links/rechts tippen zum Blättern',
     },
     en: {
       title: 'About me – Thomas Wordenbeck', years: n => `${n} years`, since: 'since 2024',
@@ -34,12 +33,13 @@
       best: 'That was the best match nearby.', more: 'You can keep looking, of course.<br>A better match is unlikely 😉',
       again: 'Bring Thomas back', keepLooking: 'Keep looking', cv: 'CV', card: 'profile card',
       prev: 'Previous photo', next: 'Next photo', no: 'Keep looking', yes: 'Like',
-      hint: 'Drag or use the arrow keys · Tap left/right to browse',
     },
   }[lang] || {};
   document.title = T.title;
 
   const ICON = {
+    left: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+    right: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
     pen: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H8"/><path d="m15.007 5.008 3.987 3.986"/><path d="M20 15v4"/><path d="M21.174 6.813a2.82 2.82 0 0 0-3.986-3.987L3.842 16.175a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M22 17h-4"/><path d="M4 5v4"/><path d="M6 7H2"/><path d="M9 2v2"/></svg>',
     check: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#2997ff"/><path d="m7.5 12.2 3 3 6-6.4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     thumb: '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v11"/><path d="M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 7A2 2 0 0 1 17.5 21H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9z"/></svg>',
@@ -98,7 +98,7 @@
           <button class="btn primary" type="button" id="again">${ICON.undo}<span>${esc(T.again)}</span></button>
           <button class="more" type="button" id="more">${esc(T.keepLooking)}</button>
         </article>
-        <article class="tcard face" id="card" aria-roledescription="${T.card}">
+        <article class="tcard face first" id="card" aria-roledescription="${T.card}">
           <div class="pics">${PAGES.map((p, i) => `<img src="${p.img}" alt="" style="object-position:${p.pos}" class="${i ? '' : 'on'}" draggable="false">`).join('')}</div>
           <div class="shade"></div>
           <div class="bars">${PAGES.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>
@@ -106,15 +106,14 @@
           <span class="badge like">${ICON.thumb}</span>
           <span class="badge nope">${ICON.down}</span>
           <div class="info">${PAGES.map((p, i) => `<div class="pane${i ? '' : ' on'}">${p.html}</div>`).join('')}</div>
-          <button class="tap prev" type="button" aria-label="${T.prev}"></button>
-          <button class="tap next" type="button" aria-label="${T.next}"></button>
+          <button class="flip prev" type="button" aria-label="${T.prev}"><span>${ICON.left}</span></button>
+          <button class="flip next" type="button" aria-label="${T.next}"><span>${ICON.right}</span></button>
         </article>
       </div>
       <div class="acts">
         <button class="act no" type="button" id="no" aria-label="${T.no}">${ICON.down}</button>
         <button class="act yes" type="button" id="yes" aria-label="${T.yes}">${ICON.thumb}</button>
       </div>
-      <p class="hint">${esc(T.hint)}</p>
     </main>`);
 
   const ov = overlays();
@@ -128,7 +127,7 @@
   const SLIDE = 6500;
   card.style.setProperty('--slide', SLIDE + 'ms');
   let page = 0, timer = 0, started = 0, remaining = SLIDE;
-  // Hinweis aufs Wischen: Nach zwei Dritteln der Standzeit neigt sich die Karte kurz nach links und rechts –
+  // Hinweis aufs Wischen: Nach zwei Dritteln der Standzeit neigt sich die Karte kurz –
   // höchstens dreimal und nur, bis jemand selbst zieht oder einen Knopf drückt
   let nudgeTimer = 0, nudges = 0, interacted = false;
   const schedule = ms => {
@@ -149,11 +148,12 @@
     void card.offsetWidth;                           // Animationen (Zoom, Balken) neu starten
     pics[k].classList.add('on'); panes[k].classList.add('on'); bars[k].classList.add('on');
     bars.forEach((b, i) => b.classList.toggle('done', i < k));
+    card.classList.toggle('first', k === 0); card.classList.toggle('last', k === PAGES.length - 1);   // Pfeile am Rand nur, wo es weitergeht
     card.classList.remove('paused');
     if (!gone) schedule(SLIDE);
   };
-  card.querySelector('.prev').addEventListener('click', () => { if (!moved) showPage(page - 1); });
-  card.querySelector('.next').addEventListener('click', () => { if (!moved) showPage(page + 1); });
+  card.querySelector('.flip.prev').addEventListener('click', () => { if (!moved) showPage(page - 1); });
+  card.querySelector('.flip.next').addEventListener('click', () => { if (!moved) showPage(page + 1); });
   document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
   if (!reduce) schedule(SLIDE); else card.classList.add('manual');
 
@@ -176,7 +176,9 @@
     btnNo.style.setProperty('--hot', dx < 0 ? k : 0);
     setStack(Math.abs(dx) / (W() * .9));
   };
-  // Kurzes Links-rechts-Neigen mit Daumen und Glow, wie ein angedeutetes Wischen
+  // Angedeutetes Wischen mit Daumen und Glow, jedes Mal etwas deutlicher (Anteil der Kartenbreite, + = rechts/grün):
+  // 1. nur leicht nach rechts · 2. weiter nach rechts, minimal nach links zurück · 3. nach rechts, dann deutlich nach links
+  const NUDGES = [[0, .09, 0], [0, .15, -.04, 0], [0, .13, -.13, 0]];
   let nudgeFrame = 0;
   const stopNudge = () => {
     if (!nudgeFrame) return;
@@ -185,12 +187,14 @@
   };
   const nudge = () => {
     if (interacted || gone || dragging || document.hidden || nudges >= 3) return;
-    nudges++; dir = 1; dy = 0;
+    const keys = NUDGES[nudges++], seg = 560, MS = seg * (keys.length - 1);
+    dir = 1; dy = 0;
     card.style.transition = 'none';
-    const t0 = performance.now(), MS = 1700, A = W() * .13;
+    const t0 = performance.now(), w = W();
+    const ease = x => x < .5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2;
     const step = t => {
-      const k = Math.min(1, (t - t0) / MS);
-      dx = -A * Math.sin(k * Math.PI * 2) * Math.sin(k * Math.PI);   // erst links, dann rechts, weich zurück
+      const k = Math.min(1, (t - t0) / MS), p = k * (keys.length - 1), i = Math.min(keys.length - 2, Math.floor(p));
+      dx = w * (keys[i] + (keys[i + 1] - keys[i]) * ease(p - i));
       paint();
       if (k < 1) nudgeFrame = requestAnimationFrame(step);
       else { nudgeFrame = 0; dx = 0; paint(); card.style.transform = ''; }

@@ -156,7 +156,7 @@
       <section class="chat" aria-label="${esc(T.label)}">
         <header class="chat-head">
           <a class="who-link" href="${ROOT}ueber-mich/" title="${esc(T.profile)}">
-            <img class="avatar" src="${ROOT}favicon.svg" alt="" width="40" height="40">
+            <img class="avatar" src="${ROOT}img/ueber-mich/headshot.jpg" alt="" width="40" height="40">
             <div><strong>Thomas</strong><span class="presence" id="presence">online</span></div>
           </a>
         </header>
