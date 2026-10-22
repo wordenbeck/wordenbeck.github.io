@@ -6,7 +6,38 @@
   const { mount } = GlasUI;
   const { I, overlays, esc } = MeUI;
   const IMG = `${V2.ROOT}img/ueber-mich/`;
-  document.title = 'Über mich – Thomas Wordenbeck';
+  const { lang } = V2;
+
+  // Alle Texte der Karte auf Deutsch und Englisch (Sprache wechselt per Neuladen)
+  const T = {
+    de: {
+      title: 'Über mich – Thomas Wordenbeck', years: n => `${n} Jahre`, since: 'seit 2024',
+      gefa: 'IT-Projekte, Business Analyse, IT-Betrieb',
+      hi: 'Hi, ich bin Thomas. Ich bringe Produktideen und Teams zusammen – und baue inzwischen auch selbst.',
+      career: 'Karriere', nums: ['Produktteams', 'MVPs', 'Nutzer'],
+      personal: 'Privat', chips: ['Familienvater', 'Abenteurer', 'Berge', 'Wandern', 'Gravelbike'],
+      outdoors: 'Am liebsten draußen – mit der Familie, auf dem Rad oder mit Rucksack in den Bergen.',
+      fakes: [['Product Owner · Hamburg', 'Backlog-Zero ist mein Cardio.'], ['Agile Coach · Köln', 'Ich habe ein Post-it für dich.']],
+      best: 'Das war das beste Match in der Nähe.', more: 'Weitersuchen geht natürlich.<br>Ein besseres Match ist unwahrscheinlich 😉',
+      again: 'Thomas zurückholen', keepLooking: 'Weitersuchen', cv: 'Lebenslauf', card: 'Profilkarte',
+      prev: 'Vorheriges Bild', next: 'Nächstes Bild', no: 'Weiter suchen', yes: 'Gefällt mir',
+      hint: 'Ziehen oder Pfeiltasten · Antippen für mehr Bilder',
+    },
+    en: {
+      title: 'About me – Thomas Wordenbeck', years: n => `${n} years`, since: 'since 2024',
+      gefa: 'IT projects, business analysis, IT operations',
+      hi: 'Hi, I’m Thomas. I bring product ideas and teams together – and these days I build things myself, too.',
+      career: 'Career', nums: ['product teams', 'MVPs', 'users'],
+      personal: 'Personal', chips: ['Family man', 'Adventurer', 'Mountains', 'Hiking', 'Gravel biking'],
+      outdoors: 'Happiest outdoors – with my family, on the bike or with a backpack in the mountains.',
+      fakes: [['Product Owner · Hamburg', 'Backlog zero is my cardio.'], ['Agile Coach · Cologne', 'I’ve got a Post-it for you.']],
+      best: 'That was the best match nearby.', more: 'You can keep looking, of course.<br>A better match is unlikely 😉',
+      again: 'Bring Thomas back', keepLooking: 'Keep looking', cv: 'CV', card: 'profile card',
+      prev: 'Previous photo', next: 'Next photo', no: 'Keep looking', yes: 'Like',
+      hint: 'Drag or use the arrow keys · Tap for more photos',
+    },
+  }[lang] || {};
+  document.title = T.title;
 
   const ICON = {
     pen: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H8"/><path d="m15.007 5.008 3.987 3.986"/><path d="M20 15v4"/><path d="M21.174 6.813a2.82 2.82 0 0 0-3.986-3.987L3.842 16.175a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M22 17h-4"/><path d="M4 5v4"/><path d="M6 7H2"/><path d="M9 2v2"/></svg>',
@@ -24,37 +55,36 @@
   // Drei Seiten der Karte: je ein Bild mit eigenem Inhalt
   // Karriere: Firma, Zeitraum und Dauer klein oben, darunter die Rolle
   const JAHR = new Date().getFullYear();
-  const dauer = (von, bis = JAHR) => `${bis - von} Jahre`;
+  const dauer = (von, bis = JAHR) => T.years(bis - von);
   const JOBS = [
-    { firma: 'E.ON', zeit: 'seit 2024', von: 2024, was: 'Transformation Manager' },
+    { firma: 'E.ON', zeit: T.since, von: 2024, was: 'Transformation Manager' },
     { firma: 'E.ON, d lab_', zeit: '2022 – 2024', von: 2022, bis: 2024, was: 'Product Manager' },
-    { firma: 'GEFA Bank', zeit: '2004 – 2022', von: 2004, bis: 2022, was: 'IT-Projekte, Business Analyse, IT-Betrieb' },
+    { firma: 'GEFA Bank', zeit: '2004 – 2022', von: 2004, bis: 2022, was: T.gefa },
   ];
   const PAGES = [
     { img: `${IMG}headshot.jpg`, pos: '50% 28%', html: `
         <h1>${esc(ME.name)} ${ICON.check}</h1>
         <p class="lead">${ICON.pen}${esc(ME.slogan)}</p>
-        <p class="txt">Hi, ich bin Thomas. Ich bringe Produktideen und Teams zusammen – und baue inzwischen auch selbst.</p>` },
+        <p class="txt">${esc(T.hi)}</p>` },
     { img: `${IMG}foto.jpg`, pos: '50% 16%', html: `
-        <p class="kick">Karriere</p>
+        <p class="kick">${esc(T.career)}</p>
         <ul class="tl">${JOBS.map(j => `<li><small><b>${esc(j.firma)}</b> · ${j.zeit} · ${dauer(j.von, j.bis)}</small><span>${esc(j.was)}</span></li>`).join('')}</ul>
-        <div class="nums">${ME.zahlen.slice(0, 3).map(z => `<span><b>${z.v.toLocaleString('de')}</b> ${esc(z.l.split(' ')[0])}</span>`).join('')}</div>` },
+        <div class="nums">${ME.zahlen.slice(0, 3).map((z, i) => `<span><b>${z.v.toLocaleString(lang)}</b> ${esc(T.nums[i])}</span>`).join('')}</div>` },
     { img: `${IMG}abenteuer.jpg`, pos: '66% 40%', html: `
-        <p class="kick">Privat</p>
+        <p class="kick">${esc(T.personal)}</p>
         <div class="chips">
-          <span>${ICON.home}Familienvater</span><span>${ICON.compass}Abenteurer</span>
-          <span>${ICON.mtn}Berge</span><span>${ICON.walk}Wandern</span><span>${ICON.bike}Gravelbike</span>
+          ${[ICON.home, ICON.compass, ICON.mtn, ICON.walk, ICON.bike].map((ic, i) => `<span>${ic}${esc(T.chips[i])}</span>`).join('')}
         </div>
-        <p class="txt">Am liebsten draußen – mit der Familie, auf dem Rad oder mit Rucksack in den Bergen.</p>` },
+        <p class="txt">${esc(T.outdoors)}</p>` },
   ];
 
   // Erfundene Profile auf den Karten dahinter (Fotos von Unsplash, unscharf)
   const FAKES = [
-    { img: `${IMG}fake-1.jpg`, name: 'Lena', alter: 31, job: 'Product Owner · Hamburg', text: 'Backlog-Zero ist mein Cardio.' },
-    { img: `${IMG}fake-2.jpg`, name: 'Marco', alter: 36, job: 'Agile Coach · Köln', text: 'Ich habe ein Post-it für dich.' },
+    { img: `${IMG}fake-1.jpg`, name: 'Lena', alter: 31, job: T.fakes[0][0], text: T.fakes[0][1] },
+    { img: `${IMG}fake-2.jpg`, name: 'Marco', alter: 36, job: T.fakes[1][0], text: T.fakes[1][1] },
   ];
   const fake = f => `<div class="fake"><img src="${f.img}" alt=""><div class="shade"></div>
-    <div class="fake-info"><p class="fake-name">${f.name} <span>${f.alter}</span></p><p class="fake-job">${f.job}</p><p class="fake-txt">${f.text}</p></div></div>`;
+    <div class="fake-info"><p class="fake-name">${f.name} <span>${f.alter}</span></p><p class="fake-job">${esc(f.job)}</p><p class="fake-txt">${esc(f.text)}</p></div></div>`;
 
   mount(`
     <main class="proto tm">
@@ -63,28 +93,28 @@
         <article class="tcard empty" id="empty" aria-hidden="true">
           ${fake(FAKES[0])}
           <div class="radar"><img src="${IMG}headshot.jpg" alt=""></div>
-          <h2>Das war das beste Match in der Nähe.</h2>
-          <p>Weitersuchen geht natürlich.<br>Ein besseres Match ist unwahrscheinlich 😉</p>
-          <button class="btn primary" type="button" id="again">${ICON.undo}<span>Thomas zurückholen</span></button>
-          <button class="more" type="button" id="more">Weitersuchen</button>
+          <h2>${esc(T.best)}</h2>
+          <p>${T.more}</p>
+          <button class="btn primary" type="button" id="again">${ICON.undo}<span>${esc(T.again)}</span></button>
+          <button class="more" type="button" id="more">${esc(T.keepLooking)}</button>
         </article>
-        <article class="tcard face" id="card" aria-roledescription="Profilkarte">
+        <article class="tcard face" id="card" aria-roledescription="${T.card}">
           <div class="pics">${PAGES.map((p, i) => `<img src="${p.img}" alt="" style="object-position:${p.pos}" class="${i ? '' : 'on'}" draggable="false">`).join('')}</div>
           <div class="shade"></div>
           <div class="bars">${PAGES.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>
-          <a class="cv" href="${ME.lebenslauf}">${I.doc}<span>Lebenslauf</span></a>
+          <a class="cv" href="${ME.lebenslauf}">${I.doc}<span>${esc(T.cv)}</span></a>
           <span class="badge like">${ICON.thumb}</span>
           <span class="badge nope">${ICON.down}</span>
           <div class="info">${PAGES.map((p, i) => `<div class="pane${i ? '' : ' on'}">${p.html}</div>`).join('')}</div>
-          <button class="tap prev" type="button" aria-label="Vorheriges Bild"></button>
-          <button class="tap next" type="button" aria-label="Nächstes Bild"></button>
+          <button class="tap prev" type="button" aria-label="${T.prev}"></button>
+          <button class="tap next" type="button" aria-label="${T.next}"></button>
         </article>
       </div>
       <div class="acts">
-        <button class="act no" type="button" id="no" aria-label="Weiter suchen">${ICON.down}</button>
-        <button class="act yes" type="button" id="yes" aria-label="Gefällt mir">${ICON.thumb}</button>
+        <button class="act no" type="button" id="no" aria-label="${T.no}">${ICON.down}</button>
+        <button class="act yes" type="button" id="yes" aria-label="${T.yes}">${ICON.thumb}</button>
       </div>
-      <p class="hint">Ziehen oder Pfeiltasten · Antippen für mehr Bilder</p>
+      <p class="hint">${esc(T.hint)}</p>
     </main>`);
 
   const ov = overlays();

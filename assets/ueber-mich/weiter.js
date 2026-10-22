@@ -5,7 +5,15 @@
   const WAIT = 8000;          // so lange läuft die Nein-Taste
   const GIVE_UP = 6;          // nach so vielen Versuchen verabschiedet sich „Ja“
   const MODES = ['hop', 'swap', 'busy'];
-  const BUSY = ['Ja ist gerade beschäftigt …', 'Bitte warten …', 'Ja installiert Updates (3 von 117) …', 'Fast fertig …'];
+  const T = {
+    de: { title: 'Weitersuchen.exe', close: 'Schließen', ask: 'Sind Sie sicher, dass Sie weitersuchen möchten?', yes: 'Ja', no: 'Nein, Thomas zurückholen',
+      error: 'Fehler 404: Kein besseres Profil gefunden.',
+      busy: ['Ja ist gerade beschäftigt …', 'Bitte warten …', 'Ja installiert Updates (3 von 117) …', 'Fast fertig …'] },
+    en: { title: 'KeepLooking.exe', close: 'Close', ask: 'Are you sure you want to keep looking?', yes: 'Yes', no: 'No, bring Thomas back',
+      error: 'Error 404: No better profile found.',
+      busy: ['Yes is busy right now …', 'Please wait …', 'Yes is installing updates (3 of 117) …', 'Almost done …'] },
+  }[V2.lang] || {};
+  const BUSY = T.busy;
 
   const ICONS = {
     q: '<svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#000080" stroke-width="2"/><path d="M12 12.5a4 4 0 1 1 5.6 3.7c-1 .5-1.6 1.3-1.6 2.4V20" fill="none" stroke="#000080" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="24" r="1.7" fill="#000080"/></svg>',
@@ -19,7 +27,7 @@
 
   // Wird „Ja“ doch erwischt (z. B. per Tastatur): freundliche Fehlermeldung
   const error = dlg => {
-    dlg.querySelector('.dlg-body p').textContent = 'Fehler 404: Kein besseres Profil gefunden.';
+    dlg.querySelector('.dlg-body p').textContent = T.error;
     dlg.querySelector('.dlg-btns').innerHTML = '<button class="dlg-no ok" type="button"><span class="lbl">OK</span></button>';
     dlg.querySelector('.dlg-no').focus();
   };
@@ -105,12 +113,12 @@
     wrap.className = 'dlg-wrap';
     wrap.innerHTML = `
       <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t">
-        <div class="dlg-bar"><span id="dlg-t">Weitersuchen.exe</span><button class="dlg-x" type="button" aria-label="Schließen">${ICONS.x}</button></div>
-        <div class="dlg-body"><span class="dlg-q">${ICONS.q}</span><p>Sind Sie sicher, dass Sie weitersuchen möchten?</p></div>
+        <div class="dlg-bar"><span id="dlg-t">${T.title}</span><button class="dlg-x" type="button" aria-label="${T.close}">${ICONS.x}</button></div>
+        <div class="dlg-body"><span class="dlg-q">${ICONS.q}</span><p>${T.ask}</p></div>
         <div class="dlg-btns">
           <p class="dlg-status" aria-live="polite"></p>
-          <button class="dlg-yes" type="button">Ja</button>
-          <button class="dlg-no" type="button"><span class="fill" style="animation-duration:${WAIT}ms"></span><span class="lbl">Nein, Thomas zurückholen</span></button>
+          <button class="dlg-yes" type="button">${T.yes}</button>
+          <button class="dlg-no" type="button"><span class="fill" style="animation-duration:${WAIT}ms"></span><span class="lbl">${T.no}</span></button>
         </div>
       </div>`;
     document.body.appendChild(wrap);

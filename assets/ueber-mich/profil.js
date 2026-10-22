@@ -1,24 +1,32 @@
 // „Über mich“ als Match-Karte: Profildaten, Kontakt-Knöpfe und das Match-Fenster.
 // Zahlen und Slogan kommen aus content.js.
 (() => {
-  const { C, esc, projects, ROOT } = V2;
-  const A = C.about.de;
+  const { C, esc, projects, ROOT, lang } = V2;
+  const A = C.about[lang] || C.about.de;
+  const T = {
+    de: { you: 'Sie', meet: 'Sie und Thomas wollen sich kennenlernen.', next: 'Der nächste Schritt ist ganz einfach: ein kurzes Gespräch.',
+      linkedin: 'Auf LinkedIn vernetzen', mail: 'Nachricht schicken', back: 'Profil weiter ansehen', built: 'eigene Produkte gebaut',
+      subject: 'Hallo Thomas – über dein Portfolio', body: 'Hallo Thomas, it\'s a match. Lass uns sprechen.\n\n' },
+    en: { you: 'You', meet: 'You and Thomas want to get to know each other.', next: 'The next step is simple: a short conversation.',
+      linkedin: 'Connect on LinkedIn', mail: 'Send a message', back: 'Keep viewing the profile', built: 'own products built',
+      subject: 'Hi Thomas – about your portfolio', body: 'Hi Thomas, it\'s a match. Let\'s talk.\n\n' },
+  }[lang] || {};
 
   const ME = {
     foto: `${ROOT}img/ueber-mich/headshot.jpg`,
     name: 'Thomas Wordenbeck',
     vorname: 'Thomas',
-    slogan: C.de.role,
+    slogan: C[lang].role,
     zahlen: [
       ...A.numbers.map(n => ({ v: n.value, l: n.label })),
-      { v: projects.length, l: 'eigene Produkte gebaut' },
+      { v: projects.length, l: T.built },
     ],
     linkedin: C.linkedin,
     lebenslauf: `${ROOT}lebenslauf/`,
   };
 
   // E-Mail erst beim Klick zusammensetzen (Adresse steht nicht lesbar im Seitencode)
-  const mail = (subject = 'Hallo Thomas – über dein Portfolio', body = '') => {
+  const mail = (subject = T.subject, body = '') => {
     location.href = `mailto:${['thomas.wordenbeck', 'gmail.com'].join('@')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -30,8 +38,8 @@
 
   // Kontakt-Knöpfe (LinkedIn + E-Mail), überall gleich
   const contactButtons = (body = '') => `
-    <a class="btn primary" href="${ME.linkedin}" target="_blank" rel="noopener">${I.in}<span>Auf LinkedIn vernetzen</span></a>
-    <button class="btn glass js-mail" type="button" data-body="${esc(body)}">${I.mail}<span>Nachricht schicken</span></button>`;
+    <a class="btn primary" href="${ME.linkedin}" target="_blank" rel="noopener">${I.in}<span>${esc(T.linkedin)}</span></a>
+    <button class="btn glass js-mail" type="button" data-body="${esc(body)}">${I.mail}<span>${esc(T.mail)}</span></button>`;
   document.addEventListener('click', e => {
     const b = e.target.closest('.js-mail');
     if (b) mail(b.dataset.subject || undefined, b.dataset.body || '');
@@ -44,11 +52,11 @@
       <div class="ov" id="ov-match" hidden>
         <div class="ov-in">
           <p class="ov-kicker">It's a Match!</p>
-          <div class="pair"><i class="glow"></i><span class="you">Sie</span><img src="${ME.foto}" alt=""><i class="burst"></i></div>
-          <h2>Sie und ${esc(ME.vorname)} wollen sich kennenlernen.</h2>
-          <p class="ov-text">Der nächste Schritt ist ganz einfach: ein kurzes Gespräch.</p>
-          <div class="ov-cta">${contactButtons('Hallo Thomas, it\'s a match. Lass uns sprechen.\n\n')}</div>
-          <button class="ov-back" type="button" data-close>Profil weiter ansehen</button>
+          <div class="pair"><i class="glow"></i><span class="you">${esc(T.you)}</span><img src="${ME.foto}" alt=""><i class="burst"></i></div>
+          <h2>${esc(T.meet)}</h2>
+          <p class="ov-text">${esc(T.next)}</p>
+          <div class="ov-cta">${contactButtons(T.body)}</div>
+          <button class="ov-back" type="button" data-close>${esc(T.back)}</button>
         </div>
       </div>`;
     document.body.appendChild(wrap);
