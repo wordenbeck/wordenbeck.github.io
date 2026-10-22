@@ -48,13 +48,20 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
   }
 
-  const footer = () => `
+  // Fußleiste: Wer hat's ausgedacht (Name führt zur Profilkarte), womit gebaut, dann LinkedIn und Rechtliches
+  const FOOT_ICON = {
+    idea: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+    code: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+  };
+  const footer = () => {
+    const en = lang === 'en';
+    return `
     <footer class="foot">
-      <span>© 2026 Thomas Wordenbeck</span>
-      <a data-linkedin target="_blank" rel="noopener">LinkedIn</a>
-      <span data-k="footer"></span>
-      <span class="foot-legal"><a href="${ROOT}impressum/">${lang === 'en' ? 'Legal notice' : 'Impressum'}</a><a href="${ROOT}datenschutz/">${lang === 'en' ? 'Privacy' : 'Datenschutz'}</a></span>
+      <span class="foot-by">${FOOT_ICON.idea}<span>${en ? 'Ideated by' : 'Ausgedacht von'} <a href="${PAGES.about}">Thomas Wordenbeck</a></span></span>
+      <span class="foot-by">${FOOT_ICON.code}<span>${en ? 'Built with Claude Code' : 'Gebaut mit Claude Code'}</span></span>
+      <span class="foot-legal"><a data-linkedin target="_blank" rel="noopener">LinkedIn</a><a href="${ROOT}impressum/">${en ? 'Legal notice' : 'Impressum'}</a><a href="${ROOT}datenschutz/">${en ? 'Privacy' : 'Datenschutz'}</a></span>
     </footer>`;
+  };
 
   // Zurück: im Verlauf zurück, wenn man von dieser Seite kam, sonst zur Übersicht
   function backButton(el) {

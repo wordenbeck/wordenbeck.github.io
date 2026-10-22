@@ -14,7 +14,6 @@ window.CONTENT = {
     status: { live: "Live", paused: "Pausiert" },
     labels: { tabs: ["Worum es geht", "Highlights", "Technik"], visit: "Website ansehen", about: "Worum es geht", pause: "Pause", play: "Abspielen", more: "Weitere Projekte", linkedin: "LinkedIn-Profil", aboutLink: "Mehr zu mir", projects: "Projekte", discover: "Produkte entdecken", open: "Demo ansehen", why: "Warum es diese Seite gibt" },
     description: "Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.",
-    footer: "Gebaut mit Claude Code.",
   },
   en: {
     nav: { work: "Projects", backBtn: "Back", why: "Why this site", about: "About me", back: "All projects", theme: "Toggle light/dark", all: "See all projects" },
@@ -25,7 +24,6 @@ window.CONTENT = {
     status: { live: "Live", paused: "Paused" },
     labels: { tabs: ["What it’s about", "Highlights", "Under the hood"], visit: "Visit website", about: "What it’s about", pause: "Pause", play: "Play", more: "More projects", linkedin: "LinkedIn profile", aboutLink: "More about me", projects: "Projects", discover: "Explore products", open: "View demo", why: "Why this site exists" },
     description: "Products for my own everyday life and for people around me – built by Thomas Wordenbeck.",
-    footer: "Built with Claude Code.",
   },
 
   // ------------------------------------------------------------------ Über mich
