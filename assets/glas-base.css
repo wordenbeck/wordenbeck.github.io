@@ -111,6 +111,7 @@ a:hover .go svg, .go:hover svg { transform: translateX(3px); }
 
 .foot { max-width: 1440px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 26px; padding: 24px var(--side) 40px; font-size: 13px; color: var(--muted); }
 .foot a:hover { color: var(--ink); }
+.foot-legal { display: flex; gap: 18px; }
 
 /* ---------- iPhone ----------
    Breite kommt von außen, die Höhe ergibt sich (Seitenverhältnis 1 : 2.1819).

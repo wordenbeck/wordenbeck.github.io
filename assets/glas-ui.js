@@ -53,6 +53,7 @@
       <span>© 2026 Thomas Wordenbeck</span>
       <a data-linkedin target="_blank" rel="noopener">LinkedIn</a>
       <span data-k="footer"></span>
+      <span class="foot-legal"><a href="${ROOT}impressum/">${lang === 'en' ? 'Legal notice' : 'Impressum'}</a><a href="${ROOT}datenschutz/">${lang === 'en' ? 'Privacy' : 'Datenschutz'}</a></span>
     </footer>`;
 
   // Zurück: im Verlauf zurück, wenn man von dieser Seite kam, sonst zur Übersicht

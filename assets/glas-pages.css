@@ -130,3 +130,10 @@
   .nums, .strengths, .facts { grid-template-columns: 1fr; }
   .stations li { grid-template-columns: 1fr; gap: 6px; }
 }
+
+/* Impressum und Datenschutz: ruhige Textseite */
+.legal .pg-hero { padding-bottom: 12px; }
+.lg-blk { max-width: 68ch; margin-top: 34px; }
+.lg-blk h2 { margin: 0 0 8px; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.lg-blk p, .lg-blk address { margin: 0 0 8px; color: var(--soft); font-style: normal; line-height: 1.6; }
+.lg-blk a { color: var(--blue); }

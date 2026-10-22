@@ -5,6 +5,7 @@
   warum/index.html         Warum diese Seite als Messenger-Chat (assets/warum/)
   ueber-mich/index.html    Über mich als Match-Karte (eigene Skripte in assets/ueber-mich/)
   lebenslauf/index.html    Ausführliches Profil (Zahlen, Stationen, Stärken)
+  impressum/, datenschutz/ Rechtliches (assets/recht.js)
 
 Aufruf:  python3 _build/make-pages.py   (aus dem Portfolio-Ordner)
 Inhalte stehen in content.js, Aufbau und Aussehen in assets/ – hier nur das Gerüst.
@@ -20,7 +21,7 @@ IDS = ["kalo", "mahlzeit", "human", "vuca", "punkte", "zirkus"]
 CSS = ["core.css", "glas-base.css", "glas-pages.css"]
 
 
-def page(kind, root, project=None):
+def page(kind, root, project=None, legal=None):
     match = kind == "match"
     chat = kind == "chat"
     # Match-Karte ohne glas-pages.css (Klassen wie .nums würden sich sonst überschneiden)
@@ -29,12 +30,13 @@ def page(kind, root, project=None):
            CSS + (["home.css"] if kind == "home" else []) + (["frag-mich.css"] if kind in ("home", "project") else []))
     links = "\n".join(f'<link rel="stylesheet" href="{root}assets/{c}?v={V}">' for c in css)
     js = (["ueber-mich/profil.js", "ueber-mich/match.js", "ueber-mich/weiter.js"] if match else
-          ["warum/chat.js"] if chat else ["app.js"] + (["frag-mich.js"] if kind in ("home", "project") else []))
+          ["warum/chat.js"] if chat else ["recht.js"] if legal else
+          ["app.js"] + (["frag-mich.js"] if kind in ("home", "project") else []))
     scripts = "\n".join(f'<script src="{root}assets/{j}?v={V}"></script>' for j in js)
     kind = "about" if match else "story" if chat else kind
     demo = (f'<script src="{root}demo-player.js?v={V}"></script>\n<script src="{root}demo-scripts.js?v={V}"></script>\n'
             if kind == "project" else "")
-    pid = f' data-project="{project}"' if project else ""
+    pid = (f' data-project="{project}"' if project else "") + (f' data-legal="{legal}"' if legal else "")
     return f"""<!doctype html>
 <html lang="de" data-theme="dark">
 <head>
@@ -45,9 +47,7 @@ def page(kind, root, project=None):
 <script>try{{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}}catch(e){{}}</script>
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{root}assets/fonts/fonts.css?v={V}">
 {links}
 </head>
 <body data-page="{kind}" data-root="{root}"{pid}>
@@ -73,4 +73,6 @@ for pid in IDS:
 write("warum/index.html", page("chat", "../"))
 write("ueber-mich/index.html", page("match", "../"))
 write("lebenslauf/index.html", page("about", "../"))
-print("Seiten geschrieben:", 4 + len(IDS))
+write("impressum/index.html", page("legal", "../", legal="impressum"))
+write("datenschutz/index.html", page("legal", "../", legal="datenschutz"))
+print("Seiten geschrieben:", 6 + len(IDS))
