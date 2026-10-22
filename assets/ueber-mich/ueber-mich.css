@@ -1,0 +1,231 @@
+/* „Über mich“ (Match-Karte): Seitenrahmen und Match-Fenster. Grundlagen aus glas-base.css */
+.proto { max-width: 1100px; margin: 0 auto; padding: 8px 16px 80px; }
+button.btn { cursor: pointer; }
+
+/* Match-Fenster */
+.ov { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  opacity: 0; transition: opacity .3s ease; }
+.ov.in { opacity: 1; }
+/* Wichtig: ausgeblendete Fenster dürfen keine Klicks abfangen (display: grid würde [hidden] sonst überstimmen) */
+.ov[hidden] { display: none; }
+.ov:not(.in) { pointer-events: none; }
+.ov-in { width: min(440px, 100%); text-align: center; padding: 34px 28px 26px; border-radius: 32px; background: var(--glass);
+  box-shadow: inset 0 1px 0 var(--hi), inset 0 0 0 1px var(--edge), 0 30px 80px -20px var(--shade);
+  transform: scale(.92) translateY(10px); transition: transform .45s var(--ease); }
+.ov.in .ov-in { transform: none; }
+.ov-kicker { margin: 0 0 18px; font-size: clamp(36px, 7vw, 52px); font-weight: 700; letter-spacing: -.04em; line-height: 1;
+  color: #30d158; transform: rotate(-4deg); }
+.ov h2 { margin: 18px 0 6px; font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
+.ov-text { margin: 0 0 22px; color: var(--soft); font-size: 15px; }
+.ov-cta { display: grid; gap: 8px; }
+.ov-cta .btn { justify-content: center; }
+.ov-back { margin-top: 14px; font-size: 14px; color: var(--muted); }
+.ov-back:hover { color: var(--ink); }
+.pair { position: relative; display: flex; justify-content: center; }
+.pair img, .pair .you { position: relative; z-index: 1; width: 104px; height: 104px; border-radius: 50%; object-fit: cover; object-position: 50% 20%; box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px #30d158; }
+.pair .you { display: grid; place-items: center; font-size: 22px; font-weight: 600; color: #fff; background: var(--blue); }
+.pair img { margin-left: -18px; }
+/* Sie kommen von links, Thomas von rechts */
+.ov.in .pair .you { animation: pairL .7s var(--ease); } .ov.in .pair img { animation: pairR .7s var(--ease); }
+/* Feier: weiches grünes Leuchten, ein Ring und kurze Funken – einmal, dann Ruhe */
+.pair .glow { position: absolute; left: 50%; top: 50%; width: 260px; height: 160px; margin: -80px 0 0 -130px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(48,209,88,.5), transparent); opacity: 0; pointer-events: none; }
+.ov.in .pair .glow { animation: glowIn 1.6s .25s ease-out forwards; }
+@keyframes glowIn { 0% { opacity: 0; transform: scale(.6); } 40% { opacity: 1; transform: scale(1.1); } 100% { opacity: .8; transform: scale(1); } }
+.pair::after { content: ""; position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%;
+  border: 2px solid #30d158; opacity: 0; pointer-events: none; }
+.ov.in .pair::after { animation: ring 1.1s .45s ease-out; }
+@keyframes ring { from { opacity: .8; transform: scale(.9); } to { opacity: 0; transform: scale(2.4); } }
+.burst { position: absolute; left: 50%; top: 50%; z-index: 2; pointer-events: none; }
+.burst b { position: absolute; width: 10px; height: 4px; margin: -2px 0 0 -5px; border-radius: 2px; opacity: 0; }
+.burst b:nth-child(3n) { width: 6px; height: 6px; border-radius: 50%; }
+.ov.in .burst b { animation: spark 1.1s calc(.4s + var(--d)) cubic-bezier(.15,.7,.3,1) forwards; }
+@keyframes spark { 0% { opacity: 1; transform: translate(0, 0) rotate(var(--r)) scale(.4); }
+  70% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), calc(var(--y) + 24px)) rotate(calc(var(--r) + 180deg)) scale(1); } }
+.ov.in .ov-kicker { animation: kick .7s .1s cubic-bezier(.2,1.5,.35,1) both; }
+@keyframes kick { from { opacity: 0; transform: rotate(-4deg) scale(.6); } }
+@keyframes pairL { from { transform: translateX(-60px) rotate(-12deg); opacity: 0; } }
+@keyframes pairR { from { transform: translateX(60px) rotate(12deg); opacity: 0; } }
+.radar { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+.radar img { position: relative; z-index: 1; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: 50% 20%; filter: grayscale(.4); }
+.radar::before, .radar::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--blue); animation: ping 2.4s ease-out infinite; }
+.radar::after { animation-delay: 1.2s; }
+@keyframes ping { from { transform: scale(1); opacity: .6; } to { transform: scale(2.1); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { .radar::before, .radar::after, .ov.in .burst b, .ov.in .pair::after, .ov.in .ov-kicker { animation: none; } }
+
+/* Profilkarte im Stil einer Dating-App: Stapel, Wischen, drei Bilder mit Ken-Burns-Zoom */
+.tm { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+
+/* Stapel: --p (0…1) = wie weit die obere Karte schon weggezogen ist */
+.deck { --p: 0; position: relative; width: min(400px, calc(100vw - 40px)); aspect-ratio: 3 / 4.6; max-height: calc(100vh - 230px); margin-bottom: 44px; }
+.tcard { position: absolute; inset: 0; border-radius: 28px; overflow: hidden; }
+/* Leuchten in der Mitte hinter dem Stapel: ruhig blau, beim Ziehen grün oder rot (wie die Mocks auf der Projektseite) */
+.deck::before { content: ""; position: absolute; left: 50%; top: 50%; width: 175%; height: 118%; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(48, 209, 88, calc(var(--like, 0) * .5)), transparent),
+              radial-gradient(closest-side, rgba(255, 77, 94, calc(var(--nope, 0) * .5)), transparent),
+              radial-gradient(closest-side, rgba(41, 151, 255, .16), transparent); }
+/* Fremde Profile dahinter: unscharfe Fotos (schon unscharf gespeichert), Name und Text leicht verschwommen */
+.fake { position: absolute; inset: 0; pointer-events: none; color: #fff; transition: opacity .4s; }
+.fake img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); }
+.tcard .fake-info { filter: blur(2.5px); text-align: left; position: absolute; left: 24px; right: 24px; bottom: 24px; }
+.tcard .fake-info p { margin: 0; }
+.tcard .fake-name { font-size: clamp(24px, 6.5vw, 28px); font-weight: 700; letter-spacing: -.03em; }
+.tcard .fake-name span { font-weight: 400; opacity: .85; }
+.tcard .fake-job { margin-top: 4px; font-size: 15px; color: rgba(255,255,255,.9); }
+.tcard .fake-txt { margin-top: 8px; font-size: 14.5px; color: rgba(255,255,255,.75); }
+.ghost { background: linear-gradient(160deg, #3a4560, #232b3d); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 16px 40px -18px rgba(0,0,0,.7); transform-origin: 50% 100%;
+  transform: translateY(calc((1 - var(--p)) * 34px + var(--p) * 17px)) scale(calc(.9 + var(--p) * .05)); filter: brightness(calc(.75 + var(--p) * .15)); }
+.empty { z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 34px 30px; text-align: center;
+  background: linear-gradient(170deg, #2c3650, #171e2d); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 20px 50px -20px rgba(0,0,0,.7);
+  transform-origin: 50% 100%; transform: translateY(calc((1 - var(--p)) * 17px)) scale(calc(.95 + var(--p) * .05)); filter: brightness(calc(.85 + var(--p) * .15)); }
+.settle .ghost, .settle .empty { transition: transform .55s cubic-bezier(.2,1.2,.35,1), filter .5s; }
+.empty h2 { text-wrap: balance; margin: 18px 0 0; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.empty p { margin: 0 0 10px; color: rgba(255,255,255,.75); font-size: 15px; line-height: 1.45; }
+.empty .btn { gap: 8px; }
+.empty .radar { width: 110px; height: 110px; }
+.empty > :not(.fake) { position: relative; }
+.empty:not(.front) > :not(.fake) { opacity: 0; }
+.empty.front > :not(.fake) { opacity: 1; transition: opacity .4s .1s; }
+.empty.front > .fake { opacity: 0; }
+.empty.front { transform: none; filter: none; }
+
+/* Obere Karte */
+.face { z-index: 2; background: #111; color: #fff; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  box-shadow: 0 30px 70px -24px rgba(0,0,0,.75), inset 0 0 0 1px rgba(255,255,255,.08),
+    0 0 70px -4px rgba(48, 209, 88, calc(var(--like, 0) * .65)), 0 0 70px -4px rgba(255, 77, 94, calc(var(--nope, 0) * .65));
+  will-change: transform; }
+.face.drag { cursor: grabbing; }
+.pics img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s ease; pointer-events: none; }
+.pics img.on { opacity: 1; }
+/* Ken-Burns-Effekt: langsamer Zoom während der Standzeit, abwechselnd hinein und heraus */
+.pics img.on:nth-child(odd) { animation: kbIn var(--slide, 6.5s) linear both; }
+.pics img.on:nth-child(even) { animation: kbOut var(--slide, 6.5s) linear both; }
+@keyframes kbIn { from { transform: scale(1.02); } to { transform: scale(1.1); } }
+@keyframes kbOut { from { transform: scale(1.1); } to { transform: scale(1.02); } }
+.paused .pics img.on { animation-play-state: paused; }
+.shade { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.6) 34%, rgba(0,0,0,0) 60%), linear-gradient(to bottom, rgba(0,0,0,.35), transparent 18%); }
+
+/* Fortschrittsbalken der drei Bilder (füllen sich wie bei Stories) */
+.bars { position: absolute; z-index: 3; top: 10px; left: 12px; right: 12px; display: flex; gap: 5px; }
+.bars i { position: relative; flex: 1; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(255,255,255,.32); }
+.bars i::after { content: ""; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; }
+.bars i.done::after { transform: none; }
+.bars i.on::after { animation: fill var(--slide, 6.5s) linear forwards; }
+.paused .bars i.on::after { animation-play-state: paused; }
+.manual .bars i.on::after { animation: none; transform: none; }
+@keyframes fill { to { transform: scaleX(1); } }
+
+.cv { position: absolute; z-index: 4; top: 24px; right: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; color: #fff; background: rgba(0,0,0,.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: background .2s; }
+.cv:hover { background: rgba(0,0,0,.62); }
+
+/* Inhalt je Bild: weicher Wechsel */
+.info { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; padding: 0 24px 24px; pointer-events: none; }
+.pane { position: absolute; left: 24px; right: 24px; bottom: 24px; opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .55s var(--ease); }
+.pane.on { position: relative; left: auto; right: auto; bottom: auto; opacity: 1; transform: none; }
+.pane h1 { margin: 0; font-size: clamp(26px, 7vw, 30px); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+.pane h1 svg { display: inline-block; vertical-align: -2px; margin-left: 2px; }
+.lead { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; font-size: 16px; font-weight: 400; color: rgba(255,255,255,.92); }
+.lead svg { flex: none; }
+.txt { margin: 10px 0 0; font-size: 15px; line-height: 1.45; color: rgba(255,255,255,.85); }
+.kick { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.7); }
+.tl { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+/* Je Station: Firma und Zeitraum klein oben, Rolle darunter in einer Zeile */
+.tl li { display: grid; gap: 1px; }
+.tl small { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.6); }
+.tl small b { font-weight: 600; color: rgba(255,255,255,.85); }
+.tl span { font-size: clamp(12.5px, 3.6vw, 15px); font-weight: 500; line-height: 1.3; white-space: nowrap; }
+.nums { display: flex; gap: 16px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; color: rgba(255,255,255,.75); }
+.nums b { font-size: 17px; color: #fff; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px; font-size: 13.5px; font-weight: 500;
+  background: rgba(255,255,255,.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* Tipp-Flächen zum Blättern */
+.tap { position: absolute; z-index: 1; top: 0; bottom: 0; width: 45%; }
+.tap.prev { left: 0; } .tap.next { right: 0; width: 55%; }
+.edge-l { animation: edgeL .35s ease; } .edge-r { animation: edgeR .35s ease; }
+@keyframes edgeL { 50% { transform: perspective(900px) rotateY(-4deg); } }
+@keyframes edgeR { 50% { transform: perspective(900px) rotateY(4deg); } }
+
+/* X und Daumen beim Ziehen */
+.badge { position: absolute; z-index: 5; top: 64px; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(0,0,0,.25); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); pointer-events: none; }
+.badge svg { width: 44px; height: 44px; }
+.badge.like { left: 22px; color: #30d158; box-shadow: inset 0 0 0 4px #30d158; opacity: var(--like, 0); transform: rotate(-14deg) scale(calc(.6 + var(--like, 0) * .4)); }
+.badge.nope { right: 22px; color: #ff4d5e; box-shadow: inset 0 0 0 4px #ff4d5e; opacity: var(--nope, 0); transform: rotate(14deg) scale(calc(.6 + var(--nope, 0) * .4)); }
+.face::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 3px rgba(48, 209, 88, calc(var(--like, 0) * .8)), inset 0 0 0 3px rgba(255, 77, 94, calc(var(--nope, 0) * .8)); }
+
+/* Knöpfe unter der Karte: leuchten beim Ziehen in Richtung mit */
+.acts { display: flex; align-items: center; justify-content: center; gap: 28px; }
+.act { --hot: 0; width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center; background: var(--glass);
+  box-shadow: inset 0 0 0 1px var(--edge), 0 12px 30px -12px var(--shade); transition: transform .25s cubic-bezier(.2,1.6,.4,1), background .2s, color .2s;
+  transform: scale(calc(1 + var(--hot) * .14)); }
+.act.no { color: #ff4d5e; background: color-mix(in srgb, #ff4d5e calc(var(--hot) * 30%), var(--glass)); }
+.act.yes { color: #30d158; background: color-mix(in srgb, #30d158 calc(var(--hot) * 30%), var(--glass)); }
+.act.no:hover, .act.yes:hover { transform: scale(1.08); }
+.act.pop { animation: pop .4s cubic-bezier(.2,1.6,.4,1); }
+@keyframes pop { 40% { transform: scale(1.25); } }
+.act svg { pointer-events: none; }
+.hint { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); }
+
+
+/* Schmale Handys: etwas weniger Rand, damit die GEFA-Zeile in eine Zeile passt */
+@media (max-width: 380px) { .info { padding: 0 20px 22px; } .pane { left: 20px; right: 20px; bottom: 22px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pics img.on, .bars i.on::after { animation: none; }
+  .bars i.on::after { transform: none; }
+}
+
+/* „Weitersuchen“ auf der leeren Karte: dezent unter „Thomas zurückholen“ */
+.empty .more { margin-top: -2px; padding: 4px 8px; font-size: 13px; color: rgba(255,255,255,.55); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.25); cursor: pointer; }
+.empty .more:hover { color: #fff; }
+
+/* Grundgerüst des Dialogs */
+.dlg-wrap { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.35); opacity: 0; transition: opacity .15s; }
+.dlg-wrap.in { opacity: 1; }
+.dlg { grid-area: 1 / 1; position: relative; width: min(390px, 100%); }
+.dlg-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dlg-x { display: grid; place-items: center; cursor: pointer; }
+.dlg-body { display: flex; align-items: flex-start; gap: 14px; }
+.dlg-body p { margin: 4px 0 0; }
+.dlg-q { flex: none; }
+.dlg-btns { display: flex; justify-content: flex-end; gap: 10px; }
+.dlg-yes, .dlg-no { cursor: pointer; white-space: nowrap; }
+.dlg-yes.free { position: absolute; z-index: 2; transition: left .2s cubic-bezier(.2,1.4,.4,1), top .2s cubic-bezier(.2,1.4,.4,1); }
+.dlg-yes.fall { animation: dlgFall .9s cubic-bezier(.5,0,.9,.6) forwards; pointer-events: none; }
+@keyframes dlgFall { 20% { transform: rotate(-8deg); } 100% { transform: translateY(420px) rotate(38deg); opacity: 0; } }
+/* Die Nein-Taste füllt sich von links und klickt am Ende von selbst */
+.dlg-no { position: relative; overflow: hidden; isolation: isolate; }
+.dlg-no .fill { position: absolute; inset: 0; z-index: -1; transform: scaleX(0); transform-origin: left; animation: dlgFill linear forwards; }
+@keyframes dlgFill { to { transform: scaleX(1); } }
+.dlg-no.ok .fill { display: none; }
+
+/* Windows 95 */
+.dlg { padding: 3px; background: #c0c0c0; color: #000; font: 13px/1.4 Tahoma, "MS Sans Serif", "Segoe UI", sans-serif;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf, 6px 8px 0 rgba(0,0,0,.35); }
+.dlg-bar { height: 22px; padding: 0 3px 0 6px; color: #fff; font-weight: 700; background: linear-gradient(90deg, #000080, #1084d0); }
+.dlg-x { width: 18px; height: 16px; color: #000; background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+.dlg-body { padding: 18px 16px 14px; }
+.dlg-btns { padding: 4px 12px 12px; }
+.dlg-yes, .dlg-no { min-width: 80px; height: 28px; padding: 0 12px; color: #000; font: inherit; background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+.dlg-no:focus-visible, .dlg-no:focus { outline: 1px dotted #000; outline-offset: -5px; }
+/* Fortschritt in Blöcken wie bei der alten Installationsanzeige */
+.dlg-no .fill { inset: 4px; background: repeating-linear-gradient(90deg, #000080 0 9px, transparent 9px 11px); opacity: .28; animation-timing-function: steps(18); }
+
+/* Sanduhr-Meldung von „Ja“ */
+.dlg-btns { flex-wrap: wrap; }
+.dlg-status { order: -1; flex-basis: 100%; display: flex; align-items: center; gap: 6px; margin: 0 0 2px; font-size: 12px; }
+.dlg-status:empty { display: none; }
+.hourglass { animation: hourglass 1.2s steps(4) infinite; }
+@keyframes hourglass { to { transform: rotate(180deg); } }
+.dlg-yes.busy { color: #808080; text-shadow: 1px 1px #fff; cursor: wait; }
+
+@media (prefers-reduced-motion: reduce) { .dlg-yes.free { transition: none; } .hourglass { animation: none; } }

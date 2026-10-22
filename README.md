@@ -10,3 +10,4 @@ Portfolio von Thomas Wordenbeck: Produkte für den eigenen Alltag und für Mensc
 - Verlauf der Gestaltung: `HISTORIE.md` (alter Stand in Git: Markierung `v1`, Entwürfe im Zweig `historie`)
 
 Rezeptfoto im Mahlzeit-Screen (`img/v2/mahlzeit-rezept-foto.jpg`): Sara Dubler, Unsplash-Lizenz.
+Unscharfe Profilfotos auf „Über mich“ (`img/ueber-mich/fake-1.jpg`, `fake-2.jpg`): Unsplash (photo-1494790108377-be9c29b29330, photo-1507003211169-0a1dd7228f2d), Unsplash-Lizenz.

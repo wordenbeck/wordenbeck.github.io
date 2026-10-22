@@ -3,7 +3,8 @@
   index.html               Startseite (Glas-Hero mit iPhone-Karussell, Querkacheln)
   <id>/index.html          Projektseite je Projekt (Demo im iPhone bzw. Browserfenster)
   warum/index.html         Warum diese Seite (roter Faden)
-  ueber-mich/index.html    Profil
+  ueber-mich/index.html    Über mich als Match-Karte (eigene Skripte in assets/ueber-mich/)
+  lebenslauf/index.html    Ausführliches Profil (Zahlen, Stationen, Stärken)
 
 Aufruf:  python3 _build/make-pages.py   (aus dem Portfolio-Ordner)
 Inhalte stehen in content.js, Aufbau und Aussehen in assets/ – hier nur das Gerüst.
@@ -20,8 +21,13 @@ CSS = ["core.css", "glas-base.css", "glas-pages.css"]
 
 
 def page(kind, root, project=None):
-    css = CSS + (["home.css"] if kind == "home" else [])
+    match = kind == "match"
+    # Match-Karte ohne glas-pages.css (Klassen wie .nums würden sich sonst überschneiden)
+    css = ["core.css", "glas-base.css", "ueber-mich/ueber-mich.css"] if match else CSS + (["home.css"] if kind == "home" else [])
     links = "\n".join(f'<link rel="stylesheet" href="{root}assets/{c}?v={V}">' for c in css)
+    js = ["ueber-mich/profil.js", "ueber-mich/match.js", "ueber-mich/weiter.js"] if match else ["app.js"]
+    scripts = "\n".join(f'<script src="{root}assets/{j}?v={V}"></script>' for j in js)
+    kind = "about" if match else kind
     demo = (f'<script src="{root}demo-player.js?v={V}"></script>\n<script src="{root}demo-scripts.js?v={V}"></script>\n'
             if kind == "project" else "")
     pid = f' data-project="{project}"' if project else ""
@@ -45,7 +51,7 @@ def page(kind, root, project=None):
 <script src="{root}content.js?v={V}"></script>
 {demo}<script src="{root}assets/core.js?v={V}"></script>
 <script src="{root}assets/glas-ui.js?v={V}"></script>
-<script src="{root}assets/app.js?v={V}"></script>
+{scripts}
 </body>
 </html>
 """
@@ -61,5 +67,6 @@ write("index.html", page("home", ""))
 for pid in IDS:
     write(f"{pid}/index.html", page("project", "../", pid))
 write("warum/index.html", page("story", "../"))
-write("ueber-mich/index.html", page("about", "../"))
-print("Seiten geschrieben:", 3 + len(IDS))
+write("ueber-mich/index.html", page("match", "../"))
+write("lebenslauf/index.html", page("about", "../"))
+print("Seiten geschrieben:", 4 + len(IDS))
