@@ -48,17 +48,18 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
   }
 
-  // Fußleiste: Wer hat's ausgedacht (Name führt zur Profilkarte), womit gebaut, dann LinkedIn und Rechtliches
+  // Fußleiste: Thomas Wordenbeck × Claude Code = Herz (Name führt zur Profilkarte), dann LinkedIn und Rechtliches.
+  // Alles grau, Links werden beim Überfahren weiß; über der Zeile füllt sich das Herz rot und schlägt einmal.
   const FOOT_ICON = {
-    idea: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
-    code: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+    pen: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H8"/><path d="m15.007 5.008 3.987 3.986"/><path d="M20 15v4"/><path d="M21.174 6.813a2.82 2.82 0 0 0-3.986-3.987L3.842 16.175a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M22 17h-4"/><path d="M4 5v4"/><path d="M6 7H2"/><path d="M9 2v2"/></svg>',
+    chip: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>',
+    heart: '<svg class="heart" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
   };
   const footer = () => {
     const en = lang === 'en';
     return `
     <footer class="foot">
-      <span class="foot-by">${FOOT_ICON.idea}<span>${en ? 'Ideated by' : 'Ausgedacht von'} <a href="${PAGES.about}">Thomas Wordenbeck</a></span></span>
-      <span class="foot-by">${FOOT_ICON.code}<span>${en ? 'Built with Claude Code' : 'Gebaut mit Claude Code'}</span></span>
+      <span class="duo"><a class="duo-me" href="${PAGES.about}">${FOOT_ICON.pen}<span>Thomas Wordenbeck</span></a><span class="duo-op" aria-hidden="true">×</span><span class="duo-cc">${FOOT_ICON.chip}<span>Claude Code</span></span><span class="duo-op" aria-hidden="true">=</span>${FOOT_ICON.heart}</span>
       <span class="foot-legal"><a data-linkedin target="_blank" rel="noopener">LinkedIn</a><a href="${ROOT}impressum/">${en ? 'Legal notice' : 'Impressum'}</a><a href="${ROOT}datenschutz/">${en ? 'Privacy' : 'Datenschutz'}</a></span>
     </footer>`;
   };
