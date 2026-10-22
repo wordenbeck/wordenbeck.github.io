@@ -25,10 +25,11 @@ def page(kind, root, project=None):
     chat = kind == "chat"
     # Match-Karte ohne glas-pages.css (Klassen wie .nums würden sich sonst überschneiden)
     css = (["core.css", "glas-base.css", "ueber-mich/ueber-mich.css"] if match else
-           ["core.css", "glas-base.css", "warum/chat.css"] if chat else CSS + (["home.css"] if kind == "home" else []))
+           ["core.css", "glas-base.css", "warum/chat.css"] if chat else
+           CSS + (["home.css"] if kind == "home" else []) + (["frag-mich.css"] if kind in ("home", "project") else []))
     links = "\n".join(f'<link rel="stylesheet" href="{root}assets/{c}?v={V}">' for c in css)
     js = (["ueber-mich/profil.js", "ueber-mich/match.js", "ueber-mich/weiter.js"] if match else
-          ["warum/chat.js"] if chat else ["app.js"])
+          ["warum/chat.js"] if chat else ["app.js"] + (["frag-mich.js"] if kind in ("home", "project") else []))
     scripts = "\n".join(f'<script src="{root}assets/{j}?v={V}"></script>' for j in js)
     kind = "about" if match else "story" if chat else kind
     demo = (f'<script src="{root}demo-player.js?v={V}"></script>\n<script src="{root}demo-scripts.js?v={V}"></script>\n'

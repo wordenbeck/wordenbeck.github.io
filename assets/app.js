@@ -3,7 +3,7 @@
 // steigen wie Stockwerke senkrecht auf. Bei Apps heben sich zusätzlich zwei Bauteile des obersten Screens ab,
 // Websites fächern nur ihre Seiten auf. Projektseite, Warum und Über mich kommen aus glas-ui.js.
 (() => {
-  const { esc, projects, url, icon, status, images, layers, iphone, browser, tintPhones, ICON, ROOT, calm, fine } = V2;
+  const { esc, projects, url, icon, status, images, layers, iphone, browser, tintPhones, ICON, ROOT, calm, fine, lang } = V2;
   const { mount, project, story, about, PAGES } = GlasUI;
 
   // Bauteile, die aus dem obersten App-Screen herausgehoben werden (Pixel im Originalbild, W = Bildbreite)
@@ -58,7 +58,10 @@
       <main>
         <section class="hero">
           <div class="hero-text">
-            <img class="mark" src="${ROOT}icons/logo-e.svg" alt="" width="56" height="56">
+            <a class="me" href="${PAGES.about}" aria-label="${lang === 'en' ? 'About me' : 'Über mich'}">
+              <img class="ava" src="${ROOT}img/ueber-mich/headshot.jpg" alt="" width="88" height="88">
+              <img class="pen" src="${ROOT}favicon.svg" alt="" width="30" height="30">
+            </a>
             <h1><span data-k="name"></span><em data-k="role"></em></h1>
             <p class="intro" data-k="intro"></p>
             <div class="actions">

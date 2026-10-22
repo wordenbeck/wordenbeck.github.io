@@ -8,6 +8,12 @@
 .hero-text > :nth-child(2) { transition-delay: .08s } .hero-text > :nth-child(3) { transition-delay: .16s } .hero-text > :nth-child(4) { transition-delay: .24s }
 .loaded .hero-text > * { opacity: 1; transform: none; }
 .mark { margin-bottom: 28px; }
+/* Profilbild über dem Namen (statt Stift-Logo): feiner Ring mit Abstand, Stift als kleines Abzeichen */
+.hero .me { position: relative; display: inline-block; margin-bottom: 30px; }
+.hero .me .ava { display: block; width: 88px; height: 88px; border-radius: 50%; object-fit: cover; object-position: 50% 25%;
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 4.5px color-mix(in srgb, var(--ink) 35%, transparent); transition: transform .3s var(--ease); }
+.hero .me:hover .ava { transform: scale(1.04); }
+.hero .me .pen { position: absolute; right: -6px; bottom: -4px; width: 30px; height: 30px; border-radius: 9px; box-shadow: 0 0 0 3px var(--bg); }
 .hero h1 { margin: 0; font-weight: 600; letter-spacing: -.045em; line-height: 1.02; }
 .hero h1 span { display: block; font-size: clamp(22px, 2vw, 28px); letter-spacing: -.02em; color: var(--muted); font-weight: 500; margin-bottom: 14px; }
 .hero h1 em { display: block; font-style: normal; font-size: clamp(38px, 4.3vw, 64px); letter-spacing: -.035em; }
