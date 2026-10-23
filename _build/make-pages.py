@@ -11,10 +11,20 @@ Aufruf:  python3 _build/make-pages.py   (aus dem Portfolio-Ordner)
 Inhalte stehen in content.js, Aufbau und Aussehen in assets/ – hier nur das Gerüst.
 """
 from pathlib import Path
+import base64
+import hashlib
 import time
 
 # Versionsnummer an CSS/JS, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher zeigen
 V = time.strftime("%Y%m%d%H%M%S")
+
+# Sicherheitsregel für den Browser (Content Security Policy): Skripte, Bilder, Schriften und Demos nur von der
+# eigenen Seite. Das kleine Skript im Kopf (Hell/Dunkel) ist über seinen Fingerabdruck (Hash) freigegeben.
+THEME_JS = "try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}"
+CSP = ("default-src 'self'; script-src 'self' 'sha256-" +
+       base64.b64encode(hashlib.sha256(THEME_JS.encode()).digest()).decode() +
+       "'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; frame-src 'self'; "
+       "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'")
 
 # Vorschau beim Teilen (LinkedIn & Co.): Diese Dienste führen kein JavaScript aus, darum stehen Text und Bild fest im HTML
 SITE = "https://wordenbeck.github.io/"
@@ -55,7 +65,8 @@ def page(kind, root, project=None, legal=None):
 <meta property="og:image" content="{SITE}img/ueber-mich/headshot.jpg">
 <meta property="og:locale" content="de_DE">
 <meta name="twitter:card" content="summary">
-<script>try{{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}}catch(e){{}}</script>
+<meta http-equiv="Content-Security-Policy" content="{CSP}">
+<script>{THEME_JS}</script>
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{root}assets/fonts/fonts.css?v={V}">
