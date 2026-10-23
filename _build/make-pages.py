@@ -16,6 +16,10 @@ import time
 # Versionsnummer an CSS/JS, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher zeigen
 V = time.strftime("%Y%m%d%H%M%S")
 
+# Vorschau beim Teilen (LinkedIn & Co.): Diese Dienste führen kein JavaScript aus, darum stehen Text und Bild fest im HTML
+SITE = "https://wordenbeck.github.io/"
+DESCRIPTION = "Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck."
+
 PORTFOLIO = Path(__file__).resolve().parent.parent
 IDS = ["kalo", "mahlzeit", "human", "vuca", "punkte", "zirkus"]
 CSS = ["core.css", "glas-base.css", "glas-pages.css"]
@@ -43,7 +47,14 @@ def page(kind, root, project=None, legal=None):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thomas Wordenbeck</title>
-<meta name="description" content="Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck.">
+<meta name="description" content="{DESCRIPTION}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Thomas Wordenbeck">
+<meta property="og:title" content="Thomas Wordenbeck">
+<meta property="og:description" content="{DESCRIPTION}">
+<meta property="og:image" content="{SITE}img/ueber-mich/headshot.jpg">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary">
 <script>try{{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}}catch(e){{}}</script>
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">

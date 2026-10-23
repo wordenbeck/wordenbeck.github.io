@@ -88,6 +88,8 @@
     const p = current();
     const others = projects.filter(o => o.id !== p.id);
     const tabs = t('labels.tabs');
+    // Beschriftung für Screenreader am Abspielknopf (wechselt mit dem Symbol)
+    const PP = lang === 'en' ? { pause: 'Pause demo', play: 'Play demo' } : { pause: 'Demo anhalten', play: 'Demo abspielen' };
     document.title = `${p.title} – Thomas Wordenbeck`;
     document.body.style.setProperty('--accent', p.accent);
     // Status und Technik in einer Reihe, nur über Farbe getrennt: Status gefüllt (Live grün, Pausiert grau), Technik ruhig mit Rahmen
@@ -105,7 +107,7 @@
           <div class="p-dev"><div class="slot" id="slot"></div></div>
           <div class="ctrl glass">
             <div class="chips" id="chapters">${p.chapters.map((c, k) => `<button data-i="${k}"><b>${k + 1}</b><span>${esc(c)}</span><i></i></button>`).join('')}</div>
-            <button class="pp" id="pp" aria-label="Pause">${ICON.pause}</button>
+            <button class="pp" id="pp" aria-label="${PP.pause}">${ICON.pause}</button>
           </div>
           <p class="caption" id="caption" aria-live="polite"></p>
         </section>
@@ -148,7 +150,7 @@
         cap.textContent = p.captions[k]; cap.classList.add('pop');
         btns.forEach((b, j) => { b.classList.remove('on'); if (j === k) { b.style.setProperty('--dur', dur + 'ms'); void b.offsetWidth; b.classList.add('on'); } });
       },
-      onPause: v => { pp.innerHTML = v ? ICON.play : ICON.pause; document.querySelector('.p-stage').classList.toggle('paused', v); },
+      onPause: v => { pp.innerHTML = v ? ICON.play : ICON.pause; pp.setAttribute('aria-label', v ? PP.play : PP.pause); document.querySelector('.p-stage').classList.toggle('paused', v); },
     });
     btns.forEach((b, k) => b.addEventListener('click', () => s.go(k)));
     pp.addEventListener('click', () => s.toggle());
@@ -192,7 +194,8 @@
   // ---------- Über mich ----------
   function about() {
     const a = C.about[lang], tt = C[lang];
-    document.title = `${tt.nav.about} – Thomas Wordenbeck`;
+    // Eigener Titel, damit sich Lebenslauf und Profilkarte („Über mich“) im Browser-Tab unterscheiden
+    document.title = `${lang === 'en' ? 'CV' : 'Lebenslauf'} – Thomas Wordenbeck`;
     const pills = list => `<ul class="pills">${list.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
     mount(`
       <main class="page about">

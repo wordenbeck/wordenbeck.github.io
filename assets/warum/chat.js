@@ -164,7 +164,7 @@
           <p class="day">${esc(T.today)}</p>
           ${groups}
         </div>
-        <div class="composer" id="composer" aria-hidden="true">
+        <div class="composer" id="composer" aria-hidden="true" inert>
           <div class="field"><span class="draft">${esc(DRAFT)}</span><span class="caret"></span></div>
           <div class="cta">
             <a class="btn primary" href="${C.linkedin}" target="_blank" rel="noopener">${SEND}<span>${esc(T.linkedin)}</span></a>
@@ -190,7 +190,7 @@
   // Alles sofort zeigen (ohne Bewegung gewünscht)
   if (calm) {
     document.querySelectorAll('.slot').forEach(s => show(s));
-    composer.classList.add('shown'); composer.removeAttribute('aria-hidden');
+    composer.classList.add('shown'); composer.removeAttribute('aria-hidden'); composer.removeAttribute('inert');
     return;
   }
 
@@ -235,7 +235,7 @@
       if (+g.dataset.g === CHAT.length - 1) {
         await wait(400);
         composer.classList.add('shown');
-        composer.removeAttribute('aria-hidden');
+        composer.removeAttribute('aria-hidden'); composer.removeAttribute('inert');
       } else if (!hurry) {
         await wait(READ);
       }

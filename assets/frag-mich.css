@@ -11,8 +11,10 @@
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px color-mix(in srgb, var(--ink) 35%, transparent); transition: transform .6s var(--glide); }
 .frag:hover .frag-ava { transform: scale(1.04); }
 
-/* Außen: gleitende Breite (per Skript gesetzt), innen: die Glas-Blase mit fester Höhe */
-.frag-msg { display: block; width: 0; margin-left: 0; overflow: hidden; opacity: 0;
+/* Außen: gleitende Breite (per Skript gesetzt), innen: die Glas-Blase mit fester Höhe.
+   position: relative, damit auch der unsichtbare (absolut gesetzte) Text mit abgeschnitten wird –
+   sonst ragt er rechts aus dem Bildschirm und die Seite lässt sich auf dem Handy seitlich verschieben */
+.frag-msg { position: relative; display: block; width: 0; margin-left: 0; overflow: hidden; opacity: 0;
   transition: width .9s var(--glide), margin-left .9s var(--glide), opacity .7s var(--glide); }
 .frag.open .frag-msg { margin-left: 10px; opacity: 1; }
 .frag-bub { display: grid; align-content: center; gap: 1px; width: max-content; height: 50px; padding: 0 15px; border-radius: 18px 18px 18px 6px;
