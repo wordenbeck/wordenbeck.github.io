@@ -354,4 +354,65 @@ window.DEMO_SCRIPTS = {
       { dur: 7500, run: async p => { await p.call("showPage('spenden')"); await p.wait(1500); await p.scroll(850, 2600); await p.wait(600); await p.scroll(1500, 2200); } },
     ],
   },
+
+  // ------------------------------------------------------------------ rolle. (echte App im Demo-Modus mit Beispieldaten)
+  // Die App hat eine strenge Sicherheitsregel ohne eval – deshalb nur Klicks, kein p.call.
+  // Die Sprünge Fahren/Fertig usw. liegen auf der unsichtbaren Demo-Leiste der App (data-go).
+  rolle: (() => {
+    const go = (p, k) => p.d.querySelector(`[data-go="${k}"]`).click();
+    const home = async p => {
+      await p.find('.day.pick', null, 8000);
+      if (!p.d.getElementById('s-home')?.classList.contains('on') || !p.d.getElementById('bigView')?.classList.contains('hidden')) {
+        p.d.getElementById('bigClose')?.click(); go(p, 'home'); await p.wait(500);
+      }
+    };
+    return {
+      chapters: [
+        { // Startseite: heute dran, Woche, Geräte/FTP/Coach – ein anderer Tag zeigt seine Vorschau
+          dur: 9500,
+          run: async p => {
+            await home(p);
+            await p.wait(1600);
+            await p.tap('.day.pick:not(.now):not(.isdone)');
+            await p.wait(2200);
+            await p.tap('#phasesBtn [data-v="ablauf"]');
+            await p.wait(2200);
+            await p.tap('.day.pick.now');
+            await p.tap('#phasesBtn [data-v="profil"]');
+          },
+        },
+        { // Profil der Einheit groß, mit Watt- und Zeitachse
+          dur: 7000,
+          run: async p => {
+            await home(p);
+            await p.wait(600);
+            await p.tap('#maxBtn');
+          },
+        },
+        { // Fahren: Coach-Leiste, Zeit, Watt, Trittfrequenz, Profil (Zeitraffer)
+          dur: 12000,
+          run: async p => {
+            await home(p);
+            go(p, 'ride');
+          },
+        },
+        { // Selbst schalten: Richtwert statt fester Watt
+          dur: 8000,
+          run: async p => {
+            await home(p);
+            go(p, 'frei');
+          },
+        },
+        { // Fertig: Rückblick mit Kurve, Abschnitten und Gefühl
+          dur: 8000,
+          run: async p => {
+            await home(p);
+            go(p, 'done');
+            await p.wait(2500);
+            await p.tap('[data-feel="passend"], .feel button', 'passend').catch(() => {});
+          },
+        },
+      ],
+    };
+  })(),
 };

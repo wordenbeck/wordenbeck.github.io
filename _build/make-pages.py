@@ -31,7 +31,7 @@ SITE = "https://wordenbeck.github.io/"
 DESCRIPTION = "Produkte für den eigenen Alltag und für Menschen in meinem Umfeld – gebaut von Thomas Wordenbeck."
 
 PORTFOLIO = Path(__file__).resolve().parent.parent
-IDS = ["kalo", "mahlzeit", "human", "vuca", "punkte", "zirkus"]
+IDS = ["rolle", "kalo", "mahlzeit", "human", "vuca", "punkte", "zirkus"]
 CSS = ["core.css", "glas-base.css", "glas-pages.css"]
 
 

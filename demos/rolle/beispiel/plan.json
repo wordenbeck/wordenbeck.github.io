@@ -1,0 +1,279 @@
+{
+ "name": "Beispielwoche",
+ "einheiten": [
+  {
+   "id": "demo-grundlage",
+   "datum": "HEUTE-4",
+   "typ": "workout",
+   "titel": "Grundlage 60 mit Würze",
+   "haerte": 1,
+   "zweck": "Ruhige Grundlage, aufgelockert durch kurze Druck- und Trittfrequenz-Wechsel.",
+   "abschnitte": [
+    {
+     "name": "Einrollen",
+     "beschreibung": "locker reinkommen",
+     "min": 8,
+     "von": 50,
+     "bis": 62
+    },
+    {
+     "wiederhole": 4,
+     "abschnitte": [
+      {
+       "name": "Grundlage {n} von 4",
+       "beschreibung": "gleichmäßig",
+       "min": 8,
+       "prozent": 68,
+       "kadenz": [
+        88,
+        95
+       ],
+       "tipp": [
+        "Ruhig rollen",
+        "So, dass du dich noch unterhalten könntest."
+       ]
+      },
+      {
+       "name": "Würze {n} von 4",
+       "beschreibung": "kurz mehr Druck",
+       "min": 2,
+       "prozent": 85,
+       "kadenz": [
+        80,
+        85
+       ],
+       "tipp": [
+        "Etwas mehr Druck",
+        "Langsamer treten, kräftiger drücken."
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Ausrollen",
+     "beschreibung": "locker",
+     "min": 12,
+     "von": 62,
+     "bis": 50
+    }
+   ]
+  },
+  {
+   "id": "demo-vo2",
+   "datum": "HEUTE-2",
+   "typ": "workout",
+   "titel": "VO2max 30/30",
+   "haerte": 3,
+   "zweck": "Kurze, harte Wechsel für mehr Spitzenleistung.",
+   "abschnitte": [
+    {
+     "name": "Aufwärmen",
+     "beschreibung": "langsam steigern",
+     "min": 12,
+     "von": 50,
+     "bis": 75
+    },
+    {
+     "wiederhole": 10,
+     "abschnitte": [
+      {
+       "name": "Hart {n} von 10",
+       "beschreibung": "30 Sekunden voll",
+       "sek": 30,
+       "prozent": 120,
+       "kadenz": [
+        95,
+        105
+       ],
+       "tipp": [
+        "Jetzt hart",
+        "Schnell treten, Oberkörper ruhig."
+       ]
+      },
+      {
+       "name": "Locker",
+       "beschreibung": "erholen",
+       "sek": 30,
+       "prozent": 55
+      }
+     ]
+    },
+    {
+     "name": "Locker",
+     "beschreibung": "erholen",
+     "min": 6,
+     "prozent": 55
+    },
+    {
+     "name": "Ausrollen",
+     "beschreibung": "locker",
+     "min": 12,
+     "von": 60,
+     "bis": 50
+    }
+   ]
+  },
+  {
+   "id": "demo-sweetspot",
+   "datum": "HEUTE",
+   "typ": "workout",
+   "titel": "Sweet Spot 3 × 10",
+   "haerte": 2,
+   "zweck": "Drei Blöcke knapp unter deiner Grenze. Anstrengend, aber machbar.",
+   "abschnitte": [
+    {
+     "name": "Aufwärmen",
+     "beschreibung": "langsam steigern",
+     "min": 10,
+     "von": 50,
+     "bis": 75
+    },
+    {
+     "wiederhole": 3,
+     "abschnitte": [
+      {
+       "name": "Block {n} von 3",
+       "beschreibung": "anstrengend, aber machbar",
+       "min": 10,
+       "prozent": 90,
+       "kadenz": [
+        88,
+        95
+       ],
+       "tipp": [
+        "Gleichmäßig drücken",
+        "Nicht zu schnell anfangen, die letzten Minuten zählen."
+       ]
+      },
+      {
+       "name": "Locker",
+       "beschreibung": "erholen",
+       "min": 4,
+       "prozent": 55
+      }
+     ]
+    },
+    {
+     "name": "Selbst schalten",
+     "beschreibung": "Gefühl für die Gänge",
+     "min": 5,
+     "prozent": 75,
+     "frei": true,
+     "tipp": [
+      "Jetzt du",
+      "Schalte so, dass es sich zügig, aber locker anfühlt."
+     ]
+    },
+    {
+     "name": "Ausfahren",
+     "beschreibung": "langsam runter",
+     "min": 8,
+     "von": 60,
+     "bis": 50
+    }
+   ]
+  },
+  {
+   "id": "demo-kadenz",
+   "datum": "HEUTE+2",
+   "typ": "workout",
+   "titel": "Trittfrequenz und Tempo",
+   "haerte": 1,
+   "zweck": "Runder treten: Wechsel zwischen schnellen und kräftigen Umdrehungen.",
+   "abschnitte": [
+    {
+     "name": "Einrollen",
+     "beschreibung": "locker",
+     "min": 10,
+     "von": 50,
+     "bis": 65
+    },
+    {
+     "wiederhole": 5,
+     "abschnitte": [
+      {
+       "name": "Schnell {n} von 5",
+       "beschreibung": "hohe Trittfrequenz",
+       "min": 3,
+       "prozent": 70,
+       "kadenz": [
+        100,
+        110
+       ]
+      },
+      {
+       "name": "Tempo {n} von 5",
+       "beschreibung": "zügig",
+       "min": 4,
+       "prozent": 82,
+       "kadenz": [
+        85,
+        92
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Ausrollen",
+     "beschreibung": "locker",
+     "min": 10,
+     "von": 60,
+     "bis": 50
+    }
+   ]
+  },
+  {
+   "id": "demo-lang",
+   "datum": "HEUTE+4",
+   "typ": "workout",
+   "titel": "Lange Runde mit Sweet Spot",
+   "haerte": 2,
+   "zweck": "Die lange Einheit der Woche, mit zwei Sweet-Spot-Blöcken in der Mitte.",
+   "abschnitte": [
+    {
+     "name": "Einrollen",
+     "beschreibung": "locker",
+     "min": 15,
+     "von": 50,
+     "bis": 65
+    },
+    {
+     "name": "Grundlage",
+     "beschreibung": "gleichmäßig",
+     "min": 25,
+     "prozent": 68
+    },
+    {
+     "wiederhole": 2,
+     "abschnitte": [
+      {
+       "name": "Sweet Spot {n} von 2",
+       "beschreibung": "knapp unter der Grenze",
+       "min": 12,
+       "prozent": 90
+      },
+      {
+       "name": "Locker",
+       "beschreibung": "erholen",
+       "min": 6,
+       "prozent": 58
+      }
+     ]
+    },
+    {
+     "name": "Grundlage",
+     "beschreibung": "gleichmäßig",
+     "min": 15,
+     "prozent": 68
+    },
+    {
+     "name": "Ausrollen",
+     "beschreibung": "locker",
+     "min": 9,
+     "von": 60,
+     "bis": 50
+    }
+   ]
+  }
+ ]
+}

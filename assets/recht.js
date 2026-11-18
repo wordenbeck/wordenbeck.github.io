@@ -18,7 +18,7 @@
           ['Kontakt', `<p>E-Mail: ${mail}</p>`],
           ['Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV', `<p>Thomas Wordenbeck, Anschrift wie oben.</p>`],
           ['Links auf andere Websites', `<p>Diese Seite verlinkt auf externe Angebote, zum Beispiel LinkedIn und die Websites meiner Projekte. Für deren Inhalte sind ausschließlich die jeweiligen Betreiber verantwortlich.</p>`],
-          ['Bildnachweis und Schriften', `<p>Unscharfe Beispielprofile auf „Über mich“ und das Rezeptfoto im Mahlzeit-Screen (Sara Dubler): ${link('https://unsplash.com/license', 'Unsplash-Lizenz')}. Alle übrigen Fotos: Thomas Wordenbeck. Schriften Inter und Space Grotesk unter der SIL Open Font License 1.1.</p>`],
+          ['Bildnachweis und Schriften', `<p>Unscharfe Beispielprofile auf „Über mich“ und das Rezeptfoto im Mahlzeit-Screen (Sara Dubler): ${link('https://unsplash.com/license', 'Unsplash-Lizenz')}. Alle übrigen Fotos: Thomas Wordenbeck. Schriften Inter, Space Grotesk und Bricolage Grotesque unter der SIL Open Font License 1.1.</p>`],
         ],
       },
       en: {
@@ -28,7 +28,7 @@
           ['Contact', `<p>Email: ${mail}</p>`],
           ['Responsible for content under § 18 (2) MStV', `<p>Thomas Wordenbeck, address as above.</p>`],
           ['Links to other websites', `<p>This site links to external services, for example LinkedIn and the websites of my projects. Their operators are solely responsible for their content.</p>`],
-          ['Image credits and fonts', `<p>Blurred example profiles on “About me” and the recipe photo in the Mahlzeit screen (Sara Dubler): ${link('https://unsplash.com/license', 'Unsplash License')}. All other photos: Thomas Wordenbeck. Fonts Inter and Space Grotesk under the SIL Open Font License 1.1.</p>`],
+          ['Image credits and fonts', `<p>Blurred example profiles on “About me” and the recipe photo in the Mahlzeit screen (Sara Dubler): ${link('https://unsplash.com/license', 'Unsplash License')}. All other photos: Thomas Wordenbeck. Fonts Inter, Space Grotesk and Bricolage Grotesque under the SIL Open Font License 1.1.</p>`],
         ],
       },
     },

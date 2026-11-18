@@ -173,6 +173,46 @@ window.CONTENT = {
   // preview.pan    = langer Screenshot, der langsam durchs Bild gleitet
   projects: [
     {
+      id: "rolle",
+      icon: '<path d="M20.341 6.484A10 10 0 0 1 10.266 21.85"/><path d="M3.659 17.516A10 10 0 0 1 13.74 2.152"/><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/>',
+      title: "rolle.",
+      status: "live",
+      tint: "#16233d", accent: "#2997ff",
+      preview: { device: "desktop", stills: ["img/rolle-1.jpg", "img/live/rolle-profil.jpg", "img/live/rolle-fahren.jpg", "img/live/rolle-fertig.jpg"] },
+      stack: ["HTML", "CSS", "JavaScript", "Web Bluetooth", "Python", "Claude Code"],
+      demo: { src: "demos/rolle/app/index.html?demo&fast", device: "desktop", width: 1440, height: 900 },
+      de: {
+        tagline: "Indoor-Training ohne Spiel, mit Claude als Coach",
+        chapters: ["Woche im Blick", "Profil der Einheit", "Fahren mit Coach", "Selbst schalten", "Rückblick"],
+        captions: [
+          "Die Startseite zeigt, was heute dran ist, die ganze Woche und den Stand von Trainer, FTP und Coach.",
+          "Jede Einheit lässt sich groß ansehen, mit Watt, Zeit und allen Abschnitten.",
+          "Beim Fahren regelt die App den Widerstand. Die Coach-Leiste kündigt jeden Wechsel vorher an.",
+          "In freien Abschnitten schaltet man selbst, die App gibt nur einen Richtwert vor.",
+          "Nach der Fahrt: Kurve, alle Abschnitte und die Frage, wie es sich angefühlt hat.",
+        ],
+        highlights: [["Heute dran statt Bibliothek", "Kein Suchen in Hunderten Workouts. Die App zeigt die eine Einheit, die heute im Plan steht."], ["Claude als Coach", "Claude Code schreibt den Wochenplan, liest die gefahrenen Einheiten und plant die nächste Woche. Auf Wunsch direkt aus der App heraus."], ["Schalten am Lenker", "Die Tasten des Zwift Ride schalten virtuelle Gänge, die App passt dazu den Widerstand des Trainers an."], ["Ampel statt Zahlenwust", "Watt und Trittfrequenz leuchten grün, gelb oder rot, je nachdem, wie nah man am Ziel ist."], ["Gemacht fürs Nebenbei", "Alles auf einem Bildschirm ohne Scrollen, die Leiste blendet sich beim Fahren aus. Die Serie läuft parallel auf dem iPad."]],
+        tech: [["Aufbau", "Web-App ohne Framework und ohne Build-Schritt, sie läuft in Chrome am Mac. Ein kleiner Python-Server startet unsichtbar per Klick auf das Dock-Symbol und beendet sich von selbst, wenn die App zu ist."], ["Bluetooth im Browser", "Über Web Bluetooth spricht die App direkt mit dem Smart-Trainer (Wahoo KICKR, Standard FTMS) und mit dem Zwift Ride. Dessen Protokoll stammt aus dem Open-Source-Projekt BikeControl."], ["Daten als Dateien", "Plan, FTP und Fahrten liegen als JSON-Dateien in einem Ordner auf dem Mac. Jede Fahrt speichert Watt und Trittfrequenz für jede Sekunde. Es gibt kein Konto und keine Cloud."], ["Coach per Claude Code", "„Plan ändern“ startet Claude Code im Hintergrund. Es darf nur die Trainingsdaten lesen und den Plan schreiben, sonst nichts. Die Trainingsregeln stehen in einer eigenen Anleitung für Claude."], ["Virtuelle Gänge", "Geschaltet wird über eine simulierte Steigung. Ein Gang entspricht etwa 9 % mehr oder weniger Widerstand, der Trainer reagiert in 0,2 bis 0,3 Sekunden."]],
+        text:
+          "Ich fahre viel draußen, im Winter aber auf der Rolle. Zwift ist mir dafür zu sehr Spiel: Strecken, Avatare, Belohnungen. Ich wollte einfach trainieren, während auf dem iPad eine Serie läuft. Also habe ich mir meinen eigenen Trainings-Player gebaut. rolle. verbindet sich per Bluetooth mit meinem Smart-Trainer und dem Zwift Ride am Lenker, spielt die Einheit des Tages ab und regelt den Widerstand. Den Plan schreibt Claude Code. Es kennt meine Fahrten der letzten Monate und meine FTP, schaut sich an, wie die Woche lief, und plant die nächste. So habe ich einen Coach, der sich an mich anpasst.",
+      },
+      en: {
+        tagline: "Indoor training without the game, coached by Claude",
+        chapters: ["The week at a glance", "Workout profile", "Riding with the coach", "Shifting yourself", "Review"],
+        captions: [
+          "The start screen shows today's workout, the whole week and the state of trainer, FTP and coach.",
+          "Every workout opens in a large view, with watts, time and all of its sections.",
+          "While riding, the app controls the resistance. The coach bar announces every change in advance.",
+          "In free sections you shift yourself, the app only suggests a target.",
+          "After the ride: the curve, every section and a question about how it felt.",
+        ],
+        highlights: [["Today's workout instead of a library", "No digging through hundreds of workouts. The app shows the one session that is on the plan today."], ["Claude as coach", "Claude Code writes the weekly plan, reads the rides and plans the next week. Right from the app if you like."], ["Shifting on the handlebar", "The buttons of the Zwift Ride shift virtual gears, and the app adjusts the trainer's resistance to match."], ["Traffic lights instead of numbers", "Watts and cadence turn green, yellow or red, depending on how close you are to the target."], ["Made for the background", "Everything on one screen without scrolling, the top bar hides while riding. The series plays on the iPad next to it."]],
+        tech: [["Setup", "A web app without a framework or build step, running in Chrome on the Mac. A small Python server starts invisibly from the Dock icon and shuts itself down once the app is closed."], ["Bluetooth in the browser", "With Web Bluetooth the app talks directly to the smart trainer (Wahoo KICKR, FTMS standard) and the Zwift Ride, whose protocol comes from the open-source project BikeControl."], ["Data as files", "Plan, FTP and rides are JSON files in a folder on the Mac. Every ride stores watts and cadence for every second. No account, no cloud."], ["Coaching via Claude Code", "“Change plan” starts Claude Code in the background. It may only read the training data and write the plan, nothing else. The training rules live in a dedicated guide for Claude."], ["Virtual gears", "Shifting works through a simulated gradient. One gear means about 9 % more or less resistance, and the trainer responds within 0.2 to 0.3 seconds."]],
+        text:
+          "I ride outdoors a lot, but in winter I'm on the trainer. Zwift feels too much like a game for that: routes, avatars, rewards. I just wanted to train while a series plays on the iPad. So I built my own training player. rolle. connects via Bluetooth to my smart trainer and the Zwift Ride on the handlebar, plays the workout of the day and controls the resistance. Claude Code writes the plan. It knows my rides of the past months and my FTP, looks at how the week went and plans the next one. That gives me a coach that adapts to me.",
+      },
+    },
+    {
       id: "kalo",
       icon: '<path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/>',
       title: "Kalo",
