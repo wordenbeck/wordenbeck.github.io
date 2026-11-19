@@ -469,7 +469,7 @@ function maybeAutoWeek() {
 
 // ---------- Geräte ----------
 async function connectTrainer() {
-  const t = DEMO ? new FakeTrainer({ failAt: 260, speedup: FAST ? 20 : 1 }) : new FtmsTrainer();
+  const t = DEMO ? new FakeTrainer({ failAt: 260, speedup: FAST ? 4 : 1 }) : new FtmsTrainer();
   t.addEventListener('status', e => {
     dev.trainerStatus = e.detail; renderDevices(); updateStartHint(); renderConn();
     if (e.detail === 'wieder verbunden') { player?.resend(); toast('KICKR wieder verbunden'); }
@@ -519,8 +519,20 @@ let unlocked = false;
 // Schalten nur über die seitlichen Knöpfe (Wunsch 17.11.): beide rechts = hoch/mehr, beide links = runter/weniger.
 // Die langen Hebel vorne bleiben aus, damit man sich nicht verschaltet.
 const UP = ['shiftUpR', 'shiftDownR'], DOWN = ['shiftUpL', 'shiftDownL'];
+// Fokus-Modus (19.11.): Pfeil rechts am Ride (navRight) oder → schaltet um. Geht immer, auch gesperrt. Bleibt gemerkt.
+let focusOn = false, focusAt = 0;
+
+function toggleFocus() {
+  if (performance.now() - focusAt < 300) return;   // Demo: Tastatur meldet sich doppelt (Ride-Ersatz + immer aktive Tastatur)
+  focusAt = performance.now();
+  focusOn = !focusOn;
+  try { localStorage.setItem('rolle-fokus', focusOn ? '1' : '0'); } catch { /* egal */ }
+  renderRide();
+}
+
 function onButton(k) {
   if (!player || player.done) return;
+  if (k === 'navRight') return toggleFocus();
   if (waiting) { if (k === 'a') beginRide(); return; }
   if (k === 'a') return player.inRampSteps ? player.stopRamp('manuell') : player.togglePause();
   // Z: Zustand steht oben im Kopf. Nur beim Entsperren vibriert der Ride (2×), Sperren ist der Normalzustand (Wunsch 18.11.)
@@ -547,7 +559,7 @@ async function startRide(workout, einheit = null) {
   }
   const ftp = state.profile.ftp;
   ride = null; review = null; unlocked = false;
-  player = new Player(workout, { trainer: dev.trainer, ftp, tickMs: FAST ? 50 : 1000 });
+  player = new Player(workout, { trainer: dev.trainer, ftp, tickMs: FAST ? 250 : 1000 });
   player.addEventListener('tick', renderRide);
   player.addEventListener('done', e => onDone(e.detail));
   player.einheit = einheit;
@@ -714,11 +726,35 @@ function renderRide() {
         : `<span><kbd>Schalter rechts</kbd>+${ERG_STEP} W</span><span><kbd>Schalter links</kbd>−${ERG_STEP} W</span><span><kbd>Y</kbd>überspringen</span>`);
   // Sperr-Zustand oben im Kopf: gesperrt · gesperrt, aber Schalter aktiv · frei (blendet mit dem Kopf aus)
   $('lockSt').className = 'lockst' + (unlocked ? ' free' : s.frei ? ' shift' : '') + (ramp ? ' hidden' : '');
+  renderFocus({ s, nx, left, ending, pst, dev_, cad });
   $('lockSt').innerHTML = unlocked ? `${icon('unlock')}Tasten frei` : s.frei ? `${icon('lock')}Gesperrt · Schalter aktiv` : `${icon('lock')}Tasten gesperrt`;
 
   const tl = timeline(p, p.rampEnd?.stufe ?? (s.stufe ?? 0) + 3);
   drawProfile($('rideProfile'), tl.view, { cursor: tl.cursor, line: tl.line });
   renderConn();
+}
+
+// Fokus-Modus: ein Wort (Halten / Mehr / Weniger / Gleich rauf …), Farbschein nach Ampel, Zeit grob in Minuten.
+// Trittfrequenz nur als zweites, kleines Wort, wenn sie nicht passt.
+function renderFocus({ s, nx, left, ending, pst, dev_, cad }) {
+  const p = player, fx = $('focusView');
+  fx.classList.toggle('hidden', !focusOn || waiting);
+  if (!focusOn || waiting) return;
+  const now = s.frei ? s.von : p.target();
+  const up = nx && nx.von > now + 5, down = nx && nx.von < now - 5;
+  const cadOff = s.kadenz && p.segT >= 6 && !ending && !p.paused ? (cad < s.kadenz[0] ? -1 : cad > s.kadenz[1] ? 1 : 0) : 0;
+  let word, fc = '--green', ft = '12%';
+  if (p.paused) { word = 'Pause'; fc = '--gray'; ft = '8%'; }
+  else if (ending) { word = up ? 'Gleich rauf' : down ? 'Gleich runter' : 'Gleich weiter'; fc = '--soft'; ft = '8%'; }
+  else if (s.frei) { word = 'Schalten'; fc = '--blue'; }
+  else if (pst === 's-none' || pst === 's-ok') { word = 'Halten'; if (cadOff) { fc = '--yellow'; ft = '15%'; } }
+  else { word = dev_ < 0 ? 'Mehr' : 'Weniger'; fc = pst === 's-warn' ? '--yellow' : '--red'; ft = pst === 's-warn' ? '18%' : '24%'; }
+  const ok = st => st === 'verbunden' || st === 'wieder verbunden';
+  $('fxWord').textContent = word;
+  $('fxWord2').textContent = !ok(dev.trainerStatus) ? 'KICKR getrennt' : cadOff < 0 ? 'schneller treten' : cadOff > 0 ? 'ruhiger treten' : '';
+  $('fxTime').textContent = ending ? `${left} s` : `noch ${Math.ceil(left / 60)} min`;
+  fx.style.setProperty('--fc', css(fc));
+  fx.style.setProperty('--ft', ft);
 }
 
 // ---------- Speichern ----------
@@ -906,6 +942,8 @@ async function demoRide(w, e, { go = true, frei = false, pause = false } = {}) {
 }
 $('demoBar').onclick = async ev => {
   const go = ev.target.closest('button')?.dataset.go; if (!go) return;
+  focusOn = go === 'fokus'; $('focusView').classList.add('hidden');   // Portfolio-Demo: eigener Sprung in den Fokus-Modus
+  if (go === 'fokus' && homeWorkout) return demoRide(homeWorkout, homeEinheit);
   ev.target.blur();
   const w = homeWorkout, e = homeEinheit;
   if (go === 'home') { demoStop(); renderHome(); show('home'); }

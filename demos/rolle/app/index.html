@@ -140,6 +140,7 @@
   <button data-go="ready">Bereit?</button>
   <button data-go="ride">Fahren</button>
   <button data-go="frei">Selbst schalten</button>
+  <button data-go="fokus">Fokus</button>
   <button data-go="pause">Pause</button>
   <button data-go="done">Fertig</button>
   <span class="sep"></span>
@@ -252,7 +253,8 @@
           <div class="kgroup">Linke Seite</div>
           <div class="ktable">
             <div><kbd>Schalter links</kbd><span>2 Knöpfe seitlich</span><b>Runter. Beim Selbst schalten immer, sonst −10 W (nur entsperrt).</b></div>
-            <div><kbd>Steuerkreuz</kbd><span>4 Pfeile</span><b class="off">ohne Funktion</b></div>
+            <div><kbd>Pfeil rechts</kbd><span>Steuerkreuz</span><b>Fokus-Modus an und aus. Geht immer, auch gesperrt.</b></div>
+            <div><kbd>übrige Pfeile</kbd><span>Steuerkreuz</span><b class="off">ohne Funktion</b></div>
             <div><kbd>PowerUp</kbd><span>orange Taste</span><b class="off">ohne Funktion</b></div>
             <div><kbd>Hebel</kbd><span>lang, vorne</span><b class="off">ohne Funktion</b></div>
             <div><kbd>Zwift-Knopf</kbd><span>innen</span><b class="never">An/Aus, nicht im Training drücken</b></div>
@@ -273,7 +275,7 @@
         </div>
       </div>
       <p>Vibration: einmal kurz 15 s vor dem nächsten Abschnitt, zweimal beim Entsperren. Sonst nie.</p>
-      <p>Tastatur: Leertaste = A, Z = Z, ↑ = Schalter rechts, ↓ = Schalter links, S = Y.</p>
+      <p>Tastatur: Leertaste = A, Z = Z, ↑ = Schalter rechts, ↓ = Schalter links, S = Y, → = Fokus.</p>
       <div class="row"><span class="spacer"></span><button class="btn primary small" id="keysClose">Schließen</button></div>
     </div>
   </div>
@@ -285,6 +287,13 @@
       <p class="hint" style="margin:0">Setz dich in Ruhe aufs Rad. Die Zeit startet, wenn du ein paar Sekunden gleichmäßig trittst oder Taste A drückst.</p>
       <div class="row-btns"><button class="btn glass" id="readyCancel">Zurück</button><button class="btn primary" id="goBtn">Los</button></div>
     </div>
+  </div>
+
+  <!-- Fokus-Modus (19.11.): nur ein Wort, Farbschein, grobe Zeit. Pfeil rechts am Ride oder → auf der Tastatur schaltet um. -->
+  <div class="fx hidden" id="focusView">
+    <div class="fx-w" id="fxWord"></div>
+    <div class="fx-w2" id="fxWord2"></div>
+    <div class="fx-time" id="fxTime"></div>
   </div>
 
   <div class="pausebox hidden" id="pauseBox">

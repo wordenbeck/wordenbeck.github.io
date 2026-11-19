@@ -654,5 +654,17 @@ body.idle #s-ride .keys { opacity: 0; }
 .kmodal .ktable b.never { color: var(--orange); font-weight: 500; }
 @media (max-width: 760px) { .kcols { grid-template-columns: 1fr; } }
 
+/* ---------- Fokus-Modus (19.11.): ein Wort, Farbschein, grobe Zeit. Über dem Fahren-Screen, unter Pause/Bereit. ---------- */
+.fx { position: fixed; inset: 0; z-index: 25; display: grid; place-items: center; align-content: center; text-align: center; background: var(--bg); }
+.fx.hidden { display: none; }
+.fx::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: background 2s;
+  background: radial-gradient(75vw 75vh at 50% 48%, color-mix(in srgb, var(--fc, var(--green)) var(--ft, 12%), transparent), transparent 72%); }
+.fx-w { position: relative; font-size: min(14vw, 19vh); font-weight: 600; letter-spacing: -.06em; line-height: 1;
+  color: color-mix(in srgb, var(--soft) 82%, var(--fc, var(--green))); transition: color 1.5s; }
+.fx-w2 { position: relative; font-size: min(5vw, 7vh); font-weight: 600; letter-spacing: -.04em; line-height: 1; margin-top: 2.2vh;
+  color: color-mix(in srgb, var(--soft) 82%, var(--yellow)); }
+.fx-w2:empty { display: none; }
+.fx-time { position: relative; margin-top: 3vh; font-size: 17px; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+
 /* Portfolio-Demo: Knöpfe für den lokalen Betrieb und die Demo-Leiste ausblenden (das Drehbuch klickt sie unsichtbar) */
 #demoBtn, #quitBtn, #demoTag, #demoBar { display: none !important; }

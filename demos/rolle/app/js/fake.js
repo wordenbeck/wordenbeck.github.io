@@ -44,7 +44,7 @@ export class KeyboardController extends EventTarget {
   async connect() {
     this.onKey = e => {
       if (e.target.closest?.('input, select, textarea, button')) return;
-      const map = { ArrowUp: 'shiftUpR', ArrowDown: 'shiftDownL', ' ': 'a', s: 'y', z: 'z', Z: 'z' };
+      const map = { ArrowUp: 'shiftUpR', ArrowDown: 'shiftDownL', ArrowRight: 'navRight', ' ': 'a', s: 'y', z: 'z', Z: 'z' };
       if (map[e.key]) { e.preventDefault(); this.emit('press', map[e.key]); }
     };
     window.addEventListener('keydown', this.onKey);

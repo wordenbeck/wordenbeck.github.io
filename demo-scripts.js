@@ -403,6 +403,13 @@ window.DEMO_SCRIPTS = {
             go(p, 'frei');
           },
         },
+        { // Fokus-Modus: ein Wort, Farbschein, grobe Zeit
+          dur: 9000,
+          run: async p => {
+            await home(p);
+            go(p, 'fokus');
+          },
+        },
         { // Fertig: Rückblick mit Kurve, Abschnitten und Gefühl
           dur: 8000,
           run: async p => {
