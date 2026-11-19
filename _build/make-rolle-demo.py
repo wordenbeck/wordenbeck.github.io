@@ -61,15 +61,18 @@ export class DemoStore {"""),
 ])
 patch(app / "js" / "main.js", [
     ("ping(); setInterval(ping, 60_000);", "if (!DEMO) { ping(); setInterval(ping, 60_000); }   // Portfolio-Demo: kein lokaler Server"),
-    # Zeitraffer ruhiger: 4× statt 20×, damit die Zahlen lesbar bleiben
-    ("speedup: FAST ? 20 : 1", "speedup: FAST ? 4 : 1"),
-    ("tickMs: FAST ? 50 : 1000", "tickMs: FAST ? 250 : 1000"),
     # Fokus-Modus nur im eigenen Kapitel, nie aus dem Browser-Speicher übernommen
     ("try { focusOn = localStorage.getItem('rolle-fokus') === '1'; } catch { /* egal */ }", ""),
     ("const go = ev.target.closest('button')?.dataset.go; if (!go) return;",
      """const go = ev.target.closest('button')?.dataset.go; if (!go) return;
   focusOn = go === 'fokus'; $('focusView').classList.add('hidden');   // Portfolio-Demo: eigener Sprung in den Fokus-Modus
   if (go === 'fokus' && homeWorkout) return demoRide(homeWorkout, homeEinheit);"""),
+])
+# Demo-Fahrer tritt ruhig und gleichmäßig: kaum Schwankung bei Trittfrequenz und Watt (Portfolio läuft in Echtzeit)
+patch(app / "js" / "fake.js", [
+    ("(Math.random() - .5) * 4", "(Math.random() - .5) * 1"),
+    ("this.power += (want - this.power) * 0.6;", "this.power += (want - this.power) * 0.35;"),
+    ("(Math.random() - .5) * 6", "(Math.random() - .5) * 1.5"),
 ])
 patch(app / "index.html", [
     ('<button data-go="frei">Selbst schalten</button>', '<button data-go="frei">Selbst schalten</button>\n  <button data-go="fokus">Fokus</button>'),

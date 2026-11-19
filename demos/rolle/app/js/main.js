@@ -469,7 +469,7 @@ function maybeAutoWeek() {
 
 // ---------- Geräte ----------
 async function connectTrainer() {
-  const t = DEMO ? new FakeTrainer({ failAt: 260, speedup: FAST ? 4 : 1 }) : new FtmsTrainer();
+  const t = DEMO ? new FakeTrainer({ failAt: 260, speedup: FAST ? 20 : 1 }) : new FtmsTrainer();
   t.addEventListener('status', e => {
     dev.trainerStatus = e.detail; renderDevices(); updateStartHint(); renderConn();
     if (e.detail === 'wieder verbunden') { player?.resend(); toast('KICKR wieder verbunden'); }
@@ -559,7 +559,7 @@ async function startRide(workout, einheit = null) {
   }
   const ftp = state.profile.ftp;
   ride = null; review = null; unlocked = false;
-  player = new Player(workout, { trainer: dev.trainer, ftp, tickMs: FAST ? 250 : 1000 });
+  player = new Player(workout, { trainer: dev.trainer, ftp, tickMs: FAST ? 50 : 1000 });
   player.addEventListener('tick', renderRide);
   player.addEventListener('done', e => onDone(e.detail));
   player.einheit = einheit;

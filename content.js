@@ -180,7 +180,7 @@ window.CONTENT = {
       tint: "#16233d", accent: "#2997ff",
       preview: { device: "desktop", stills: ["img/rolle-1.jpg", "img/live/rolle-profil.jpg", "img/live/rolle-fahren.jpg", "img/live/rolle-fertig.jpg"] },
       stack: ["HTML", "CSS", "JavaScript", "Web Bluetooth", "Python", "Claude Code"],
-      demo: { src: "demos/rolle/app/index.html?demo&fast", device: "desktop", width: 1440, height: 900 },
+      demo: { src: "demos/rolle/app/index.html?demo", device: "desktop", width: 1440, height: 900 },
       de: {
         tagline: "Indoor-Training ohne Schnickschnack, mit Claude als Coach",
         chapters: ["Woche im Blick", "Profil der Einheit", "Fahren mit Coach", "Selbst schalten", "Fokus-Modus", "Rückblick"],

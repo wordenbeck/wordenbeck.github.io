@@ -25,12 +25,12 @@ export class FakeTrainer extends EventTarget {
     const hard = this.mode === 'erg' && this.target >= this.failAt;
     this.overload = hard ? this.overload + 1 : Math.max(0, this.overload - 2);
     const baseCad = 90 - Math.max(0, this.overload - 15) * 6;
-    this.cadence = Math.max(0, baseCad + (Math.random() - .5) * 4);
+    this.cadence = Math.max(0, baseCad + (Math.random() - .5) * 1);
     let want = 0;
     if (this.mode === 'erg') want = this.cadence > 30 ? this.target : this.target * this.cadence / 60;
     if (this.mode === 'sim') want = 75 * 9.81 * Math.max(0.005, this.grade / 100 + 0.005) * speedFrom(this.cadence, 34 / 14);
-    this.power += (want - this.power) * 0.6;
-    this.emit('data', { power: Math.max(0, Math.round(this.power + (Math.random() - .5) * 6)), cadence: Math.round(this.cadence), speed: speedFrom(this.cadence, 34 / 14) * 3.6 });
+    this.power += (want - this.power) * 0.35;
+    this.emit('data', { power: Math.max(0, Math.round(this.power + (Math.random() - .5) * 1.5)), cadence: Math.round(this.cadence), speed: speedFrom(this.cadence, 34 / 14) * 3.6 });
   }
 
   async setTargetPower(w) { this.mode = 'erg'; this.target = w; }
